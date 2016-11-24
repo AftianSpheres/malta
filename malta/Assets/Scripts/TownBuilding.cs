@@ -20,8 +20,9 @@ public class TownBuilding : MonoBehaviour
     private bool buildingAlteredSinceLastUpdate = false;
 
 	// Use this for initialization
-	void Start () {
-	
+	void Start ()
+    {
+        RefreshMessage();
 	}
 	
 	// Update is called once per frame
@@ -61,7 +62,7 @@ public class TownBuilding : MonoBehaviour
         switch (buildingType)
         {
             case BuildingType.House:
-                buildingMessage.text = "YO DO ME MOTHERFUCKER";
+                buildingMessage.text = associatedAdventurer.fullTitle;
                 break;
         }
     }
