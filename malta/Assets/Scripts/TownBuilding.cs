@@ -14,7 +14,6 @@ public class TownBuilding : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public Sprite outbuiltSprite;
     public TextMesh buildingMessage;
-    public int level;
     public bool hasOutbuilding;
     public bool forgeOutbuildingIsKobold;
     private bool buildingAlteredSinceLastUpdate = false;
@@ -22,13 +21,16 @@ public class TownBuilding : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        RefreshMessage();
+        RefreshBuildingAssociations();
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if (buildingAlteredSinceLastUpdate) RefreshMessage(); // doing it like this also lets you mark buildings as "dirty" based on timed events
+        if (buildingAlteredSinceLastUpdate)
+        {
+            RefreshBuildingAssociations(); // doing it like this also lets you mark buildings as "dirty" based on timed events
+        }
 	}
 
     public void BuildOutbuilding (bool koboldIfForge = false)
@@ -45,19 +47,7 @@ public class TownBuilding : MonoBehaviour
 
     }
 
-    public void LevelAdjust (int levels)
-    {
-        if (level + levels <= buildingTypeMaxLevels[(int)buildingType] && level + levels > 0) level += levels;
-        else if (level < buildingTypeMaxLevels[(int)buildingType] && levels > 0) level = buildingTypeMaxLevels[(int)buildingType];
-        else if (level > 1) level = 1;
-        else
-        {
-            throw new System.Exception("Tried to level building to invalid level: " + gameObject.name);
-        }
-        buildingAlteredSinceLastUpdate = true;
-    }
-
-    void RefreshMessage ()
+    void RefreshBuildingAssociations ()
     {
         switch (buildingType)
         {

@@ -10,5 +10,9 @@ public enum BuildingType
     Smith,
     Sawmill,
     Palace,
-    Mason
+    Mason,
+    Mine,
+    Woodlands,
+    ClayPit,
+    Tower
 }
