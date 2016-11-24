@@ -7,8 +7,9 @@ public class LevelLoadManager : Manager<LevelLoadManager>
     public static int[] sceneIDs =
     {
         1, // title
-        2, // map
-        3, // fight
+        2, // town
+        3, // overworld
+        4, // fight
     };
 
     public void EnterLevel (int level, int[] roomCoords, int EntryPointIndex, Direction playerInitialFacingDir)
