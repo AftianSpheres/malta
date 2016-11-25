@@ -16,6 +16,7 @@ public class GameStateManager : Manager<GameStateManager>
     void Start ()
     {
         sessionFingerprint = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+        controllingPopupsStack = new Stack<PopupMenu>();
 	}
 	
     /// <summary>
@@ -25,10 +26,8 @@ public class GameStateManager : Manager<GameStateManager>
     {
         if (popupHasFocus && !controllingPopupsStack.Peek().isActive)
         {
-            if (controllingPopupsStack.Count > 1)
-            {
-                controllingPopupsStack.Pop().Close();
-            }
+            controllingPopupsStack.Pop();
+            if (controllingPopupsStack.Count == 0) popupHasFocus = false;
         }
     }
 

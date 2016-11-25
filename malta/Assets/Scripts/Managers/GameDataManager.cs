@@ -9,6 +9,8 @@ using System.Collections;
 public class GameDataManager : Manager<GameDataManager>
 {
     public Adventurer sovereignAdventurer;
+    public Adventurer forgeAdventurer;
+    public Adventurer[] houseAdventurers = new Adventurer[2];
     public AdventurerAttack sovereignTactic;
     public AdventurerSpecial sovereignSkill;
     public bool pendingUpgrade_ClayPit = false;
@@ -58,6 +60,8 @@ public class GameDataManager : Manager<GameDataManager>
     private int pendingUpgradeTimer_Sawmill = 0;
     private int pendingUpgradeTimer_Smith = 0;
     private int pendingUpgradeTimer_Woodlands = 0;
+    public bool[] housesBuilt = { true, false };
+    public bool[] housesOutbuildingsBuilt = { false, false };
 
     void Start ()
     {

@@ -5,6 +5,7 @@ using System.Collections;
 public class HousePopup : MonoBehaviour
 {
     public TownBuilding associatedHouse;
+    public Button outbuildingButton;
     public Text nameLabel;
     public Text titleLabel;
     public Text attacksLabel;
@@ -28,6 +29,7 @@ public class HousePopup : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
+        if (associatedHouse.hasOutbuilding && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
         if (associatedHouse.associatedAdventurer.fullName != nameLabel.text) nameLabel.text = associatedHouse.associatedAdventurer.fullName;
         if (associatedHouse.associatedAdventurer.title != titleLabel.text) titleLabel.text = associatedHouse.associatedAdventurer.title;
         if (adventurerHPCached != associatedHouse.associatedAdventurer.HP || adventurerMartialCached != associatedHouse.associatedAdventurer.Martial

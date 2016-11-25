@@ -24,6 +24,7 @@ public class PopupMenu : MonoBehaviour
     public void Open ()
     {
         contents.SetActive(true);
+        GameStateManager.Instance.GiveFocusToPopup(this);
     }
 
     public void Close ()

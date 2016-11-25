@@ -12,15 +12,15 @@ public class Adventurer : ScriptableObject
     public AdventurerClass advClass = AdventurerClass.Warrior;
     public AdventurerSpecial special;
     public AdventurerSpecies species = AdventurerSpecies.Human;
-    public int HP;
-    public int individualHP;
-    public int Martial;
-    public int individualMartial;
-    public int Magic;
-    public int individualMagic;
-    public int Speed;
-    public int individualSpeed;
-    public bool isElite;
+    public int HP { get; private set; }
+    public int individualHP { get; private set; }
+    public int Martial { get; private set; }
+    public int individualMartial { get; private set; }
+    public int Magic { get; private set; }
+    public int individualMagic { get; private set; }
+    public int Speed { get; private set; }
+    public int individualSpeed { get; private set; }
+    public bool isElite { get; private set; }
     public bool initialized { get; private set; }
     private static string[] attackNames;
     private static string[] specialNames;
@@ -46,7 +46,6 @@ public class Adventurer : ScriptableObject
 
     void RerollFullTitle ()
     {
-        fullName = firstName + " " + lastName;
         if (isElite) title = "Elite " + GetSpeciesTerm(species, true) + " " + GetClassTerm(advClass);
         else title = GetSpeciesTerm(species, true) + " " + GetClassTerm(advClass);
         fullTitle = fullName + ", " + title;
@@ -64,6 +63,13 @@ public class Adventurer : ScriptableObject
             firstName = "Amelia";
             lastName = "Earhart";
         }
+        fullName = firstName + " " + lastName;
+    }
+
+    public void Promote ()
+    {
+        isElite = true;
+        RerollFullTitle();
     }
 
     public void Reroll (AdventurerClass _advClass, AdventurerSpecies _species, bool _isElite, int[] individualStats)
