@@ -5,6 +5,8 @@ public class Adventurer : ScriptableObject
 {
     public string firstName;
     public string lastName;
+    public string fullName;
+    public string title;
     public string fullTitle;
     public AdventurerAttack[] attacks;
     public AdventurerClass advClass = AdventurerClass.Warrior;
@@ -19,6 +21,7 @@ public class Adventurer : ScriptableObject
     public int Speed;
     public int individualSpeed;
     public bool isElite;
+    public bool initialized { get; private set; }
 
     void CalcStats ()
     {
@@ -40,8 +43,10 @@ public class Adventurer : ScriptableObject
 
     void RerollFullTitle ()
     {
-        if (isElite) fullTitle = firstName + " " + lastName + ", " + "Elite " + GetSpeciesTerm(species, true) + " " + GetClassTerm(advClass);
-        else fullTitle = firstName + " " + lastName + ", " + GetSpeciesTerm(species, true) + " " + GetClassTerm(advClass);
+        fullName = firstName + " " + lastName;
+        if (isElite) title = "Elite " + GetSpeciesTerm(species, true) + " " + GetClassTerm(advClass);
+        else title = GetSpeciesTerm(species, true) + " " + GetClassTerm(advClass);
+        fullTitle = fullName + ", " + title;
     }
 
     void RerollName()
@@ -70,6 +75,7 @@ public class Adventurer : ScriptableObject
         RerollName();
         RerollFullTitle();
         RecalcStatsAndReloadMoves();
+        initialized = true;
     }
 
     public void RecalcStatsAndReloadMoves ()

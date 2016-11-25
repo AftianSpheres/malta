@@ -10,3 +10,8 @@
 6:02 PM - off
 6:10 PM - on
 6:47 PM - off
+
+-------------
+
+12:06 PM - start
+1:58 PM - off

@@ -10,7 +10,7 @@ public class TownBuilding : MonoBehaviour
     private static int[] buildingTypeMaxLevels = { -1, 1, 1, 10, 10, 10, 1, 10 };
     public BuildingType buildingType;
     public Adventurer associatedAdventurer;
-    public Rect rect;
+    new public BoxCollider2D collider;
     public SpriteRenderer spriteRenderer;
     public Sprite outbuiltSprite;
     public TextMesh buildingMessage;
@@ -31,7 +31,13 @@ public class TownBuilding : MonoBehaviour
         {
             RefreshBuildingAssociations(); // doing it like this also lets you mark buildings as "dirty" based on timed events
         }
+        if (associatedAdventurer != null && !associatedAdventurer.initialized) associatedAdventurer.Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, false, new int[]{ 0, 0, 0, 0});
 	}
+
+    public void InteractedWithIcon ()
+    {
+
+    }
 
     public void BuildOutbuilding (bool koboldIfForge = false)
     {

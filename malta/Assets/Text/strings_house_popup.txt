@@ -1,0 +1,4 @@
+Max HP: 
+ | MAR: 
+ | MAG: 
+ | SPD: 
