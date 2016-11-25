@@ -70,6 +70,7 @@ public class Adventurer : ScriptableObject
     {
         isElite = true;
         RerollFullTitle();
+		RerollStats();
     }
 
     public void Reroll (AdventurerClass _advClass, AdventurerSpecies _species, bool _isElite, int[] individualStats)

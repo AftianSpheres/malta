@@ -19,3 +19,4 @@
 4:28 PM - off
 4:49 PM - on
 5:19 PM - off
+5:45 PM - on/off
