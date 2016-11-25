@@ -70,7 +70,14 @@ public class Adventurer : ScriptableObject
     {
         isElite = true;
         RerollFullTitle();
-		RerollStats();
+        RecalcStatsAndReloadMoves();
+    }
+
+    public void Reclass (AdventurerClass _advClass)
+    {
+        advClass = _advClass;
+        RerollFullTitle();
+        RecalcStatsAndReloadMoves();
     }
 
     public void Reroll (AdventurerClass _advClass, AdventurerSpecies _species, bool _isElite, int[] individualStats)
