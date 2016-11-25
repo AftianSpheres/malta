@@ -15,6 +15,8 @@ public class HousePopup : MonoBehaviour
     private int adventurerMartialCached;
     private int adventurerMagicCached;
     private int adventurerSpeedCached;
+    private AdventurerAttack[] adventurerAttacksCached;
+    private AdventurerSpecial adventurerSpecialCached = AdventurerSpecial.UninitializedValue;
     private string[] strings;
 
 	// Use this for initialization
@@ -36,6 +38,31 @@ public class HousePopup : MonoBehaviour
             adventurerMagicCached = associatedHouse.associatedAdventurer.Magic;
             adventurerSpeedCached = associatedHouse.associatedAdventurer.Speed;
             statsLabel.text = strings[0] + adventurerHPCached.ToString() + strings[1] + adventurerMartialCached.ToString() + strings[2] + adventurerMagicCached.ToString() + strings[3] + adventurerSpeedCached.ToString(); 
+        }
+        bool attacksChanged = false;
+        if (adventurerAttacksCached == null || adventurerAttacksCached.Length != associatedHouse.associatedAdventurer.attacks.Length) attacksChanged = true;
+        else
+        {
+            for (int i = 0; i < adventurerAttacksCached.Length && i < associatedHouse.associatedAdventurer.attacks.Length; i++)
+            {
+                attacksChanged = true;
+                break;
+            }
+        }
+        if (attacksChanged)
+        {
+            string[] attacksStrings = { "", "", "" };
+            adventurerAttacksCached = associatedHouse.associatedAdventurer.attacks;
+            for (int i = 0; i < adventurerAttacksCached.Length && i < 3; i++)
+            {
+                attacksStrings[i] = Adventurer.GetAttackName(associatedHouse.associatedAdventurer.attacks[i]);
+            }
+            attacksLabel.text = attacksStrings[0] + '\n' + attacksStrings[1] + '\n' + attacksStrings[2];
+        }
+        if (adventurerSpecialCached != associatedHouse.associatedAdventurer.special)
+        {
+            adventurerSpecialCached = associatedHouse.associatedAdventurer.special;
+            specialLabel.text = Adventurer.GetSpecialDescription(adventurerSpecialCached);
         }
 	}
 }

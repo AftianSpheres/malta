@@ -22,6 +22,9 @@ public class Adventurer : ScriptableObject
     public int individualSpeed;
     public bool isElite;
     public bool initialized { get; private set; }
+    private static string[] attackNames;
+    private static string[] specialNames;
+    private const string specialDescsResourcePath = "special_descs/";
 
     void CalcStats ()
     {
@@ -83,6 +86,38 @@ public class Adventurer : ScriptableObject
         CalcStats();
         attacks = GetClassAttacks(advClass);
         special = GetClassSpecial(advClass);
+    }
+
+    public static string GetAttackName (AdventurerAttack attack)
+    {
+        string name = "Out of range attack name";
+        if (attackNames == null)
+        {
+            TextAsset a = Resources.Load<TextAsset>("attack_names");
+            attackNames = a.text.Split('\n');
+        }
+        if ((int)attack < attackNames.Length) name = attackNames[(int)attack];
+        return name;
+    }
+
+    public static string GetSpecialDescription (AdventurerSpecial special)
+    {
+        string desc = "No special ability";
+        TextAsset a = Resources.Load<TextAsset>(specialDescsResourcePath + special.ToString());
+        if (a != null) desc = a.text;
+        return desc;
+    }
+
+    public static string GetSpecialName (AdventurerSpecial special)
+    {
+        string name = "Out of range special name";
+        if (specialNames == null)
+        {
+            TextAsset a = Resources.Load<TextAsset>("special_names");
+            specialNames = a.text.Split('\n');
+        }
+        if ((int)special < specialNames.Length) name = specialNames[(int)special];
+        return name;
     }
 
     public static AdventurerAttack[] GetClassAttacks (AdventurerClass advClass)

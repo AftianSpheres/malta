@@ -1,5 +1,6 @@
 ﻿public enum AdventurerSpecial
 {
+    UninitializedValue = -999999,
     None,
     SilencingShot,
     ShieldWall,

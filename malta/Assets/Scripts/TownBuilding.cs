@@ -8,6 +8,7 @@ using System.Collections;
 public class TownBuilding : MonoBehaviour
 {
     private static int[] buildingTypeMaxLevels = { -1, 1, 1, 10, 10, 10, 1, 10 };
+    public PopupMenu associatedPopup;
     public BuildingType buildingType;
     public Adventurer associatedAdventurer;
     new public BoxCollider2D collider;
@@ -34,9 +35,9 @@ public class TownBuilding : MonoBehaviour
         if (associatedAdventurer != null && !associatedAdventurer.initialized) associatedAdventurer.Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, false, new int[]{ 0, 0, 0, 0});
 	}
 
-    public void InteractedWithIcon ()
+    private void OnMouseDown()
     {
-
+        if (associatedPopup != null && !GameStateManager.Instance.popupHasFocus) associatedPopup.Open();
     }
 
     public void BuildOutbuilding (bool koboldIfForge = false)
