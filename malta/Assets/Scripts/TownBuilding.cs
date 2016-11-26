@@ -41,9 +41,19 @@ public class TownBuilding : MonoBehaviour
     public void BuildOutbuilding (bool koboldIfForge = false)
     {
         if (hasOutbuilding) throw new System.Exception("Tried to add outbuilding to building, but it already had one: " + gameObject.name);
-        if (buildingType == BuildingType.House) GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] = true;
-        associatedAdventurer.Promote();
-        buildingAlteredSinceLastUpdate = true;
+        switch (buildingType)
+        {
+            case BuildingType.House:
+                if (GameDataManager.Instance.SpendResourcesIfPossible(0, 0, 0, 20, 20, 20))
+                {
+                    GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] = true;
+                    associatedAdventurer.Promote();
+                    buildingAlteredSinceLastUpdate = true;
+                }
+                break;
+            default:
+                throw new System.Exception("Can't add outbuilding to building of type " + buildingType.ToString());
+        }
     }
 
     void RefreshBuildingAssociations ()

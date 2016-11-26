@@ -96,7 +96,7 @@ public class GameDataManager : Manager<GameDataManager>
 
     }
 
-    void HandlePendingUpgrade(ref int pendingUpgradeTimer, ref int buildingLv, ref bool pendingUpgrade)
+    void HandlePendingUpgrade (ref int pendingUpgradeTimer, ref int buildingLv, ref bool pendingUpgrade)
     {
         if (pendingUpgradeTimer> 0) pendingUpgradeTimer -= buildingLv_Docks + 1; // spec didn't indicate exactly how docks work afaik, but linear scaling seems less broken than exponential
         else if (pendingUpgrade)
@@ -116,7 +116,7 @@ public class GameDataManager : Manager<GameDataManager>
         _in_RecalculateResourceMaximums(ref resPlanks_max, buildingLv_Sawmill, resPlanks_maxUpgrades);
     }
 
-    void _in_RecalculateResourceMaximums(ref int max, int structureLevel, int maxUpgrades)
+    void _in_RecalculateResourceMaximums (ref int max, int structureLevel, int maxUpgrades)
     {
         if (structureLevel > 0) max = Mathf.FloorToInt(Mathf.Pow(2, structureLevel)) * resourceMaximumsBaseValue;
         else max = resourceMaximumsBaseValue;
@@ -138,14 +138,14 @@ public class GameDataManager : Manager<GameDataManager>
         }
     }
 
-    void _in_ResourceGain(ref int res, int structureLevel, int max, int baseGain)
+    void _in_ResourceGain (ref int res, int structureLevel, int max, int baseGain)
     {
         if (structureLevel > 0) res += baseGain * Mathf.FloorToInt(Mathf.Pow(2, (structureLevel)));
         else res += baseGain;
         if (res > max) res = max;
     }
 
-    public void SetBuildingUpgradePending(BuildingType building)
+    public void SetBuildingUpgradePending (BuildingType building)
     {
         switch (building)
         {
@@ -175,9 +175,27 @@ public class GameDataManager : Manager<GameDataManager>
         }
     }
 
-    void _in_SetBuildingUpgradePending(ref bool pendingUpgrade, ref int pendingUpgradeTimer, int buildingLv)
+    public bool SpendResourcesIfPossible (int numClay, int numLumber, int numOre, int numBrick, int numPlanks, int numMetal)
+    {
+        bool result = false;
+        if (resClay >= numClay && resLumber >= numLumber && resOre >= numOre && resBricks >= numBrick && resPlanks >= numPlanks && resMetal >= numMetal)
+        {
+            resClay -= numClay;
+            resLumber -= numLumber;
+            resOre -= numOre;
+            resBricks -= numBrick;
+            resPlanks -= numPlanks;
+            resMetal -= numMetal;
+            result = true;
+        }
+        return result;
+    }
+
+    void _in_SetBuildingUpgradePending (ref bool pendingUpgrade, ref int pendingUpgradeTimer, int buildingLv)
     {
         pendingUpgrade = true;
         pendingUpgradeTimer = pendingUpgradeBaseTime * buildingLv;
     }
+
+
 }
