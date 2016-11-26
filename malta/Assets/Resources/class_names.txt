@@ -1,0 +1,9 @@
+Classless Chump
+Warrior
+Bowman
+Footman
+Mystic
+Sage
+Wizard
+Sovereign
+Avatar

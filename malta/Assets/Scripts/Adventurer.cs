@@ -23,7 +23,16 @@ public class Adventurer : ScriptableObject
     public bool isElite { get; private set; }
     public bool initialized { get; private set; }
     private static string[] attackNames;
+    private static string[] classNames;
     private static string[] specialNames;
+    private static string[] humanFirstNames;
+    private static string[] humanLastNames;
+    private static string[] faeFirstNames;
+    private static string[] faeLastNames;
+    private static string[] orcFirstNames;
+    private static string[] orcLastNames;
+    private static string[] aeonFirstNames = { "Dwayne" };
+    private static string[] aeonLastNames = { "Johnson" };
     private const string specialDescsResourcePath = "special_descs/";
 
     void CalcStats ()
@@ -46,23 +55,42 @@ public class Adventurer : ScriptableObject
 
     void RerollFullTitle ()
     {
-        if (isElite) title = "Elite " + GetSpeciesTerm(species, true) + " " + GetClassTerm(advClass);
-        else title = GetSpeciesTerm(species, true) + " " + GetClassTerm(advClass);
+        if (isElite) title = "Elite " + GetSpeciesTerm(species, true) + " " + GetClassName(advClass);
+        else title = GetSpeciesTerm(species, true) + " " + GetClassName(advClass);
         fullTitle = fullName + ", " + title;
     }
 
     void RerollName()
     {
-        if (firstName != "Dwayne")
+        string[] firstNames;
+        string[] lastNames;
+        switch (species)
         {
-            firstName = "Dwayne";
-            lastName = "Johnson";
+            case AdventurerSpecies.Human:
+                if (humanFirstNames == null) humanFirstNames = Resources.Load<TextAsset>("first_names_human").text.Split('\n');
+                if (humanLastNames == null) humanLastNames = Resources.Load<TextAsset>("first_names_human").text.Split('\n');
+                firstNames = humanFirstNames;
+                lastNames = humanLastNames;
+                break;
+            case AdventurerSpecies.Fae:
+                if (faeFirstNames == null) faeFirstNames = Resources.Load<TextAsset>("first_names_fae").text.Split('\n');
+                if (faeLastNames == null) faeLastNames = Resources.Load<TextAsset>("first_names_fae").text.Split('\n');
+                firstNames = faeFirstNames;
+                lastNames = faeLastNames;
+                break;
+            case AdventurerSpecies.Orc:
+                if (orcFirstNames == null) orcFirstNames = Resources.Load<TextAsset>("first_names_orc").text.Split('\n');
+                if (orcLastNames == null) orcLastNames = Resources.Load<TextAsset>("first_names_orc").text.Split('\n');
+                firstNames = orcFirstNames;
+                lastNames = orcLastNames;
+                break;
+            default:
+                firstNames = aeonFirstNames;
+                lastNames = aeonLastNames;
+                break;
         }
-        else
-        {
-            firstName = "Amelia";
-            lastName = "Earhart";
-        }
+        firstName = firstNames[Random.Range(0, firstNames.Length)];
+        lastName = lastNames[Random.Range(0, lastNames.Length)];
         fullName = firstName + " " + lastName;
     }
 
@@ -227,37 +255,16 @@ public class Adventurer : ScriptableObject
         return stats;
     }
 
-    public static string GetClassTerm (AdventurerClass advClass)
+    public static string GetClassName (AdventurerClass advClass)
     {
-        string term = "DEFAULT";
-        switch (advClass)
+        string name = "Out of range class name";
+        if (classNames == null)
         {
-            case AdventurerClass.Warrior:
-                term = "Warrior";
-                break;
-            case AdventurerClass.Bowman:
-                term = "Bowman";
-                break;
-            case AdventurerClass.Footman:
-                term = "Footman";
-                break;
-            case AdventurerClass.Mystic:
-                term = "Mystic";
-                break;
-            case AdventurerClass.Sage:
-                term = "Sage";
-                break;
-            case AdventurerClass.Wizard:
-                term = "Wizard";
-                break;
-            case AdventurerClass.Sovereign:
-                term = "Sovereign";
-                break;
-            case AdventurerClass.Avatar:
-                term = "Avatar";
-                break;
+            TextAsset a = Resources.Load<TextAsset>("class_names");
+            classNames = a.text.Split('\n');
         }
-        return term;
+        if ((int)advClass < classNames.Length) name = classNames[(int)advClass];
+        return name;
     }
 
     public static int[] GetSpeciesStatMods (AdventurerSpecies species)

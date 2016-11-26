@@ -5,6 +5,9 @@ using System.Collections;
 public class HousePopup : MonoBehaviour
 {
     public TownBuilding associatedHouse;
+    public PopupMenu shell;
+    public RetrainPopup retrainPopup;
+    public EvictPopup evictPopup;
     public Button outbuildingButton;
     public Text nameLabel;
     public Text titleLabel;
@@ -18,6 +21,7 @@ public class HousePopup : MonoBehaviour
     private int adventurerSpeedCached;
     private AdventurerAttack[] adventurerAttacksCached;
     private AdventurerSpecial adventurerSpecialCached = AdventurerSpecial.UninitializedValue;
+    private string cachedName;
     private string[] strings;
 
 	// Use this for initialization
@@ -30,7 +34,7 @@ public class HousePopup : MonoBehaviour
 	void Update ()
     {
         if (associatedHouse.hasOutbuilding && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
-        if (associatedHouse.associatedAdventurer.fullName != nameLabel.text) nameLabel.text = associatedHouse.associatedAdventurer.fullName;
+        if (associatedHouse.associatedAdventurer.fullName != cachedName) nameLabel.text = strings[4] + associatedHouse.associatedAdventurer.fullName;
         if (associatedHouse.associatedAdventurer.title != titleLabel.text) titleLabel.text = associatedHouse.associatedAdventurer.title;
         if (adventurerHPCached != associatedHouse.associatedAdventurer.HP || adventurerMartialCached != associatedHouse.associatedAdventurer.Martial
         || adventurerMagicCached != associatedHouse.associatedAdventurer.Magic || adventurerSpeedCached != associatedHouse.associatedAdventurer.Speed)
@@ -67,4 +71,18 @@ public class HousePopup : MonoBehaviour
             specialLabel.text = Adventurer.GetSpecialDescription(adventurerSpecialCached);
         }
 	}
+
+    public void OpenRetrainPopup()
+    {
+        retrainPopup.shell.Open();
+        retrainPopup.associatedAdventurer = associatedHouse.associatedAdventurer;
+        shell.SurrenderFocus();
+    }
+
+    public void OpenEvictPopup()
+    {
+        evictPopup.shell.Open();
+        evictPopup.associatedAdventurer = associatedHouse.associatedAdventurer;
+        shell.SurrenderFocus();
+    }
 }

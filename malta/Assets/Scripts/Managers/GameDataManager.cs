@@ -11,6 +11,8 @@ public class GameDataManager : Manager<GameDataManager>
     public Adventurer sovereignAdventurer;
     public Adventurer forgeAdventurer;
     public Adventurer[] houseAdventurers = new Adventurer[2];
+    public AdventurerClass warriorClassUnlock { get; private set; }
+    public AdventurerClass mysticClassUnlock { get; private set; }
     public AdventurerAttack sovereignTactic;
     public AdventurerSpecial sovereignSkill;
     public bool pendingUpgrade_ClayPit = false;
@@ -67,6 +69,8 @@ public class GameDataManager : Manager<GameDataManager>
     {
         sovereignTactic = AdventurerAttack.GetBehindMe;
         sovereignSkill = AdventurerSpecial.Protect;
+        warriorClassUnlock = AdventurerClass.Warrior;
+        mysticClassUnlock = AdventurerClass.Mystic;
         sovereignAdventurer = ScriptableObject.CreateInstance<Adventurer>();
         sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
         lastSecondTimestamp = Time.time;

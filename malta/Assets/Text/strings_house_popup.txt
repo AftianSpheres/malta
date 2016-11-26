@@ -2,3 +2,4 @@ Max HP:
  | MAR: 
  | MAG: 
  | SPD: 
+ Home of 
