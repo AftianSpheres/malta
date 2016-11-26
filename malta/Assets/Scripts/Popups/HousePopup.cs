@@ -36,7 +36,11 @@ public class HousePopup : MonoBehaviour
     {
         if (associatedHouse.hasOutbuilding && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
         else if (!associatedHouse.hasOutbuilding && !outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(true);
-        if (associatedHouse.associatedAdventurer.fullName != cachedName) nameLabel.text = strings[4] + associatedHouse.associatedAdventurer.fullName;
+        if (associatedHouse.associatedAdventurer.fullName != cachedName)
+        {
+            cachedName = associatedHouse.associatedAdventurer.fullName;
+            nameLabel.text = strings[4] + associatedHouse.associatedAdventurer.fullName;
+        }
         if (associatedHouse.associatedAdventurer.title != titleLabel.text) titleLabel.text = associatedHouse.associatedAdventurer.title;
         if (adventurerHPCached != associatedHouse.associatedAdventurer.HP || adventurerMartialCached != associatedHouse.associatedAdventurer.Martial
         || adventurerMagicCached != associatedHouse.associatedAdventurer.Magic || adventurerSpeedCached != associatedHouse.associatedAdventurer.Speed)

@@ -68,19 +68,19 @@ public class Adventurer : ScriptableObject
         {
             case AdventurerSpecies.Human:
                 if (humanFirstNames == null) humanFirstNames = Resources.Load<TextAsset>("first_names_human").text.Split('\n');
-                if (humanLastNames == null) humanLastNames = Resources.Load<TextAsset>("first_names_human").text.Split('\n');
+                if (humanLastNames == null) humanLastNames = Resources.Load<TextAsset>("last_names_human").text.Split('\n');
                 firstNames = humanFirstNames;
                 lastNames = humanLastNames;
                 break;
             case AdventurerSpecies.Fae:
                 if (faeFirstNames == null) faeFirstNames = Resources.Load<TextAsset>("first_names_fae").text.Split('\n');
-                if (faeLastNames == null) faeLastNames = Resources.Load<TextAsset>("first_names_fae").text.Split('\n');
+                if (faeLastNames == null) faeLastNames = Resources.Load<TextAsset>("last_names_fae").text.Split('\n');
                 firstNames = faeFirstNames;
                 lastNames = faeLastNames;
                 break;
             case AdventurerSpecies.Orc:
                 if (orcFirstNames == null) orcFirstNames = Resources.Load<TextAsset>("first_names_orc").text.Split('\n');
-                if (orcLastNames == null) orcLastNames = Resources.Load<TextAsset>("first_names_orc").text.Split('\n');
+                if (orcLastNames == null) orcLastNames = Resources.Load<TextAsset>("last_names_orc").text.Split('\n');
                 firstNames = orcFirstNames;
                 lastNames = orcLastNames;
                 break;
