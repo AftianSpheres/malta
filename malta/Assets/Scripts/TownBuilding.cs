@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+enum BuildingStates_House
+{
+    Base,
+    WithOutbuilding,
+    Foundation
+}
+
 /// <summary>
 /// Handles basic data management for town buildings.
 /// To do: serialization/saving/loading
@@ -8,20 +15,24 @@ using System.Collections;
 public class TownBuilding : MonoBehaviour
 {
     private static int[] buildingTypeMaxLevels = { -1, 1, 1, 10, 10, 10, 1, 10 };
+    public int buildingStateIndex;
     public int nonUniqueBuildingsIndex;
-    public PopupMenu associatedPopup;
+    public PopupMenu[] associatedPopups;
+    public HousePopup housePopup;
+    public BuildHousePopup buildHousePopup;
     public BuildingType buildingType;
     public Adventurer associatedAdventurer;
     new public BoxCollider2D collider;
     public SpriteRenderer spriteRenderer;
-    public Sprite outbuiltSprite;
+    public Sprite[] buildingSprites;
     public TextMesh buildingMessage;
     public bool hasOutbuilding;
+    public bool isUndeveloped;
     public bool forgeOutbuildingIsKobold;
     private bool buildingAlteredSinceLastUpdate = true;
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update ()
     {
         if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
         {
@@ -35,7 +46,18 @@ public class TownBuilding : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (associatedPopup != null && !GameStateManager.Instance.popupHasFocus) associatedPopup.Open();
+        if (associatedPopups[buildingStateIndex] != null && !GameStateManager.Instance.popupHasFocus)
+        {
+            OpenPopupOnBuilding();
+        }
+    }
+
+    public void BuildFromFoundation()
+    {
+        if (!isUndeveloped) throw new System.Exception("Can't build from foundation because building " + gameObject.name + " is already developed!");
+        buildingStateIndex = 0;
+        isUndeveloped = false;
+        buildingAlteredSinceLastUpdate = true;
     }
 
     public void BuildOutbuilding (bool koboldIfForge = false)
@@ -44,15 +66,31 @@ public class TownBuilding : MonoBehaviour
         switch (buildingType)
         {
             case BuildingType.House:
-                if (GameDataManager.Instance.SpendResourcesIfPossible(0, 0, 0, 20, 20, 20))
+                GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] = true;
+                associatedAdventurer.Promote();
+                buildingAlteredSinceLastUpdate = true;
+                break;
+            case BuildingType.Forge:
+                if (koboldIfForge) GameDataManager.Instance.unlock_Taskmaster = true;
+                else
                 {
-                    GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] = true;
-                    associatedAdventurer.Promote();
-                    buildingAlteredSinceLastUpdate = true;
+                    associatedAdventurer = GameDataManager.Instance.forgeAdventurer = ScriptableObject.CreateInstance<Adventurer>();
+                    associatedAdventurer.Reroll(GameDataManager.Instance.warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
                 }
+                buildingAlteredSinceLastUpdate = true;
                 break;
             default:
                 throw new System.Exception("Can't add outbuilding to building of type " + buildingType.ToString());
+        }
+    }
+
+    public void OpenPopupOnBuilding ()
+    {
+        associatedPopups[buildingStateIndex].Open();
+        if (buildingType == BuildingType.House)
+        {
+            if (housePopup.gameObject.activeInHierarchy) housePopup.associatedHouse = this;
+            else if (buildHousePopup.gameObject.activeInHierarchy) buildHousePopup.associatedHouse = this;
         }
     }
 
@@ -69,10 +107,17 @@ public class TownBuilding : MonoBehaviour
                 if (hasOutbuilding == false && GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] == true)
                 {
                     hasOutbuilding = true;
-                    spriteRenderer.sprite = outbuiltSprite;
                 }
-                buildingMessage.text = associatedAdventurer.fullTitle;
+                if (buildingStateIndex == (int)BuildingStates_House.Foundation)
+                {
+                    buildingMessage.text = "";
+                }
+                else
+                {
+                    buildingMessage.text = associatedAdventurer.fullTitle;
+                }
                 break;
         }
+        spriteRenderer.sprite = buildingSprites[buildingStateIndex];
     }
 }

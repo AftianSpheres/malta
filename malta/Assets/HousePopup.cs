@@ -6,6 +6,7 @@ public class HousePopup : MonoBehaviour
 {
     public TownBuilding associatedHouse;
     public PopupMenu shell;
+    public PopupMenu insufficientResourcesPopup;
     public RetrainPopup retrainPopup;
     public EvictPopup evictPopup;
     public Button outbuildingButton;
@@ -34,6 +35,7 @@ public class HousePopup : MonoBehaviour
 	void Update ()
     {
         if (associatedHouse.hasOutbuilding && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
+        else if (!associatedHouse.hasOutbuilding && !outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(true);
         if (associatedHouse.associatedAdventurer.fullName != cachedName) nameLabel.text = strings[4] + associatedHouse.associatedAdventurer.fullName;
         if (associatedHouse.associatedAdventurer.title != titleLabel.text) titleLabel.text = associatedHouse.associatedAdventurer.title;
         if (adventurerHPCached != associatedHouse.associatedAdventurer.HP || adventurerMartialCached != associatedHouse.associatedAdventurer.Martial
@@ -84,5 +86,18 @@ public class HousePopup : MonoBehaviour
         evictPopup.shell.Open();
         evictPopup.associatedAdventurer = associatedHouse.associatedAdventurer;
         shell.SurrenderFocus();
+    }
+
+    public void AddOutbuilding()
+    {
+        if (GameDataManager.Instance.SpendResourcesIfPossible(0, 0, 0, 20, 20, 20))
+        {
+            associatedHouse.BuildOutbuilding();
+        }
+        else
+        {
+            shell.SurrenderFocus();
+            insufficientResourcesPopup.Open();
+        }
     }
 }
