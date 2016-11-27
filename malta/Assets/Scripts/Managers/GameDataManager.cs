@@ -55,13 +55,13 @@ public class GameDataManager : Manager<GameDataManager>
     private const int resourceGainThreshold = 59;
     private const int resourceMaximumsBaseValue= 600; // ten hours
     private const int pendingUpgradeBaseTime = 300; // five minutes;
-    private int pendingUpgradeTimer_ClayPit = 0;
-    private int pendingUpgradeTimer_Docks = 0;
-    private int pendingUpgradeTimer_Mason = 0;
-    private int pendingUpgradeTimer_Mine = 0;
-    private int pendingUpgradeTimer_Sawmill = 0;
-    private int pendingUpgradeTimer_Smith = 0;
-    private int pendingUpgradeTimer_Woodlands = 0;
+    public int pendingUpgradeTimer_ClayPit = 0;
+    public int pendingUpgradeTimer_Docks = 0;
+    public int pendingUpgradeTimer_Mason = 0;
+    public int pendingUpgradeTimer_Mine = 0;
+    public int pendingUpgradeTimer_Sawmill = 0;
+    public int pendingUpgradeTimer_Smith = 0;
+    public int pendingUpgradeTimer_Woodlands = 0;
     public bool[] housesBuilt = { true, false };
     public bool[] housesOutbuildingsBuilt = { false, false };
 
@@ -75,7 +75,7 @@ public class GameDataManager : Manager<GameDataManager>
         sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
         lastSecondTimestamp = Time.time;
         RecalculateResourceMaximums();
-        if (Application.isEditor) Time.timeScale = 6.0f; // speed things up for in-editor testing
+        //if (Application.isEditor) Time.timeScale = 6.0f; // speed things up for in-editor testing
     }
 
     void Update ()
@@ -175,10 +175,22 @@ public class GameDataManager : Manager<GameDataManager>
         }
     }
 
+    public bool CheckMaterialAvailability (int[] resourceNums)
+    {
+        return CheckMaterialAvailability(resourceNums[0], resourceNums[1], resourceNums[2], resourceNums[3], resourceNums[4], resourceNums[5]);
+    }
+
+    public bool CheckMaterialAvailability(int numClay, int numLumber, int numOre, int numBrick, int numPlanks, int numMetal)
+    {
+        bool result = false;
+        if (resClay >= numClay && resLumber >= numLumber && resOre >= numOre && resBricks >= numBrick && resPlanks >= numPlanks && resMetal >= numMetal) result = true;
+        return result;
+    }
+
     public bool SpendResourcesIfPossible (int numClay, int numLumber, int numOre, int numBrick, int numPlanks, int numMetal)
     {
         bool result = false;
-        if (resClay >= numClay && resLumber >= numLumber && resOre >= numOre && resBricks >= numBrick && resPlanks >= numPlanks && resMetal >= numMetal)
+        if (CheckMaterialAvailability(numClay, numLumber, numOre, numBrick, numPlanks, numMetal))
         {
             resClay -= numClay;
             resLumber -= numLumber;

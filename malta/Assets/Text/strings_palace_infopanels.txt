@@ -1,0 +1,30 @@
+: Level 0 > Level 1
+: Level 1 > Level 2
+: Level 2 > Level 3
+: Level 3 > Level 4
+: Level 4 > Level 5
+: Level 5 > Level 6
+: Level 6 > Level 7
+: Level 7 > Level 8
+: Level 8 > Level 9
+: Level 9 > Level 10
+: Max level!
+Error!
+Status: Upgrade ready
+Status: Upgrade in progress
+Status: Not yet built
+Status: Insufficient resources
+Status: Ready for outbuilding
+Status: All good!
+Bare Foundation
+Empty House
+Home of
+Forge
+Docks
+Mason
+Sawmill
+Blacksmith
+Mines
+Woodlands
+Clay Pit
+Wizard's Tower

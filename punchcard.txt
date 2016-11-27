@@ -31,3 +31,7 @@
 1:14 PM - off
 2:55 PM - on
 3:42 PM - off
+5:28 PM - on
+6:21 PM - off
+6:52 PM - on
+8:05 PM - off

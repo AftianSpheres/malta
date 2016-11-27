@@ -14,7 +14,7 @@ enum BuildingStates_House
 /// </summary>
 public class TownBuilding : MonoBehaviour
 {
-    private static int[] buildingTypeMaxLevels = { -1, 1, 1, 10, 10, 10, 1, 10 };
+    public static int[] buildingTypeMaxLevels = { 1, 1, 10, 10, 10, 1, 10, 10, 10, 10, 10 };
     public int buildingStateIndex;
     public int nonUniqueBuildingsIndex;
     public PopupMenu[] associatedPopups;
@@ -82,6 +82,98 @@ public class TownBuilding : MonoBehaviour
             default:
                 throw new System.Exception("Can't add outbuilding to building of type " + buildingType.ToString());
         }
+    }
+
+    /// <summary>
+    /// This is a gross lookup table implemented in code because it lets us do
+    /// balancing tweaks with more precision than an actual algorithmic approach.
+    /// </summary>
+    public static int[] GetUpgradeCost_Docks ()
+    {
+        int[] costs; // clay, wood, ore, brick, plank, metal
+        switch (GameDataManager.Instance.buildingLv_Docks)
+        {
+            case 0:
+                costs = new int[] { 2, 2, 2, 0, 0, 0 };
+                break;
+            case 1:
+                costs = new int[] { 4, 4, 4, 0, 0, 0 };
+                break;
+            case 2:
+                costs = new int[] { 4, 4, 4, 4, 4, 4 };
+                break;
+            case 3:
+                costs = new int[] { 8, 8, 8, 8, 8, 8 };
+                break;
+            case 4:
+                costs = new int[] { 16, 16, 16, 16, 16, 16 };
+                break;
+            case 5:
+                costs = new int[] { 32, 32, 32, 32, 32, 32 };
+                break;
+            case 6:
+                costs = new int[] { 64, 64, 64, 64, 64, 64 };
+                break;
+            case 7:
+                costs = new int[] { 128, 128, 128, 128, 128, 128 };
+                break;
+            case 8:
+                costs = new int[] { 205, 205, 205, 307, 307, 307 };
+                break;
+            case 9:
+                costs = new int[] { 410, 410, 410, 614, 614, 614 };
+                break;
+            default:
+                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                break;
+        }
+        return costs;
+    }
+
+    /// <summary>
+    /// This is a gross lookup table implemented in code because it lets us do
+    /// balancing tweaks with more precision than an actual algorithmic approach.
+    /// </summary>
+    public static int[] GetUpgradeCost_Mason()
+    {
+        int[] costs; // clay, wood, ore, brick, plank, metal
+        switch (GameDataManager.Instance.buildingLv_Mason)
+        {
+            case 0:
+                costs = new int[] { 2, 0, 0, 0, 0, 0 };
+                break;
+            case 1:
+                costs = new int[] { 4, 0, 0, 0, 0, 0 };
+                break;
+            case 2:
+                costs = new int[] { 4, 0, 0, 4, 0, 0 };
+                break;
+            case 3:
+                costs = new int[] { 8, 0, 0, 8, 0, 0 };
+                break;
+            case 4:
+                costs = new int[] { 16, 0, 0, 16, 0, 0 };
+                break;
+            case 5:
+                costs = new int[] { 32, 0, 0, 32, 0, 0 };
+                break;
+            case 6:
+                costs = new int[] { 64, 0, 0, 64, 0, 0 };
+                break;
+            case 7:
+                costs = new int[] { 128, 0, 0, 128, 0, 0 };
+                break;
+            case 8:
+                costs = new int[] { 154, 26, 26, 230, 38, 38 };
+                break;
+            case 9:
+                costs = new int[] { 308, 52, 52, 460, 76, 76 };
+                break;
+            default:
+                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                break;
+        }
+        return costs;
     }
 
     public void OpenPopupOnBuilding ()
