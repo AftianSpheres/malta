@@ -15,6 +15,8 @@ enum BuildingStates_House
 public class TownBuilding : MonoBehaviour
 {
     public static int[] buildingTypeMaxLevels = { 1, 1, 10, 10, 10, 1, 10, 10, 10, 10, 10 };
+    public static int[] houseConstructionCosts = { 0, 0, 0, 10, 10, 10 };
+    public static int[] houseOutbuildingCosts = { 0, 0, 0, 20, 20, 20 };
     public int buildingStateIndex;
     public int nonUniqueBuildingsIndex;
     public PopupMenu[] associatedPopups;
@@ -55,6 +57,7 @@ public class TownBuilding : MonoBehaviour
     public void BuildFromFoundation()
     {
         if (!isUndeveloped) throw new System.Exception("Can't build from foundation because building " + gameObject.name + " is already developed!");
+        GameDataManager.Instance.housesBuilt[nonUniqueBuildingsIndex] = true;
         buildingStateIndex = 0;
         isUndeveloped = false;
         buildingAlteredSinceLastUpdate = true;
@@ -88,10 +91,10 @@ public class TownBuilding : MonoBehaviour
     /// This is a gross lookup table implemented in code because it lets us do
     /// balancing tweaks with more precision than an actual algorithmic approach.
     /// </summary>
-    public static int[] GetUpgradeCost_Docks ()
+    public static int[] GetUpgradeCost_Docks (int level)
     {
         int[] costs; // clay, wood, ore, brick, plank, metal
-        switch (GameDataManager.Instance.buildingLv_Docks)
+        switch (level)
         {
             case 0:
                 costs = new int[] { 2, 2, 2, 0, 0, 0 };
@@ -134,10 +137,10 @@ public class TownBuilding : MonoBehaviour
     /// This is a gross lookup table implemented in code because it lets us do
     /// balancing tweaks with more precision than an actual algorithmic approach.
     /// </summary>
-    public static int[] GetUpgradeCost_Mason()
+    public static int[] GetUpgradeCost_MasonClaypit(int level)
     {
         int[] costs; // clay, wood, ore, brick, plank, metal
-        switch (GameDataManager.Instance.buildingLv_Mason)
+        switch (level)
         {
             case 0:
                 costs = new int[] { 2, 0, 0, 0, 0, 0 };
@@ -176,6 +179,98 @@ public class TownBuilding : MonoBehaviour
         return costs;
     }
 
+    /// <summary>
+    /// This is a gross lookup table implemented in code because it lets us do
+    /// balancing tweaks with more precision than an actual algorithmic approach.
+    /// </summary>
+    public static int[] GetUpgradeCost_SawmillWoodlands(int level)
+    {
+        int[] costs; // clay, wood, ore, brick, plank, metal
+        switch (level)
+        {
+            case 0:
+                costs = new int[] { 0, 2, 0, 0, 0, 0 };
+                break;
+            case 1:
+                costs = new int[] { 0, 4, 0, 0, 0, 0 };
+                break;
+            case 2:
+                costs = new int[] { 0, 4, 0, 0, 4, 0 };
+                break;
+            case 3:
+                costs = new int[] { 0, 8, 0, 0, 8, 0 };
+                break;
+            case 4:
+                costs = new int[] { 0, 16, 0, 0, 16, 0 };
+                break;
+            case 5:
+                costs = new int[] { 0, 32, 0, 0, 32, 0 };
+                break;
+            case 6:
+                costs = new int[] { 0, 64, 0, 0, 64, 0 };
+                break;
+            case 7:
+                costs = new int[] { 0, 128, 0, 0, 128, 0 };
+                break;
+            case 8:
+                costs = new int[] { 26, 154, 26, 38, 230, 38 };
+                break;
+            case 9:
+                costs = new int[] { 52, 308, 52, 76, 460, 76 };
+                break;
+            default:
+                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                break;
+        }
+        return costs;
+    }
+
+    /// <summary>
+    /// This is a gross lookup table implemented in code because it lets us do
+    /// balancing tweaks with more precision than an actual algorithmic approach.
+    /// </summary>
+    public static int[] GetUpgradeCost_SmithMines(int level)
+    {
+        int[] costs; // clay, wood, ore, brick, plank, metal
+        switch (level)
+        {
+            case 0:
+                costs = new int[] { 0, 0, 2, 0, 0, 0 };
+                break;
+            case 1:
+                costs = new int[] { 0, 0, 4, 0, 0, 0 };
+                break;
+            case 2:
+                costs = new int[] { 0, 0, 4, 0, 0, 4 };
+                break;
+            case 3:
+                costs = new int[] { 0, 0, 8, 0, 0, 8 };
+                break;
+            case 4:
+                costs = new int[] { 0, 0, 16, 0, 0, 16 };
+                break;
+            case 5:
+                costs = new int[] { 0, 0, 32, 0, 0, 32 };
+                break;
+            case 6:
+                costs = new int[] { 0, 0, 64, 0, 0, 64 };
+                break;
+            case 7:
+                costs = new int[] { 0, 0, 128, 0, 0, 128 };
+                break;
+            case 8:
+                costs = new int[] { 26, 26, 154, 38, 38, 230 };
+                break;
+            case 9:
+                costs = new int[] { 52, 52, 308, 76, 76, 460 };
+                break;
+            default:
+                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                break;
+        }
+        return costs;
+    }
+
     public void OpenPopupOnBuilding ()
     {
         associatedPopups[buildingStateIndex].Open();
@@ -196,9 +291,15 @@ public class TownBuilding : MonoBehaviour
                     if (GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] == null) GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] = associatedAdventurer;
                     else associatedAdventurer = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex];
                 }
-                if (hasOutbuilding == false && GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] == true)
+                if (GameDataManager.Instance.housesBuilt[nonUniqueBuildingsIndex] == true && isUndeveloped)
+                {
+                    isUndeveloped = false;
+                    buildingStateIndex = 0;
+                }
+                if (hasOutbuilding == false && GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex])
                 {
                     hasOutbuilding = true;
+                    buildingStateIndex = 1;
                 }
                 if (buildingStateIndex == (int)BuildingStates_House.Foundation)
                 {

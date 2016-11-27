@@ -18,7 +18,7 @@ Status: Ready for outbuilding
 Status: All good!
 Bare Foundation
 Empty House
-Home of
+Home of 
 Forge
 Docks
 Mason

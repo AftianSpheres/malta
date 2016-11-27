@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | malta</title>
+    <style>
+	canvas {
+		padding-left: 0;
+		padding-right: 0;
+		margin-left: auto;
+		margin-right: auto;
+		display: block;
+	}
+    </style>
+  </head>
+  <body>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="675px" width="1200px" align = "center"></canvas>
+    <script type='text/javascript'>
+  var Module = {
+    TOTAL_MEMORY: 536870912,
+    errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
+    compatibilitycheck: null,
+    dataUrl: "Release/mbuild.data",
+    codeUrl: "Release/mbuild.js",
+    memUrl: "Release/mbuild.mem",
+    
+  };
+</script>
+<script src="Release/UnityLoader.js"></script>
+
+  </body>
+</html>
