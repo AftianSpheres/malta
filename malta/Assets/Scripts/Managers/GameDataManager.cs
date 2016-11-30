@@ -15,6 +15,7 @@ public class GameDataManager : Manager<GameDataManager>
     public AdventurerClass mysticClassUnlock { get; private set; }
     public AdventurerAttack sovereignTactic;
     public AdventurerSpecial sovereignSkill;
+    public string sovereignName = "Dude Huge";
     public bool pendingUpgrade_ClayPit = false;
     public bool pendingUpgrade_Docks = false;
     public bool pendingUpgrade_Mason = false;
@@ -25,10 +26,12 @@ public class GameDataManager : Manager<GameDataManager>
     public bool unlock_raceFae = false;
     public bool unlock_raceOrc = false;
     public bool unlock_Taskmaster = false;
+    public bool unlock_WizardsTower = false;
     public int buildingLv_Docks = 0;
     public int buildingLv_Mason = 0;
     public int buildingLv_Sawmill = 0;
     public int buildingLv_Smith = 0;
+    public int buildingLv_WizardsTower = 1;
     public int harvestLv_ClayPit = 1;
     public int harvestLv_Mine = 1;
     public int harvestLv_Woodlands = 1;
@@ -140,9 +143,43 @@ public class GameDataManager : Manager<GameDataManager>
 
     void _in_ResourceGain (ref int res, int structureLevel, int max, int baseGain)
     {
-        if (structureLevel > 0) res += baseGain * Mathf.FloorToInt(Mathf.Pow(2, (structureLevel)));
-        else res += baseGain;
+        res += GetResourceGainRate(structureLevel, baseGain);
         if (res > max) res = max;
+    }
+
+    public int GetResourceGainRate(int structureLevel, int baseGain)
+    {
+        int gain = baseGain;
+        if (structureLevel > 0) gain = baseGain * Mathf.FloorToInt(Mathf.Pow(2, (structureLevel)));
+        if (unlock_WizardsTower) gain += Mathf.RoundToInt(gain * 0.1f * buildingLv_WizardsTower);
+        return gain;
+    }
+
+    public int GetResourceGainRate(ResourceType resource)
+    {
+        int gain = -1;
+        switch (resource)
+        {
+            case ResourceType.Bricks:
+                gain = GetResourceGainRate(buildingLv_Mason, 4);
+                break;
+            case ResourceType.Clay:
+                gain = GetResourceGainRate(harvestLv_ClayPit - 1, 1);
+                break;
+            case ResourceType.Metal:
+                gain = GetResourceGainRate(buildingLv_Smith, 4);
+                break;
+            case ResourceType.Ore:
+                gain = GetResourceGainRate(harvestLv_Mine - 1, 1);
+                break;
+            case ResourceType.Planks:
+                gain = GetResourceGainRate(buildingLv_Sawmill, 4);
+                break;
+            case ResourceType.Lumber:
+                gain = GetResourceGainRate(harvestLv_Woodlands - 1, 1);
+                break;
+        }
+        return gain;
     }
 
     public void SetBuildingUpgradePending (BuildingType building)
