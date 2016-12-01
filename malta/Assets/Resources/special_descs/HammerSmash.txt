@@ -1,0 +1,2 @@
+Sovereign special: Hammer Smash
+Each attack has a 30% chance of dealing double damage.

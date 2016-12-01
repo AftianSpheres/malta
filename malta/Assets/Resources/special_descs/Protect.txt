@@ -1,0 +1,2 @@
+Sovereign special: Protect
+When an ally is struck, retaliate against attacker with an attack that deals 4 points of Martial damage.

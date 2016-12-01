@@ -1,4 +1,21 @@
 Sovereign 
-Current strategy: 
-Current special: 
  / minute
+HP: 
+MAR: 
+MAG: 
+SPE: 
+The portal is inert... Embark on adventures, and maybe you'll find a way to activate it?
+The portal remains inert, but somehow, it seems as if something about it has changed.
+The portal frame glows faintly, and seems hot to the touch.
+Space seems somehow altered within the portal frame.
+There's a hole in the air within the portal frame, twisting wildly and loosing sparks.
+The portal is still, like the surface of a placid lake. You can see into another world...
+It's not clear what you'd need to do to activate the portal. Maybe a wizard might have the means to do so, though...?
+The Wizard's Tower seems like it's connected to the portal somehow...
+The portal seems like it's nearly ready for use. Just a little more!
+You have the resources to upgrade the Wizard's Tower.
+You'll need to wait for some more resources, though.
+You're short on bricks. Try upgrading the Mason.
+You're short on metal. Try upgrading the Blacksmith.
+You're short on planks. Try upgrading the Sawmill.
+The portal is ready. All that remains is to activate it.

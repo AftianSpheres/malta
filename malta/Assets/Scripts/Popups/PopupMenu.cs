@@ -11,13 +11,16 @@ public class PopupMenu : MonoBehaviour
     public GameObject contents;
     public PopupMenu[] focusSharers;
     public Button[] buttons;
+    public Scrollbar[] scrollbars;
     private Button[] activeButtons;
+    private Scrollbar[] activeScrollbars;
     public bool[] closeFocusSharersWhenClosingSelf;
     private bool surrenderedFocus;
 
     // Use this for initialization
-    void Start () {
-	
+    void Start ()
+    {
+
 	}
 	
 	// Update is called once per frame
@@ -30,6 +33,10 @@ public class PopupMenu : MonoBehaviour
                 for (int i = 0; i < activeButtons.Length; i++)
                 {
                     if (activeButtons[i] != null) activeButtons[i].interactable = true;
+                }
+                for (int i = 0; i < activeScrollbars.Length; i++)
+                {
+                    if (activeScrollbars[i] != null) activeScrollbars[i].interactable = true;
                 }
                 surrenderedFocus = false;
             }
@@ -60,6 +67,15 @@ public class PopupMenu : MonoBehaviour
             {
                 activeButtons[i] = buttons[i];
                 activeButtons[i].interactable = false;
+            }
+        }
+        activeScrollbars = new Scrollbar[scrollbars.Length];
+        for (int i = 0; i < scrollbars.Length; i++)
+        {
+            if (scrollbars[i].interactable)
+            {
+                activeScrollbars[i] = scrollbars[i];
+                activeScrollbars[i].interactable = false;
             }
         }
         surrenderedFocus = true;

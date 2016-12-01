@@ -13,9 +13,11 @@ public class GameDataManager : Manager<GameDataManager>
     public Adventurer[] houseAdventurers = new Adventurer[2];
     public AdventurerClass warriorClassUnlock { get; private set; }
     public AdventurerClass mysticClassUnlock { get; private set; }
-    public AdventurerAttack sovereignTactic;
-    public AdventurerSpecial sovereignSkill;
-    public string sovereignName = "Dude Huge";
+    public AdventurerAttack sovereignTactic { get; private set; }
+    public AdventurerSpecial sovereignSkill { get; private set; }
+    public string sovereignFirstName = "Dude";
+    public string sovereignLastName = "Huge";
+    public string sovereignName { get { return sovereignAdventurer.fullName; } }
     public bool pendingUpgrade_ClayPit = false;
     public bool pendingUpgrade_Docks = false;
     public bool pendingUpgrade_Mason = false;
@@ -25,6 +27,9 @@ public class GameDataManager : Manager<GameDataManager>
     public bool pendingUpgrade_Woodlands = false;
     public bool unlock_raceFae = false;
     public bool unlock_raceOrc = false;
+    public bool unlock_sovSpe_CalledShots = false;
+    public bool unlock_sovSpe_HammerSmash = false;
+    public bool unlock_sovSpe_Protect = false;
     public bool unlock_Taskmaster = false;
     public bool unlock_WizardsTower = false;
     public int buildingLv_Docks = 0;
@@ -71,7 +76,7 @@ public class GameDataManager : Manager<GameDataManager>
     void Start ()
     {
         sovereignTactic = AdventurerAttack.GetBehindMe;
-        sovereignSkill = AdventurerSpecial.Protect;
+        sovereignSkill = AdventurerSpecial.None;
         warriorClassUnlock = AdventurerClass.Warrior;
         mysticClassUnlock = AdventurerClass.Mystic;
         sovereignAdventurer = ScriptableObject.CreateInstance<Adventurer>();
@@ -210,6 +215,18 @@ public class GameDataManager : Manager<GameDataManager>
             default:
                 throw new System.Exception("Tried to level up un-level-able building of type: " + building.ToString());
         }
+    }
+
+    public void SetSovereignSpecial (AdventurerSpecial special)
+    {
+        sovereignSkill = special;
+        sovereignAdventurer.special = special;
+    }
+
+    public void SetSovereignTactic (AdventurerAttack attack)
+    {
+        sovereignTactic = attack;
+        sovereignAdventurer.attacks[1] = attack;
     }
 
     public bool CheckMaterialAvailability (int[] resourceNums)

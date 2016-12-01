@@ -67,7 +67,14 @@ public class HousePopup : MonoBehaviour
             adventurerAttacksCached = associatedHouse.associatedAdventurer.attacks;
             for (int i = 0; i < adventurerAttacksCached.Length && i < 3; i++)
             {
-                attacksStrings[i] = Adventurer.GetAttackName(associatedHouse.associatedAdventurer.attacks[i]);
+                if (associatedHouse.associatedAdventurer.attacks[i] != AdventurerAttack.None)
+                {
+                    attacksStrings[i] = Adventurer.GetAttackName(associatedHouse.associatedAdventurer.attacks[i]);
+                }
+                else
+                {
+                    attacksStrings[i] = "";
+                }
             }
             attacksLabel.text = attacksStrings[0] + '\n' + attacksStrings[1] + '\n' + attacksStrings[2];
         }

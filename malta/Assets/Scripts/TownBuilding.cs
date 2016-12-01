@@ -271,6 +271,53 @@ public class TownBuilding : MonoBehaviour
         return costs;
     }
 
+    /// <summary>
+    /// This is a gross lookup table implemented in code because it lets us do
+    /// balancing tweaks with more precision than an actual algorithmic approach.
+    /// also I think the economy seems kinda busted right now, lol - level^2 isn't near what the resource-gain buildings demand for upgrades
+    /// </summary>
+    public static int[] GetUpgradeCost_WizardsTower(int level)
+    {
+        int[] costs; // clay, wood, ore, brick, plank, metal
+        switch (level)
+        {
+            case 0:
+                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                break;
+            case 1:
+                costs = new int[] { 0, 0, 0, 1, 1, 1 };
+                break;
+            case 2:
+                costs = new int[] { 0, 0, 0, 4, 4, 4 };
+                break;
+            case 3:
+                costs = new int[] { 0, 0, 0, 9, 9, 9 };
+                break;
+            case 4:
+                costs = new int[] { 0, 0, 0, 16, 16, 16 };
+                break;
+            case 5:
+                costs = new int[] { 0, 0, 0, 25, 25, 25 };
+                break;
+            case 6:
+                costs = new int[] { 0, 0, 0, 36, 36, 36 };
+                break;
+            case 7:
+                costs = new int[] { 0, 0, 0, 49, 49, 49 };
+                break;
+            case 8:
+                costs = new int[] { 0, 0, 0, 64, 64, 64 };
+                break;
+            case 9:
+                costs = new int[] { 0, 0, 0, 81, 81, 81 };
+                break;
+            default:
+                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                break;
+        }
+        return costs;
+    }
+
     public void OpenPopupOnBuilding ()
     {
         associatedPopups[buildingStateIndex].Open();

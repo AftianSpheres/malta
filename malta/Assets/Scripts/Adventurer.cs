@@ -33,6 +33,7 @@ public class Adventurer : ScriptableObject
     private static string[] orcLastNames;
     private static string[] aeonFirstNames = { "Dwayne" };
     private static string[] aeonLastNames = { "Johnson" };
+    private const string attackDescsResourcePath = "attack_descs/";
     private const string specialDescsResourcePath = "special_descs/";
 
     void CalcStats ()
@@ -62,35 +63,43 @@ public class Adventurer : ScriptableObject
 
     void RerollName()
     {
-        string[] firstNames;
-        string[] lastNames;
-        switch (species)
+        if (advClass == AdventurerClass.Sovereign)
         {
-            case AdventurerSpecies.Human:
-                if (humanFirstNames == null) humanFirstNames = Resources.Load<TextAsset>("first_names_human").text.Split('\n');
-                if (humanLastNames == null) humanLastNames = Resources.Load<TextAsset>("last_names_human").text.Split('\n');
-                firstNames = humanFirstNames;
-                lastNames = humanLastNames;
-                break;
-            case AdventurerSpecies.Fae:
-                if (faeFirstNames == null) faeFirstNames = Resources.Load<TextAsset>("first_names_fae").text.Split('\n');
-                if (faeLastNames == null) faeLastNames = Resources.Load<TextAsset>("last_names_fae").text.Split('\n');
-                firstNames = faeFirstNames;
-                lastNames = faeLastNames;
-                break;
-            case AdventurerSpecies.Orc:
-                if (orcFirstNames == null) orcFirstNames = Resources.Load<TextAsset>("first_names_orc").text.Split('\n');
-                if (orcLastNames == null) orcLastNames = Resources.Load<TextAsset>("last_names_orc").text.Split('\n');
-                firstNames = orcFirstNames;
-                lastNames = orcLastNames;
-                break;
-            default:
-                firstNames = aeonFirstNames;
-                lastNames = aeonLastNames;
-                break;
+            firstName = GameDataManager.Instance.sovereignFirstName;
+            lastName = GameDataManager.Instance.sovereignLastName;
         }
-        firstName = firstNames[Random.Range(0, firstNames.Length)];
-        lastName = lastNames[Random.Range(0, lastNames.Length)];
+        else
+        {
+            string[] firstNames;
+            string[] lastNames;
+            switch (species)
+            {
+                case AdventurerSpecies.Human:
+                    if (humanFirstNames == null) humanFirstNames = Resources.Load<TextAsset>("first_names_human").text.Split('\n');
+                    if (humanLastNames == null) humanLastNames = Resources.Load<TextAsset>("last_names_human").text.Split('\n');
+                    firstNames = humanFirstNames;
+                    lastNames = humanLastNames;
+                    break;
+                case AdventurerSpecies.Fae:
+                    if (faeFirstNames == null) faeFirstNames = Resources.Load<TextAsset>("first_names_fae").text.Split('\n');
+                    if (faeLastNames == null) faeLastNames = Resources.Load<TextAsset>("last_names_fae").text.Split('\n');
+                    firstNames = faeFirstNames;
+                    lastNames = faeLastNames;
+                    break;
+                case AdventurerSpecies.Orc:
+                    if (orcFirstNames == null) orcFirstNames = Resources.Load<TextAsset>("first_names_orc").text.Split('\n');
+                    if (orcLastNames == null) orcLastNames = Resources.Load<TextAsset>("last_names_orc").text.Split('\n');
+                    firstNames = orcFirstNames;
+                    lastNames = orcLastNames;
+                    break;
+                default:
+                    firstNames = aeonFirstNames;
+                    lastNames = aeonLastNames;
+                    break;
+            }
+            firstName = firstNames[Random.Range(0, firstNames.Length)];
+            lastName = lastNames[Random.Range(0, lastNames.Length)];
+        }
         fullName = firstName + " " + lastName;
     }
 
@@ -142,6 +151,14 @@ public class Adventurer : ScriptableObject
         return name;
     }
 
+    public static string GetAttackDescription(AdventurerAttack attack)
+    {
+        string desc = "None";
+        TextAsset a = Resources.Load<TextAsset>(attackDescsResourcePath + attack.ToString());
+        if (a != null) desc = a.text;
+        return desc;
+    }
+
     public static string GetSpecialDescription (AdventurerSpecial special)
     {
         string desc = "No special ability";
@@ -168,7 +185,7 @@ public class Adventurer : ScriptableObject
         switch (advClass)
         {
             case AdventurerClass.Warrior:
-                attacks = new AdventurerAttack[] { AdventurerAttack.MaceSwing };
+                attacks = new AdventurerAttack[] { AdventurerAttack.MaceSwing, AdventurerAttack.None };
                 break;
             case AdventurerClass.Bowman:
                 attacks = new AdventurerAttack[] { AdventurerAttack.Bowshot, AdventurerAttack.RainOfArrows };
@@ -189,7 +206,7 @@ public class Adventurer : ScriptableObject
                 attacks = new AdventurerAttack[] { AdventurerAttack.HammerBlow, GameDataManager.Instance.sovereignTactic };
                 break;
             case AdventurerClass.Avatar:
-                attacks = new AdventurerAttack[] { AdventurerAttack.Rend };
+                attacks = new AdventurerAttack[] { AdventurerAttack.Rend, AdventurerAttack.None };
                 break;
         }
         return attacks;

@@ -1,3 +1,2 @@
-Special: Called Shots
-it's rigged
-the shots are rigged
+Sovereign special: Called Shots
+Lowers Speed by 2 points; raises Martial by 1 point.
