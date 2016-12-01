@@ -51,6 +51,9 @@ public class BuildingInfoPanel : MonoBehaviour
                 case BuildingType.House:
                     UpdateProcessing_Houses();
                     break;
+                case BuildingType.Forge:
+                    UpdateProcessing_Forge();
+                    break;
                 case BuildingType.Docks:
                     UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.pendingUpgrade_Docks, ref GameDataManager.Instance.pendingUpgradeTimer_Docks, 
                         ref GameDataManager.Instance.buildingLv_Docks, 22, TownBuilding.GetUpgradeCost_Docks);
@@ -102,6 +105,30 @@ public class BuildingInfoPanel : MonoBehaviour
         if (seconds > 9) secString = seconds.ToString();
         else secString = "0" + seconds.ToString();
         timerCounter.text = minutes.ToString() + ":" + secString;
+    }
+
+    private void UpdateProcessing_Forge ()
+    {
+        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior)
+        {
+            if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
+            // do things
+        }
+        else if (GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
+        {
+            if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
+            // similar but distinct things
+        }
+        else if (!GameDataManager.Instance.unlock_forgeOutbuilding)
+        {
+            if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
+            // less similar things
+        }
+        else
+        {
+            if (materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(false);
+            if (devStatusLabel.text != strings[17]) devStatusLabel.text = strings[17];
+        }
     }
 
     private void UpdateProcessing_Houses ()

@@ -47,6 +47,13 @@ public class PalacePopup : MonoBehaviour
     public Text sovereignAttacksArea;
     public Text sovereignStatsArea;
     public Text sovereignTacticDesc;
+    public Text matsNeededBrick;
+    public Text matsNeededClay;
+    public Text matsNeededMetal;
+    public Text matsNeededOre;
+    public Text matsNeededPlanks;
+    public Text matsNeededWood;
+    public GameObject matsNeededSection;
     public PopupMenu shell;
     public PopupMenu sovereignSpecialPopup;
     public PopupMenu sovereignTacticsPopup;
@@ -172,9 +179,15 @@ public class PalacePopup : MonoBehaviour
                 cachedPortalNextSteps = PortalNextSteps.NoTower;
                 portalNextStepsArea.text = strings[12];
             }
+            if (matsNeededSection.activeInHierarchy) matsNeededSection.SetActive(false);
         }
         else
         {
+            if (GameDataManager.Instance.buildingLv_WizardsTower == 10)
+            {
+                if (matsNeededSection.activeInHierarchy) matsNeededSection.SetActive(false);
+            }
+            else if (!matsNeededSection.activeInHierarchy) matsNeededSection.SetActive(true);
             switch (GameDataManager.Instance.buildingLv_WizardsTower)
             {
                 case 1:
@@ -282,9 +295,20 @@ public class PalacePopup : MonoBehaviour
         }
     }
 
+    private void _in_UpdateProcessing_PortalArea_reqs (ref int[] reqs)
+    {
+        matsNeededClay.text = reqs[0].ToString();
+        matsNeededWood.text = reqs[1].ToString();
+        matsNeededOre.text = reqs[2].ToString();
+        matsNeededBrick.text = reqs[3].ToString();
+        matsNeededMetal.text = reqs[4].ToString();
+        matsNeededPlanks.text = reqs[5].ToString();
+    }
+
     private void _in_UpdateProcessing_PortalArea_preLv7 ()
     {
         int[] recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.buildingLv_WizardsTower);
+        _in_UpdateProcessing_PortalArea_reqs(ref recs);
         if (GameDataManager.Instance.CheckMaterialAvailability(recs))
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_ReadyForUpgrade)
@@ -329,6 +353,7 @@ public class PalacePopup : MonoBehaviour
     private void _in_UpdateProcessing_PortalArea_postLv7()
     {
         int[] recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.buildingLv_WizardsTower);
+        _in_UpdateProcessing_PortalArea_reqs(ref recs);
         if (GameDataManager.Instance.CheckMaterialAvailability(recs))
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_ReadyForUpgrade)

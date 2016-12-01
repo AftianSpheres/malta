@@ -25,6 +25,7 @@ public class GameDataManager : Manager<GameDataManager>
     public bool pendingUpgrade_Sawmill = false;
     public bool pendingUpgrade_Smith = false;
     public bool pendingUpgrade_Woodlands = false;
+    public bool unlock_forgeOutbuilding = false;
     public bool unlock_raceFae = false;
     public bool unlock_raceOrc = false;
     public bool unlock_sovSpe_CalledShots = false;

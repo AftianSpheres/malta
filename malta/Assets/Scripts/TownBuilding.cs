@@ -134,6 +134,23 @@ public class TownBuilding : MonoBehaviour
     }
 
     /// <summary>
+    /// Checks how much a new class upgrade should cost. Second is 3x cost of first.
+    /// </summary>
+    public static int[] GetUpgradeCost_Forge ()
+    {
+        int[] costs;
+        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
+        {
+            costs = new int[] { 5, 5, 5, 5, 5, 5 };
+        }
+        else
+        {
+            costs = new int[] { 15, 15, 15, 15, 15, 15 };
+        }
+        return costs;
+    }
+
+    /// <summary>
     /// This is a gross lookup table implemented in code because it lets us do
     /// balancing tweaks with more precision than an actual algorithmic approach.
     /// </summary>
