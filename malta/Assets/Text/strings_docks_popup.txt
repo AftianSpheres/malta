@@ -1,0 +1,16 @@
+Docks, Level 
+Upgrade Docks
+No upgrade in progress
+Building is at max level
+Time remaining until upgrade completion: 
+Build time multiplier: 1.0x
+Build time multiplier: 2.0x
+Build time multiplier: 3.0x
+Build time multiplier: 4.0x
+Build time multiplier: 5.0x
+Build time multiplier: 6.0x
+Build time multiplier: 7.0x
+Build time multiplier: 8.0x
+Build time multiplier: 9.0x
+Build time multiplier: 10.0x
+Build time multiplier: 11.0x

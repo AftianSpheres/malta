@@ -367,14 +367,7 @@ public class ResourceBuildingPopup : MonoBehaviour
                 if (cachedPendingUpgradeTimer != pendingUpgradeTimer)
                 {
                     cachedPendingUpgradeTimer = pendingUpgradeTimer;
-                    if (buildingType == BuildingType.ClayPit || buildingType == BuildingType.Mine || buildingType == BuildingType.Woodlands)
-                    {
-                        timerArea.text = PopupMenu.GetTimerReadout(pendingUpgradeTimer, GameDataManager.Instance.buildingLv_Docks + 1);
-                    }
-                    else
-                    {
-                        timerArea.text = PopupMenu.GetTimerReadout(pendingUpgradeTimer, GameDataManager.Instance.buildingLv_Docks + 1);
-                    }
+                    timerArea.text = PopupMenu.GetTimerReadout(pendingUpgradeTimer, GameDataManager.Instance.buildingLv_Docks + 1);
                 }
             }
             else if (timerArea.gameObject.activeInHierarchy) timerArea.gameObject.SetActive(false);
