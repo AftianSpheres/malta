@@ -1,0 +1,33 @@
+Mason, 
+Smith, 
+Sawmill, 
+Clay Pit, 
+Mines, 
+Woodlands, 
+Level 
+No upgrade in progress
+Building is at max level
+Time remaining until upgrade completion: 
+Output: 
+ / minute
+Storage capacity: 
+ [
+ upgrades]
+Upgrade Mason
+Upgrade Smith
+Upgrade Sawmill
+Upgrade Clay Pit
+Upgrade Mines
+Upgrade Woodlands
+[
+ clay]
+ ore]
+ wood]
+ clay, 
+ ore, 
+ wood, 
+ bricks]
+ metal]
+ planks]
+Upgrade storage capacity?
+(Temporary - only until next level)

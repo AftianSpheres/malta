@@ -28,3 +28,4 @@ Mines
 Woodlands
 Clay Pit
 Wizard's Tower
+Status: Class upgrade ready

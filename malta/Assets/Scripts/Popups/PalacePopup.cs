@@ -55,6 +55,9 @@ public class PalacePopup : MonoBehaviour
     public Text matsNeededWood;
     public GameObject matsNeededSection;
     public PopupMenu shell;
+    public PopupMenu masonPopup;
+    public PopupMenu sawmillPopup;
+    public PopupMenu smithPopup;
     public PopupMenu sovereignSpecialPopup;
     public PopupMenu sovereignTacticsPopup;
     public TextAsset stringsResource;
@@ -104,17 +107,20 @@ public class PalacePopup : MonoBehaviour
 
     public void OpenMasonPopup ()
     {
-        Debug.Log("Not yet implemented");
+        shell.Close();
+        masonPopup.Open();
     }
 
     public void OpenSawmillPopup ()
     {
-        Debug.Log("Not yet implemented");
+        shell.Close();
+        sawmillPopup.Open();
     }
 
     public void OpenSmithPopup ()
     {
-        Debug.Log("Not yet implemented");
+        shell.Close();
+        smithPopup.Open();
     }
 
     public void OpenClayPitPopup ()

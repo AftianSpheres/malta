@@ -53,3 +53,16 @@
 9:35 PM - off
 1:01 AM - on
 1:34 AM - off
+
+-------------
+
+3:18 PM - start
+4:04 PM - off
+4:41 PM - on
+5:02 PM - off
+5:48 PM - on
+6:23 PM - off
+6:33 PM - on
+7:14 PM - off
+8:00 PM - on
+8:12 PM - off

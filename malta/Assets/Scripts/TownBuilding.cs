@@ -139,13 +139,27 @@ public class TownBuilding : MonoBehaviour
     public static int[] GetUpgradeCost_Forge ()
     {
         int[] costs;
-        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
+        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
         {
             costs = new int[] { 5, 5, 5, 5, 5, 5 };
         }
-        else
+        else if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
         {
             costs = new int[] { 15, 15, 15, 15, 15, 15 };
+        }
+        else
+        {
+            costs = new int[] { 45, 45, 45, 45, 45, 45 };
+        }
+        return costs;
+    }
+
+    public static int[] GetCapUpCost_MasonClaypit(int level)
+    {
+        int[] costs = GetUpgradeCost_MasonClaypit(level);
+        for (int i = 0; i < costs.Length; i++)
+        {
+            if (costs[i] > 0) costs[i] = Mathf.CeilToInt(costs[i] * 0.25f);
         }
         return costs;
     }
@@ -189,9 +203,22 @@ public class TownBuilding : MonoBehaviour
             case 9:
                 costs = new int[] { 308, 52, 52, 460, 76, 76 };
                 break;
+            case 10:
+                costs = new int[] { 616, 104, 104, 920, 152, 152 };
+                break;
             default:
                 costs = new int[] { 0, 0, 0, 0, 0, 0 };
                 break;
+        }
+        return costs;
+    }
+
+    public static int[] GetCapUpCost_SawmillWoodlands(int level)
+    {
+        int[] costs = GetUpgradeCost_SawmillWoodlands(level);
+        for (int i = 0; i < costs.Length; i++)
+        {
+            if (costs[i] > 0) costs[i] = Mathf.CeilToInt(costs[i] * 0.25f);
         }
         return costs;
     }
@@ -235,9 +262,22 @@ public class TownBuilding : MonoBehaviour
             case 9:
                 costs = new int[] { 52, 308, 52, 76, 460, 76 };
                 break;
+            case 10:
+                costs = new int[] { 104, 616, 104, 152, 920, 152 };
+                break;
             default:
                 costs = new int[] { 0, 0, 0, 0, 0, 0 };
                 break;
+        }
+        return costs;
+    }
+
+    public static int[] GetCapUpCost_SmithMines(int level)
+    {
+        int[] costs = GetUpgradeCost_SmithMines(level);
+        for (int i = 0; i < costs.Length; i++)
+        {
+            if (costs[i] > 0) costs[i] = Mathf.CeilToInt(costs[i] * 0.25f);
         }
         return costs;
     }
@@ -280,6 +320,9 @@ public class TownBuilding : MonoBehaviour
                 break;
             case 9:
                 costs = new int[] { 52, 52, 308, 76, 76, 460 };
+                break;
+            case 10:
+                costs = new int[] { 104, 104, 616, 152, 152, 920 };
                 break;
             default:
                 costs = new int[] { 0, 0, 0, 0, 0, 0 };

@@ -98,31 +98,52 @@ public class BuildingInfoPanel : MonoBehaviour
 
     private void RefreshTimer (float timer, float level)
     {
-        float trueSeconds = timer / level;
-        int minutes = Mathf.FloorToInt(trueSeconds / 60);
-        int seconds = Mathf.CeilToInt(trueSeconds % 60);
-        string secString;
-        if (seconds > 9) secString = seconds.ToString();
-        else secString = "0" + seconds.ToString();
-        timerCounter.text = minutes.ToString() + ":" + secString;
+        timerCounter.text = PopupMenu.GetTimerReadout(timer, level);
     }
 
     private void UpdateProcessing_Forge ()
     {
-        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior)
+        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
         {
             if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-            // do things
-        }
-        else if (GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
-        {
-            if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-            // similar but distinct things
+            if (GameDataManager.Instance.resClay != cachedMaterialQuantities[0] ||
+                GameDataManager.Instance.resLumber != cachedMaterialQuantities[1] ||
+                GameDataManager.Instance.resOre != cachedMaterialQuantities[2] ||
+                GameDataManager.Instance.resBricks != cachedMaterialQuantities[3] ||
+                GameDataManager.Instance.resPlanks != cachedMaterialQuantities[4] ||
+                GameDataManager.Instance.resMetal != cachedMaterialQuantities[5])
+            {
+                cachedMaterialQuantities = new int[] {GameDataManager.Instance.resClay, GameDataManager.Instance.resLumber, GameDataManager.Instance.resOre,
+                                                                  GameDataManager.Instance.resBricks, GameDataManager.Instance.resPlanks, GameDataManager.Instance.resMetal};
+                int[] costs = TownBuilding.GetUpgradeCost_Forge();
+                RefreshResourceCounters(costs);
+                if (GameDataManager.Instance.CheckMaterialAvailability(costs))
+                {
+                    if (devStatusLabel.text != strings[30]) devStatusLabel.text = strings[30];
+                }
+                else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
+            }
         }
         else if (!GameDataManager.Instance.unlock_forgeOutbuilding)
         {
             if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-            // less similar things
+            if (GameDataManager.Instance.resClay != cachedMaterialQuantities[0] ||
+                GameDataManager.Instance.resLumber != cachedMaterialQuantities[1] ||
+                GameDataManager.Instance.resOre != cachedMaterialQuantities[2] ||
+                GameDataManager.Instance.resBricks != cachedMaterialQuantities[3] ||
+                GameDataManager.Instance.resPlanks != cachedMaterialQuantities[4] ||
+                GameDataManager.Instance.resMetal != cachedMaterialQuantities[5])
+            {
+                cachedMaterialQuantities = new int[] {GameDataManager.Instance.resClay, GameDataManager.Instance.resLumber, GameDataManager.Instance.resOre,
+                                                                  GameDataManager.Instance.resBricks, GameDataManager.Instance.resPlanks, GameDataManager.Instance.resMetal};
+                int[] costs = TownBuilding.GetUpgradeCost_Forge();
+                RefreshResourceCounters(costs);
+                if (GameDataManager.Instance.CheckMaterialAvailability(costs))
+                {
+                    if (devStatusLabel.text != strings[16]) devStatusLabel.text = strings[16];
+                }
+                else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
+            }
         }
         else
         {
@@ -149,7 +170,7 @@ public class BuildingInfoPanel : MonoBehaviour
                 RefreshResourceCounters(TownBuilding.houseConstructionCosts);
                 if (GameDataManager.Instance.CheckMaterialAvailability(TownBuilding.houseConstructionCosts))
                 {
-                    if (devStatusLabel.text != strings[16]) devStatusLabel.text = strings[14];
+                    if (devStatusLabel.text != strings[14]) devStatusLabel.text = strings[14];
                 }
                 else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
             }

@@ -80,4 +80,17 @@ public class PopupMenu : MonoBehaviour
         }
         surrenderedFocus = true;
     }
+
+    public static string GetTimerReadout(float timer, float level)
+    {
+        string timerReadout;
+        float trueSeconds = timer / level;
+        int minutes = Mathf.FloorToInt(trueSeconds / 60);
+        int seconds = Mathf.CeilToInt(trueSeconds - (60 * minutes));
+        string secString;
+        if (seconds > 9) secString = seconds.ToString();
+        else secString = "0" + seconds.ToString();
+        timerReadout = minutes.ToString() + ":" + secString;
+        return timerReadout;
+    }
 }

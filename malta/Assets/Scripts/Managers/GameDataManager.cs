@@ -84,7 +84,7 @@ public class GameDataManager : Manager<GameDataManager>
         sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
         lastSecondTimestamp = Time.time;
         RecalculateResourceMaximums();
-        //if (Application.isEditor) Time.timeScale = 6.0f; // speed things up for in-editor testing
+        if (Application.isEditor) Time.timeScale = 60.0f; // speed things up for in-editor testing
     }
 
     void Update ()
@@ -94,24 +94,27 @@ public class GameDataManager : Manager<GameDataManager>
             lastSecondTimestamp = Time.time;
             UpdateProcessing_ResourceGain();
             if (unlock_Taskmaster) UpdateProcessing_ResourceGain(); // output doubled in the quickest, laziest way possible
-            HandlePendingUpgrade(ref pendingUpgradeTimer_ClayPit, ref harvestLv_ClayPit, ref pendingUpgrade_ClayPit);
-            HandlePendingUpgrade(ref pendingUpgradeTimer_Docks, ref buildingLv_Docks, ref pendingUpgrade_Docks);
-            HandlePendingUpgrade(ref pendingUpgradeTimer_Mason, ref buildingLv_Mason, ref pendingUpgrade_Mason);
-            HandlePendingUpgrade(ref pendingUpgradeTimer_Mine, ref harvestLv_Mine, ref pendingUpgrade_Mine);
-            HandlePendingUpgrade(ref pendingUpgradeTimer_Sawmill, ref buildingLv_Sawmill, ref pendingUpgrade_Sawmill);
-            HandlePendingUpgrade(ref pendingUpgradeTimer_Smith, ref buildingLv_Smith, ref pendingUpgrade_Smith);
-            HandlePendingUpgrade(ref pendingUpgradeTimer_Woodlands, ref harvestLv_Woodlands, ref pendingUpgrade_Woodlands);
+            HandlePendingUpgrade(ref pendingUpgradeTimer_ClayPit, ref harvestLv_ClayPit, ref pendingUpgrade_ClayPit, ref resClay_maxUpgrades);
+            HandlePendingUpgrade(ref pendingUpgradeTimer_Docks, ref buildingLv_Docks, ref pendingUpgrade_Docks, ref pendingUpgradeTimer_Docks); // this is a hack
+            HandlePendingUpgrade(ref pendingUpgradeTimer_Mason, ref buildingLv_Mason, ref pendingUpgrade_Mason, ref resBricks_maxUpgrades);
+            HandlePendingUpgrade(ref pendingUpgradeTimer_Mine, ref harvestLv_Mine, ref pendingUpgrade_Mine, ref resOre_maxUpgrades);
+            HandlePendingUpgrade(ref pendingUpgradeTimer_Sawmill, ref buildingLv_Sawmill, ref pendingUpgrade_Sawmill, ref resPlanks_maxUpgrades);
+            HandlePendingUpgrade(ref pendingUpgradeTimer_Smith, ref buildingLv_Smith, ref pendingUpgrade_Smith, ref resMetal_maxUpgrades);
+            HandlePendingUpgrade(ref pendingUpgradeTimer_Woodlands, ref harvestLv_Woodlands, ref pendingUpgrade_Woodlands, ref resLumber_maxUpgrades);
         }
 
     }
 
-    void HandlePendingUpgrade (ref int pendingUpgradeTimer, ref int buildingLv, ref bool pendingUpgrade)
+    void HandlePendingUpgrade (ref int pendingUpgradeTimer, ref int buildingLv, ref bool pendingUpgrade, ref int capUpgrades)
     {
         if (pendingUpgradeTimer> 0) pendingUpgradeTimer -= buildingLv_Docks + 1; // spec didn't indicate exactly how docks work afaik, but linear scaling seems less broken than exponential
         else if (pendingUpgrade)
         {
             buildingLv++;
+            pendingUpgradeTimer = 0;
+            capUpgrades = 0;
             pendingUpgrade = false;
+            RecalculateResourceMaximums();
         }
     }
 
@@ -242,6 +245,11 @@ public class GameDataManager : Manager<GameDataManager>
         return result;
     }
 
+    public bool SpendResourcesIfPossible (int[] resourceNums)
+    {
+        return SpendResourcesIfPossible(resourceNums[0], resourceNums[1], resourceNums[2], resourceNums[3], resourceNums[4], resourceNums[5]);
+    }
+
     public bool SpendResourcesIfPossible (int numClay, int numLumber, int numOre, int numBrick, int numPlanks, int numMetal)
     {
         bool result = false;
@@ -256,6 +264,32 @@ public class GameDataManager : Manager<GameDataManager>
             result = true;
         }
         return result;
+    }
+
+    public void UpgradeResourceCap (ResourceType resource)
+    {
+        switch (resource)
+        {
+            case ResourceType.Bricks:
+                resBricks_maxUpgrades++;
+                break;
+            case ResourceType.Metal:
+                resMetal_maxUpgrades++;
+                break;
+            case ResourceType.Planks:
+                resPlanks_maxUpgrades++;
+                break;
+            case ResourceType.Clay:
+                resClay_maxUpgrades++;
+                break;
+            case ResourceType.Ore:
+                resOre_maxUpgrades++;
+                break;
+            case ResourceType.Lumber:
+                resLumber_maxUpgrades++;
+                break;
+        }
+        RecalculateResourceMaximums();
     }
 
     void _in_SetBuildingUpgradePending (ref bool pendingUpgrade, ref int pendingUpgradeTimer, int buildingLv)
