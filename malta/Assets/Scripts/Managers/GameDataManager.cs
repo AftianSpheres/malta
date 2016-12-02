@@ -191,6 +191,26 @@ public class GameDataManager : Manager<GameDataManager>
         return gain;
     }
 
+    public void PromoteMysticsTo (AdventurerClass advClass)
+    {
+        for (int i = 0; i < houseAdventurers.Length; i++)
+        {
+            if (houseAdventurers[i] != null && houseAdventurers[i].advClass == mysticClassUnlock) houseAdventurers[i].advClass = advClass;
+        }
+        if (forgeAdventurer != null && forgeAdventurer.advClass == mysticClassUnlock) forgeAdventurer.advClass = advClass;
+        mysticClassUnlock = advClass;
+    }
+
+    public void PromoteWarriorsTo (AdventurerClass advClass)
+    {
+        for (int i = 0; i < houseAdventurers.Length; i++)
+        {
+            if (houseAdventurers[i] != null && houseAdventurers[i].advClass == warriorClassUnlock) houseAdventurers[i].advClass = advClass;
+        }
+        if (forgeAdventurer != null && forgeAdventurer.advClass == warriorClassUnlock) forgeAdventurer.advClass = advClass;
+        warriorClassUnlock = advClass;
+    }
+
     public void SetBuildingUpgradePending (BuildingType building)
     {
         switch (building)

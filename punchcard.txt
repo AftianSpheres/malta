@@ -68,3 +68,8 @@
 8:12 PM - off
 1:37 AM - on
 2:17 AM - off
+
+-------------
+
+4:00 PM - start
+5:00 PM - off
