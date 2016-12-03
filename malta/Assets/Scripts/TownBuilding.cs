@@ -39,10 +39,24 @@ public class TownBuilding : MonoBehaviour
         if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
         {
             if (buildingAlteredSinceLastUpdate) RefreshBuildingAssociations(); // doing it like this also lets you mark buildings as "dirty" based on timed events
-            if (associatedAdventurer != null && !associatedAdventurer.initialized)
+            if (buildingType == BuildingType.House || buildingType == BuildingType.Forge)
             {
-                associatedAdventurer.Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, hasOutbuilding, new int[] { 0, 0, 0, 0 });
+                if (associatedAdventurer == null)
+                {
+                    if (buildingType == BuildingType.House)
+                    {
+                        if (GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] != null) associatedAdventurer = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex];
+                        else associatedAdventurer = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] = ScriptableObject.CreateInstance<Adventurer>();
+                    }
+                    else if (GameDataManager.Instance.forgeAdventurer != null) associatedAdventurer = GameDataManager.Instance.forgeAdventurer;
+                    else associatedAdventurer = GameDataManager.Instance.forgeAdventurer = ScriptableObject.CreateInstance<Adventurer>();
+                }
+                if (!associatedAdventurer.initialized)
+                {
+                    associatedAdventurer.Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, hasOutbuilding && (buildingType == BuildingType.House), new int[] { 0, 0, 0, 0 });
+                }
             }
+
         }
     }
 
@@ -81,6 +95,7 @@ public class TownBuilding : MonoBehaviour
                     associatedAdventurer.Reroll(GameDataManager.Instance.warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
                 }
                 buildingAlteredSinceLastUpdate = true;
+                GameDataManager.Instance.unlock_forgeOutbuilding = true;
                 break;
             default:
                 throw new System.Exception("Can't add outbuilding to building of type " + buildingType.ToString());

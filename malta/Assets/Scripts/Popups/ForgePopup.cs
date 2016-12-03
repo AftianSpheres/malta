@@ -1,13 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+enum ForgeStatus
+{
+    Uninitialized,
+    NoUpgrades,
+    AtLeastOneUpgrade,
+    ReadyForOutbuilding,
+    Outbuilding_Adventurer,
+    Outbuilding_Taskmaster
+}
+
 public class ForgePopup : MonoBehaviour
 {
     public PopupMenu shell;
-    public BoxCollider2D bowmanButtonCollider;
-    public BoxCollider2D footmanButtonCollider;
-    public BoxCollider2D sageButtonCollider;
-    public BoxCollider2D wizardButtonCollider;
     public GameObject adventurerArea;
     public GameObject adventurerButton;
     public GameObject bowmanButton;
@@ -18,14 +24,21 @@ public class ForgePopup : MonoBehaviour
     public GameObject taskmasterButton;
     public GameObject wizardButton;
     public PopupMenu insufficientResourcesPopup;
+    public Text[] adventurerButtonReqsLabels;
     public Text[] bowmanButtonReqsLabels;
     public Text[] footmanButtonReqsLabels;
     public Text[] sageButtonReqsLabels;
+    public Text[] taskmasterButtonReqsLabels;
     public Text[] wizardButtonReqsLabels;
+    public Text explainAreaText;
     public Text mysticUpgradeText;
     public Text warriorUpgradeText;
     public TextAsset stringsResource;
+    public TownBuilding townBuilding;
     private string[] strings;
+    private float explainAreaExpiryTimer = -1;
+    private const float explainAreaExpiryTime = 0.5f;
+    private ForgeStatus status;
 
     // Use this for initialization
     void Start ()
@@ -38,22 +51,132 @@ public class ForgePopup : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-
+            if (explainAreaExpiryTimer > 0)
+            {
+                explainAreaExpiryTimer -= Time.deltaTime;
+            }
+            if (explainAreaExpiryTimer <= 0 && explainArea.activeInHierarchy)
+            {
+                explainArea.SetActive(false);
+            }
+            if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && (bowmanButton.activeInHierarchy || footmanButton.activeInHierarchy))
+            {
+                bowmanButton.SetActive(false);
+                footmanButton.SetActive(false);
+                warriorUpgradeText.gameObject.SetActive(true);
+                if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Bowman) warriorUpgradeText.text = strings[4];
+                else warriorUpgradeText.text = strings[5];
+            }
+            if (GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && (sageButton.activeInHierarchy || wizardButton.activeInHierarchy))
+            {
+                sageButton.SetActive(false);
+                wizardButton.SetActive(false);
+                mysticUpgradeText.gameObject.SetActive(true);
+                if (GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Sage) mysticUpgradeText.text = strings[6];
+                else warriorUpgradeText.text = strings[7];
+            }
+            if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
+            {
+                if (!GameDataManager.Instance.unlock_forgeOutbuilding)
+                {
+                    if (!adventurerButton.activeInHierarchy) adventurerButton.SetActive(true);
+                    if (!taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(true);
+                }
+                else
+                {
+                    if (adventurerButton.activeInHierarchy) adventurerButton.SetActive(false);
+                    if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
+                    if (GameDataManager.Instance.unlock_Taskmaster)
+                    {
+                        if (!taskmasterArea.activeInHierarchy) taskmasterArea.SetActive(true);
+                    }
+                    else if (!adventurerArea.activeInHierarchy && townBuilding.associatedAdventurer != null) adventurerArea.SetActive(true);
+                }
+            }
+            switch (status) // this is gross. probably rip it out & do something cleaner later on. (probably the one thing that'd ever be made more elegant by switch fallthrough, lol)
+            {
+                case ForgeStatus.Uninitialized:
+                    if (GameDataManager.Instance.unlock_forgeOutbuilding)
+                    {
+                        if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
+                        else status = ForgeStatus.Outbuilding_Adventurer;
+                        RefreshReqsLabels();
+                    }
+                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
+                    {
+                        status = ForgeStatus.AtLeastOneUpgrade;
+                        RefreshReqsLabels();
+                    }
+                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
+                    {
+                        status = ForgeStatus.ReadyForOutbuilding;
+                        RefreshReqsLabels();
+                    }
+                    else
+                    {
+                        status = ForgeStatus.NoUpgrades;
+                        RefreshReqsLabels();
+                    }
+                    break;
+                case ForgeStatus.NoUpgrades:
+                    if (GameDataManager.Instance.unlock_forgeOutbuilding)
+                    {
+                        if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
+                        else status = ForgeStatus.Outbuilding_Adventurer;
+                        RefreshReqsLabels();
+                    }
+                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
+                    {
+                        status = ForgeStatus.AtLeastOneUpgrade;
+                        RefreshReqsLabels();
+                    }
+                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
+                    {
+                        status = ForgeStatus.ReadyForOutbuilding;
+                        RefreshReqsLabels();
+                    }
+                    break;
+                case ForgeStatus.AtLeastOneUpgrade:
+                    if (GameDataManager.Instance.unlock_forgeOutbuilding)
+                    {
+                        if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
+                        else status = ForgeStatus.Outbuilding_Adventurer;
+                        RefreshReqsLabels();
+                    }
+                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
+                    {
+                        status = ForgeStatus.ReadyForOutbuilding;
+                        RefreshReqsLabels();
+                    }
+                    break;
+                case ForgeStatus.ReadyForOutbuilding:
+                    if (GameDataManager.Instance.unlock_forgeOutbuilding)
+                    {
+                        if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
+                        else status = ForgeStatus.Outbuilding_Adventurer;
+                        RefreshReqsLabels();
+                    }
+                    break;
+            }
         }
 	}
+
+    private void RefreshReqsLabels ()
+    {
+        int[] costs = TownBuilding.GetUpgradeCost_Forge();
+        for (int i = 0; i < costs.Length; i++)
+        {
+            adventurerButtonReqsLabels[i].text = bowmanButtonReqsLabels[i].text = footmanButtonReqsLabels[i].text = 
+                sageButtonReqsLabels[i].text = taskmasterButtonReqsLabels[i].text = wizardButtonReqsLabels[i].text = costs[i].ToString();
+        }
+    }
 
     public void BuildAdventurerQuartersButtonInteraction ()
     {
         int[] costs = TownBuilding.GetUpgradeCost_Forge();
         if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
         {
-            GameDataManager.Instance.unlock_forgeOutbuilding = true;
-            GameDataManager.Instance.unlock_Taskmaster = false;
-            if (GameDataManager.Instance.forgeAdventurer == null)
-            {
-                GameDataManager.Instance.forgeAdventurer = ScriptableObject.CreateInstance<Adventurer>();
-                GameDataManager.Instance.forgeAdventurer.Reroll(GameDataManager.Instance.warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
-            }
+            townBuilding.BuildOutbuilding();
         }
         else
         {
@@ -67,13 +190,27 @@ public class ForgePopup : MonoBehaviour
         int[] costs = TownBuilding.GetUpgradeCost_Forge();
         if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
         {
-            GameDataManager.Instance.unlock_forgeOutbuilding = true;
-            GameDataManager.Instance.unlock_Taskmaster = true;
+            townBuilding.BuildOutbuilding(true);
         }
         else
         {
             shell.SurrenderFocus();
             insufficientResourcesPopup.Open();
+        }
+    }
+
+    public void MouseoverExit()
+    {
+        explainAreaExpiryTimer = explainAreaExpiryTime;
+    }
+
+    public void MysticToSageButtonMouseoverEntry ()
+    {
+        if (GameStateManager.Instance.PopupHasFocus(shell))
+        {
+            if (!explainArea.activeInHierarchy) explainArea.SetActive(true);
+            if (explainAreaText.text != strings[2]) explainAreaText.text = strings[2];
+            explainAreaExpiryTimer = -1.0f;
         }
     }
 
@@ -88,6 +225,16 @@ public class ForgePopup : MonoBehaviour
         }
     }
 
+    public void MysticToWizardButtonMouseoverEntry ()
+    {
+        if (GameStateManager.Instance.PopupHasFocus(shell))
+        {
+            if (!explainArea.activeInHierarchy) explainArea.SetActive(true);
+            if (explainAreaText.text != strings[3]) explainAreaText.text = strings[3];
+            explainAreaExpiryTimer = -1.0f;
+        }
+    }
+
     public void MysticToWizardButtonInteraction ()
     {
         int[] costs = TownBuilding.GetUpgradeCost_Forge();
@@ -99,6 +246,16 @@ public class ForgePopup : MonoBehaviour
         }
     }
 
+    public void WarriorToBowmanButtonMouseoverEntry ()
+    {
+        if (GameStateManager.Instance.PopupHasFocus(shell))
+        {
+            if (!explainArea.activeInHierarchy) explainArea.SetActive(true);
+            if (explainAreaText.text != strings[0]) explainAreaText.text = strings[0];
+            explainAreaExpiryTimer = -1.0f;
+        }
+    }
+
     public void WarriorToBowmanButtonInteraction ()
     {
         int[] costs = TownBuilding.GetUpgradeCost_Forge();
@@ -107,6 +264,16 @@ public class ForgePopup : MonoBehaviour
         {
             shell.SurrenderFocus();
             insufficientResourcesPopup.Open();
+        }
+    }
+
+    public void WarriorToFootmanButtonMouseoverEntry ()
+    {
+        if (GameStateManager.Instance.PopupHasFocus(shell))
+        {
+            if (!explainArea.activeInHierarchy) explainArea.SetActive(true);
+            if (explainAreaText.text != strings[1]) explainAreaText.text = strings[1];
+            explainAreaExpiryTimer = -1.0f;
         }
     }
 

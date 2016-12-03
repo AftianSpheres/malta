@@ -84,7 +84,7 @@ public class GameDataManager : Manager<GameDataManager>
         sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
         lastSecondTimestamp = Time.time;
         RecalculateResourceMaximums();
-        if (Application.isEditor) Time.timeScale = 60.0f; // speed things up for in-editor testing
+        if (Application.isEditor) Time.timeScale = 100.0f; // speed things up for in-editor testing
     }
 
     void Update ()

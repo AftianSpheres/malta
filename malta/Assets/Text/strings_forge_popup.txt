@@ -2,3 +2,7 @@ Upgrade your Warriors to nimble Bowmen, who trade defense for speed, power and r
 Upgrade your Warriors to sturdy Footmen, who boast a modest power increase and substantially more durability.
 Upgrade your Mystics to wise Sages, who specialize in party support.
 Upgrade your Mystics to potent Wizards, who concentrate on pure destructive force.
+Warrior has been upgraded to Bowman!
+Warrior has been upgraded to Footman!
+Mystic has been upgraded to Sage!
+Mystic has been upgraded to Wizard!

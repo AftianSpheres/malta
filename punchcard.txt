@@ -73,3 +73,9 @@
 
 4:00 PM - start
 5:00 PM - off
+8:17 PM - on
+8:49 PM - off
+9:44 PM - on
+10:10 PM - off
+11:51 PM - on
+12:20 AM - off

@@ -5,25 +5,19 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | malta</title>
     <style>
-	canvas {
-		padding-left: 0;
-		padding-right: 0;
-		margin-left: auto;
-		margin-right: auto;
-		display: block;
-	}
+    /* a style sheet needs to be present for cursor hiding and custom cursors to work. */
     </style>
   </head>
   <body>
-    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="675px" width="1200px" align = "center"></canvas>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="675px" width="1200px"></canvas>
     <script type='text/javascript'>
   var Module = {
     TOTAL_MEMORY: 536870912,
     errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
     compatibilitycheck: null,
-    dataUrl: "Release/mbuild.data",
-    codeUrl: "Release/mbuild.js",
-    memUrl: "Release/mbuild.mem",
+    dataUrl: "Release/malta.data",
+    codeUrl: "Release/malta.js",
+    memUrl: "Release/malta.mem",
     
   };
 </script>

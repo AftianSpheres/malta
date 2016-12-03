@@ -34,8 +34,11 @@ public class HousePopup : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if (associatedHouse.hasOutbuilding && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
-        else if (!associatedHouse.hasOutbuilding && !outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(true);
+        if (outbuildingButton != null)
+        {
+            if (associatedHouse.hasOutbuilding && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
+            else if (!associatedHouse.hasOutbuilding && !outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(true);
+        }
         if (associatedHouse.associatedAdventurer.fullName != cachedName)
         {
             cachedName = associatedHouse.associatedAdventurer.fullName;

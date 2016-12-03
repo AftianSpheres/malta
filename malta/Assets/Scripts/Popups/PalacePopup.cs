@@ -56,6 +56,7 @@ public class PalacePopup : MonoBehaviour
     public GameObject matsNeededSection;
     public PopupMenu shell;
     public PopupMenu docksPopup;
+    public PopupMenu forgePopup;
     public PopupMenu masonPopup;
     public PopupMenu sawmillPopup;
     public PopupMenu smithPopup;
@@ -104,7 +105,8 @@ public class PalacePopup : MonoBehaviour
 
     public void OpenForgePopup ()
     {
-        Debug.Log("Not yet implemented");
+        shell.Close();
+        forgePopup.Open();
     }
 
     public void OpenMasonPopup ()
