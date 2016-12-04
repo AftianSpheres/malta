@@ -18,6 +18,8 @@ public class GameDataManager : Manager<GameDataManager>
     public string sovereignFirstName = "Dude";
     public string sovereignLastName = "Huge";
     public string sovereignName { get { return sovereignAdventurer.fullName; } }
+    public string yourTownName = "Citysburg";
+    public string[] fakeTownNames = { "Town A", "Town No. 2", "Tertiary Town" };
     public bool pendingUpgrade_ClayPit = false;
     public bool pendingUpgrade_Docks = false;
     public bool pendingUpgrade_Mason = false;
@@ -84,11 +86,12 @@ public class GameDataManager : Manager<GameDataManager>
         sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
         lastSecondTimestamp = Time.time;
         RecalculateResourceMaximums();
-        if (Application.isEditor) Time.timeScale = 100.0f; // speed things up for in-editor testing
     }
 
     void Update ()
     {
+        if (Input.GetKey(KeyCode.Pause)) Time.timeScale = 100.0f; // speed things up for testing
+        else Time.timeScale = 1.0f;
         if (Time.time - lastSecondTimestamp >= 1.0f)
         {
             lastSecondTimestamp = Time.time;

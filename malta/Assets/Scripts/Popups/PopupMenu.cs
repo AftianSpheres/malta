@@ -6,7 +6,7 @@ public class PopupMenu : MonoBehaviour
 {
     public bool isActive
     {
-        get { return contents.activeInHierarchy; }
+        get { if (contents != null) return contents.activeInHierarchy; else return false; } // ugly hack, keeps loading popup from breaking shit
     }
     public GameObject contents;
     public PopupMenu[] focusSharers;

@@ -22,6 +22,7 @@ public class LevelLoadManager : Manager<LevelLoadManager>
 
     IEnumerator _in_EnterLevel(int sceneIndex, BuildingType checkBuildingOnLoad, int buildingIndex)
     {
+        topLevelMenuSystem.loadingPopup.Open();
         AsyncOperation loading = SceneManager.LoadSceneAsync(sceneIndex, LoadSceneMode.Single);
         while (loading.isDone == false)
         {
