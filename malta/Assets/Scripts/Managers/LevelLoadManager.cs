@@ -6,25 +6,23 @@ public class LevelLoadManager : Manager<LevelLoadManager>
 {
     public static int[] sceneIDs =
     {
-        1, // title
-        2, // town
-        3, // overworld
-        4, // fight
+        1, // town
+        2, // overworld
+        3, // fight
     };
 
-    public void EnterLevel (int level, int[] roomCoords, int EntryPointIndex, Direction playerInitialFacingDir)
+    public void EnterLevel (int level)
     {
         int index = sceneIDs[level];
-        StartCoroutine(_in_EnterLevel(index, roomCoords, EntryPointIndex, playerInitialFacingDir));
+        StartCoroutine(_in_EnterLevel(index));
     }
 
-    IEnumerator _in_EnterLevel(int index, int[] roomCoords, int EntryPointIndex, Direction playerInitialFacingDir)
+    IEnumerator _in_EnterLevel(int index)
     {
         AsyncOperation loading = SceneManager.LoadSceneAsync(index, LoadSceneMode.Single);
         while (loading.isDone == false)
         {
             yield return null;
         }
-        Debug.Log("Loaded scene: " + SceneManager.GetActiveScene().name);
     }
 }

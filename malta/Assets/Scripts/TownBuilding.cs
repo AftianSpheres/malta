@@ -429,7 +429,7 @@ public class TownBuilding : MonoBehaviour
                 }
                 else
                 {
-                    buildingMessage.text = associatedAdventurer.fullTitle;
+                    if (associatedAdventurer != null) buildingMessage.text = associatedAdventurer.fullTitle;
                 }
                 break;
         }
