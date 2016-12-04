@@ -129,17 +129,20 @@ public class PalacePopup : MonoBehaviour
 
     public void OpenClayPitPopup ()
     {
-        Debug.Log("ffs we don't even have a peninsular map scene yet");
+        shell.Close();
+        LevelLoadManager.Instance.EnterLevel(SceneIDType.OverworldScene, BuildingType.ClayPit);
     }
 
     public void OpenMinesPopup()
     {
-        Debug.Log("ffs we don't even have a peninsular map scene yet");
+        shell.Close();
+        LevelLoadManager.Instance.EnterLevel(SceneIDType.OverworldScene, BuildingType.Mine);
     }
 
     public void OpenWoodlandsPopup()
     {
-        Debug.Log("ffs we don't even have a peninsular map scene yet");
+        shell.Close();
+        LevelLoadManager.Instance.EnterLevel(SceneIDType.OverworldScene, BuildingType.Woodlands);
     }
 
     public void OpenWizardsTowerPopup()

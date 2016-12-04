@@ -12,7 +12,7 @@ public class ScreenChanger : MonoBehaviour
 {
     public float animLength;
     public float zoomDistance;
-    public int targetSceneID;
+    public SceneIDType targetSceneID;
     public Camera mainCamera;
     public AudioSource bgmSource;
     public AudioClip whooshySoundOrSomething;

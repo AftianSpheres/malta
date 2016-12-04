@@ -96,70 +96,49 @@ public class ForgePopup : MonoBehaviour
             switch (status) // this is gross. probably rip it out & do something cleaner later on. (probably the one thing that'd ever be made more elegant by switch fallthrough, lol)
             {
                 case ForgeStatus.Uninitialized:
-                    if (GameDataManager.Instance.unlock_forgeOutbuilding)
-                    {
-                        if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
-                        else status = ForgeStatus.Outbuilding_Adventurer;
-                        RefreshReqsLabels();
-                    }
-                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
-                    {
-                        status = ForgeStatus.AtLeastOneUpgrade;
-                        RefreshReqsLabels();
-                    }
-                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
-                    {
-                        status = ForgeStatus.ReadyForOutbuilding;
-                        RefreshReqsLabels();
-                    }
-                    else
-                    {
-                        status = ForgeStatus.NoUpgrades;
-                        RefreshReqsLabels();
-                    }
+                    _in_FuckingAwfulSwitchStatement(3);
                     break;
                 case ForgeStatus.NoUpgrades:
-                    if (GameDataManager.Instance.unlock_forgeOutbuilding)
-                    {
-                        if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
-                        else status = ForgeStatus.Outbuilding_Adventurer;
-                        RefreshReqsLabels();
-                    }
-                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
-                    {
-                        status = ForgeStatus.AtLeastOneUpgrade;
-                        RefreshReqsLabels();
-                    }
-                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
-                    {
-                        status = ForgeStatus.ReadyForOutbuilding;
-                        RefreshReqsLabels();
-                    }
+                    _in_FuckingAwfulSwitchStatement(2);
                     break;
                 case ForgeStatus.AtLeastOneUpgrade:
-                    if (GameDataManager.Instance.unlock_forgeOutbuilding)
-                    {
-                        if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
-                        else status = ForgeStatus.Outbuilding_Adventurer;
-                        RefreshReqsLabels();
-                    }
-                    else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
-                    {
-                        status = ForgeStatus.ReadyForOutbuilding;
-                        RefreshReqsLabels();
-                    }
+                    _in_FuckingAwfulSwitchStatement(1);
                     break;
                 case ForgeStatus.ReadyForOutbuilding:
-                    if (GameDataManager.Instance.unlock_forgeOutbuilding)
-                    {
-                        if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
-                        else status = ForgeStatus.Outbuilding_Adventurer;
-                        RefreshReqsLabels();
-                    }
+                    _in_FuckingAwfulSwitchStatement(0);
                     break;
             }
         }
 	}
+
+    /// <summary>
+    /// This is still gross and needs to be ripped out entirely but at least this makes it maintainable.
+    /// </summary>
+    /// <param name="steps">How far down do we want to follow this piece of shit?</param>
+    private void _in_FuckingAwfulSwitchStatement(int steps)
+    {
+        if (GameDataManager.Instance.unlock_forgeOutbuilding)
+        {
+            if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
+            else status = ForgeStatus.Outbuilding_Adventurer;
+            RefreshReqsLabels();
+        }
+        else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && steps > 0)
+        {
+            status = ForgeStatus.AtLeastOneUpgrade;
+            RefreshReqsLabels();
+        }
+        else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && steps > 1)
+        {
+            status = ForgeStatus.ReadyForOutbuilding;
+            RefreshReqsLabels();
+        }
+        else if (steps > 2)
+        {
+            status = ForgeStatus.NoUpgrades;
+            RefreshReqsLabels();
+        }
+    }
 
     private void RefreshReqsLabels ()
     {
