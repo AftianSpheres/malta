@@ -15,5 +15,6 @@ public enum BuildingType
     Woodlands,
     ClayPit,
     Tower,
-    Portal
+    Portal,
+    Forest
 }

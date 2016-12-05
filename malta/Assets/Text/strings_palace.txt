@@ -21,3 +21,11 @@ You're short on planks. Try upgrading the Sawmill.
 The portal is ready. All that remains is to activate it.
 It's said that this portal is a gate to another world... but it doesn't seem to be usable right now.
 The portal has opened. All you need do now is step through.
+Next destination: Forest Outskirts
+Scouts say a powerful magic-user has been spotted amongst a gang of bandits. The lot should be manageable enough, but take care.
+Next destination: Forest Depths
+Scouts say that a band of skilled mercenaries has been hired by the forest folk. Expect greater resistance. You may want to invest in extra training for your party before embarking.
+Next destination: Overgrown City
+Scouts confirm that they've found the city of the forest folk. This will be an exceptionally dangerous expedition, but we have reason to believe that their city may hide something having to do with the portal...
+Next destination: Forest Labyrinth Level 
+...We've had no word from our scouts. What's more, it seems like we'll need to offer a wager of our resources to enter... Is this really a good idea?

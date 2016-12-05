@@ -35,6 +35,7 @@ public class GameDataManager : Manager<GameDataManager>
     public bool unlock_sovSpe_Protect = false;
     public bool unlock_Taskmaster = false;
     public bool unlock_WizardsTower = false;
+    public int adventureLevel = 0;
     public int buildingLv_Docks = 0;
     public int buildingLv_Mason = 0;
     public int buildingLv_Sawmill = 0;
@@ -43,6 +44,7 @@ public class GameDataManager : Manager<GameDataManager>
     public int harvestLv_ClayPit = 1;
     public int harvestLv_Mine = 1;
     public int harvestLv_Woodlands = 1;
+    public int nextRandomAdventureAnte = 2;
     public int resBricks = 0;
     public int resBricks_max;
     public int resBricks_maxUpgrades = 0;
@@ -104,6 +106,19 @@ public class GameDataManager : Manager<GameDataManager>
             HandlePendingUpgrade(ref pendingUpgradeTimer_Sawmill, ref buildingLv_Sawmill, ref pendingUpgrade_Sawmill, ref resPlanks_maxUpgrades);
             HandlePendingUpgrade(ref pendingUpgradeTimer_Smith, ref buildingLv_Smith, ref pendingUpgrade_Smith, ref resMetal_maxUpgrades);
             HandlePendingUpgrade(ref pendingUpgradeTimer_Woodlands, ref harvestLv_Woodlands, ref pendingUpgrade_Woodlands, ref resLumber_maxUpgrades);
+        }
+        for (int i = 0; i < housesBuilt.Length; i++)
+        {
+            if (housesBuilt[i] && houseAdventurers[i] == null)
+            {
+                houseAdventurers[i] = ScriptableObject.CreateInstance<Adventurer>();
+                houseAdventurers[i].Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, housesOutbuildingsBuilt[i], new int[] { 0, 0, 0, 0 });
+            }
+        }
+        if (unlock_forgeOutbuilding && !unlock_Taskmaster && forgeAdventurer != null)
+        {
+            forgeAdventurer = ScriptableObject.CreateInstance<Adventurer>();
+            forgeAdventurer.Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
         }
 
     }
