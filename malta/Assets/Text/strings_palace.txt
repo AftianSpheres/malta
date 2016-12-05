@@ -19,3 +19,5 @@ You're short on bricks. Try upgrading the Mason.
 You're short on metal. Try upgrading the Blacksmith.
 You're short on planks. Try upgrading the Sawmill.
 The portal is ready. All that remains is to activate it.
+It's said that this portal is a gate to another world... but it doesn't seem to be usable right now.
+The portal has opened. All you need do now is step through.

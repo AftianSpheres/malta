@@ -68,6 +68,9 @@ public class LevelLoadManager : Manager<LevelLoadManager>
                 case BuildingType.ClayPit:
                     topLevelMenuSystem.clayPitPopup.Open();
                     break;
+                case BuildingType.Tower:
+                    topLevelMenuSystem.towerPopup.Open();
+                    break;
             }
         }
     }

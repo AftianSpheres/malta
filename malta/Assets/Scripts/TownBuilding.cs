@@ -14,7 +14,7 @@ enum BuildingStates_House
 /// </summary>
 public class TownBuilding : MonoBehaviour
 {
-    public static int[] buildingTypeMaxLevels = { 1, 1, 10, 10, 10, 1, 10, 10, 10, 10, 10 };
+    public static int[] buildingTypeMaxLevels = { 1, 1, 10, 10, 10, 1, 10, 10, 10, 10, 10, -1 };
     public static int[] houseConstructionCosts = { 0, 0, 0, 10, 10, 10 };
     public static int[] houseOutbuildingCosts = { 0, 0, 0, 20, 20, 20 };
     public int buildingStateIndex;
@@ -37,7 +37,7 @@ public class TownBuilding : MonoBehaviour
     void Update ()
     {
         if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
-        {
+        {          
             if (buildingAlteredSinceLastUpdate) RefreshBuildingAssociations(); // doing it like this also lets you mark buildings as "dirty" based on timed events
             if (buildingType == BuildingType.House || buildingType == BuildingType.Forge)
             {
@@ -56,13 +56,17 @@ public class TownBuilding : MonoBehaviour
                     associatedAdventurer.Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, hasOutbuilding && (buildingType == BuildingType.House), new int[] { 0, 0, 0, 0 });
                 }
             }
-
+            else if (buildingType == BuildingType.Tower)
+            {
+                if (GameDataManager.Instance.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.unlock_WizardsTower;
+                if (spriteRenderer.enabled) RefreshBuildingAssociations();
+            }
         }
     }
 
     private void OnMouseDown()
     {
-        if (associatedPopups[buildingStateIndex] != null && !GameStateManager.Instance.popupHasFocus)
+        if (associatedPopups[buildingStateIndex] != null && !GameStateManager.Instance.popupHasFocus && spriteRenderer.enabled)
         {
             OpenPopupOnBuilding();
         }
@@ -431,6 +435,10 @@ public class TownBuilding : MonoBehaviour
                 {
                     if (associatedAdventurer != null) buildingMessage.text = associatedAdventurer.fullTitle;
                 }
+                break;
+            case BuildingType.Portal:
+                if (GameDataManager.Instance.buildingLv_WizardsTower < buildingTypeMaxLevels[(int)BuildingType.Tower]) buildingStateIndex = 0;
+                else buildingStateIndex = 1;
                 break;
         }
         spriteRenderer.sprite = buildingSprites[buildingStateIndex];

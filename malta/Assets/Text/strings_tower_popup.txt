@@ -1,0 +1,11 @@
+Wizard's Tower, Level 
+Resource gain multiplier: 1.1x
+Resource gain multiplier: 1.2x
+Resource gain multiplier: 1.3x
+Resource gain multiplier: 1.4x
+Resource gain multiplier: 1.5x
+Resource gain multiplier: 1.6x
+Resource gain multiplier: 1.7x
+Resource gain multiplier: 1.8x
+Resource gain multiplier: 1.9x
+Resource gain multiplier: 2.0x
