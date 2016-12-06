@@ -103,3 +103,16 @@
 8:31 AM - off
 8:34 AM - on
 9:03 AM - off
+
+-------------
+
+7:09 PM - start
+7:43 PM - off
+9:02 PM - on
+9:12 PM - off
+10:04 PM - on
+10:40 PM - off
+10:44 PM - on
+10:59 PM - off
+12:06 AM - on
+12:39 AM - off
