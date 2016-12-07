@@ -38,6 +38,7 @@ public enum BattlerActionInterruptType
 public class Battler : MonoBehaviour
 {
     public BattleOverseer overseer;
+    public BattlerPuppet puppet;
     public Adventurer adventurer;
     public Battler bodyguard;
     public List<Battler> deathblowList;
@@ -153,11 +154,13 @@ public class Battler : MonoBehaviour
     public void ApplyBarrier (int turns = 1)
     {
         if (barrierTurns < turns) barrierTurns = turns;
+        overseer.messageBox.Step(BattleMessageType.Barrier);
     }
 
     public void ApplyHaste (int turns = 1)
     {
         if (hasteTurns < turns) hasteTurns = turns;
+        overseer.messageBox.Step(BattleMessageType.Haste);
     }
 
     public void AttackWith (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action)
@@ -193,12 +196,12 @@ public class Battler : MonoBehaviour
         _action = action;
         if (_target != null)
         {
-            _target.incomingHit = true;
-            if (_secondaryTarget != null) _secondaryTarget.incomingHit = true;
+            _target.incomingHit = _target.puppet.incomingHit = true;
+            if (_secondaryTarget != null) _secondaryTarget.incomingHit = _secondaryTarget.puppet.incomingHit = true;
         }
         else if (_hitAll)
         {
-            for (int i = 0; i < validEnemyTargets.Count; i++) validEnemyTargets[i].incomingHit = true;
+            for (int i = 0; i < validEnemyTargets.Count; i++) validEnemyTargets[i].incomingHit = validEnemyTargets[i].puppet.incomingHit = true;
         }
     }
 
@@ -276,6 +279,7 @@ public class Battler : MonoBehaviour
             }
             weakestAlly.DealDamage(healValue);
         }
+        overseer.messageBox.Step();
     }
 
     public static int CalcDamage (int damage, int offense, int defense)
@@ -305,7 +309,11 @@ public class Battler : MonoBehaviour
             }
             if (barrierTurns > 0) damage /= 2;
             if (shieldWallTurns > 0) damage /= 2;
-            if (shieldBlockTurns > 0) damage -= 5;
+            if (shieldBlockTurns > 0)
+            {
+                damage -= 5;
+                shieldBlockTurns--;
+            }
             if (damage < 0) damage = 0;
         }
         currentHP -= damage;
@@ -430,6 +438,7 @@ public class Battler : MonoBehaviour
         else if (adventurer.special == AdventurerSpecial.Protect) onAllyHitInterruptActions.Add(BattlerAction.Protect);
         if (HasAttack(AdventurerAttack.GetBehindMe)) onAllyDeathblowInterruptActions.Add(BattlerAction.GetBehindMe);
         if (HasAttack(AdventurerAttack.Flanking)) onAllyDeathblowInterruptActions.Add(BattlerAction.Flanking);
+        puppet.Setup();
     }
 
     public void TickCooldownsAndShit ()
@@ -439,7 +448,6 @@ public class Battler : MonoBehaviour
         if (feedbackCooldown > 0) feedbackCooldown--;
         if (hasteCooldown > 0) hasteCooldown--;
         if (hasteTurns > 0) hasteTurns--;
-        if (shieldBlockTurns > 0) shieldBlockTurns--;
         if (shieldWallTurns > 0) shieldWallTurns--;
         if (silentTurns > 0) silentTurns--;
         InitializeDisposables();

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class BattleOverseer : MonoBehaviour
 {
     public BattleTheater theater;
+    public BattleMessageBox messageBox;
     public Adventurer[][] enemyPartyConfigs;
     public Battler[] enemyParty;
     public Battler[] playerParty;
@@ -12,7 +13,8 @@ public class BattleOverseer : MonoBehaviour
     public Battler currentTurnTarget;
     public BattlerAction nextAction;
     public SortedList<float, Battler> turnOrderList;
-    private Battler[] allBattlers;
+    public Battler[] allBattlers { get; private set; }
+    public bool standardActionPriorityBracket;
     private bool currentBattleResolved;
     private bool encoreWaitingForEnemies;
     private bool encoreWaitingForPlayer;
@@ -20,8 +22,7 @@ public class BattleOverseer : MonoBehaviour
     private bool nextActionIsPlayerDeathblow;
     private int battleNo = 0;
     private int turn = 0;
-    private int turnStep = 0;
-    private const float battleStepLength = 1.5f;
+    private const float battleStepLength = 1.33f;
     private List<Battler> validEnemyTargets;
     private List<Battler> validPlayerTargets;
     private float timer;
@@ -76,6 +77,7 @@ public class BattleOverseer : MonoBehaviour
             EndBattle();
             yield break;
         }
+        ClearBattlerHitStatuses();
         processingTurn = false;
     }
 
@@ -126,6 +128,7 @@ public class BattleOverseer : MonoBehaviour
                         if (CheckIfBattleResolved()) yield break;
                     }
             }
+            standardActionPriorityBracket = true;
             if (currentActingBattler.isEnemy) currentActingBattler.ExecuteAttack(validPlayerTargets, validEnemyTargets);
             else currentActingBattler.ExecuteAttack(validEnemyTargets, validPlayerTargets);
             timer = 0;
@@ -135,6 +138,7 @@ public class BattleOverseer : MonoBehaviour
                 timer += Time.deltaTime;
                 yield return null;
             }
+            standardActionPriorityBracket = false;
             if (CheckIfBattleResolved()) yield break;
         }
         processingTurnStep = false;
@@ -173,7 +177,8 @@ public class BattleOverseer : MonoBehaviour
 
     public void EndBattle ()
     {
-
+        if (validPlayerTargets.Count > 0) messageBox.Step(BattleMessageType.Win);
+        else messageBox.Step(BattleMessageType.Loss);
     }
 
     bool CheckIfBattleResolved ()
@@ -355,5 +360,10 @@ public class BattleOverseer : MonoBehaviour
     {
         if (toEnemy) encoreWaitingForEnemies = true;
         else encoreWaitingForPlayer = true;
+    }
+
+    public void ClearBattlerHitStatuses ()
+    {
+        for (int i = 0; i < allBattlers.Length; i++) if (allBattlers[i] != null) allBattlers[i].incomingHit = false;
     }
 }
