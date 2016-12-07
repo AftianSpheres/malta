@@ -127,3 +127,5 @@
 3:33 AM - off
 3:49 AM - on
 4:51 AM - off
+5:56 AM - on
+7:25 AM - on

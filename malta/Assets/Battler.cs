@@ -204,6 +204,7 @@ public class Battler : MonoBehaviour
 
     public void ExecuteAttack (List<Battler> validEnemyTargets, List<Battler> friends)
     {
+        Debug.Log(gameObject.name + " moves with " + _action.ToString());
         int offense;
         if (_isMagic) offense = adventurer.Magic;
         else offense = adventurer.Martial;
@@ -309,13 +310,19 @@ public class Battler : MonoBehaviour
         }
         currentHP -= damage;
         if (currentHP > adventurer.HP) currentHP = adventurer.HP;
-        else if (currentHP < 0)
+        else if (currentHP <= 0)
         {
-            currentHP = 0;
-            dead = true;
+            Die();
         }
         lastDamage = damage;
+        Debug.Log(gameObject.name + " handled " + damage.ToString() + " damage");
         return damage;
+    }
+
+    public void Die ()
+    {
+        currentHP = 0;
+        dead = true;
     }
 
     public BattlerAction GetAction (int turn, List<Battler> allies, List<Battler> opponents)
@@ -337,6 +344,7 @@ public class Battler : MonoBehaviour
         else if (HasAttack(AdventurerAttack.BurstOfSpeed) && burstOfSpeedCooldown < 1 && turn > 0) action = BattlerAction.BurstOfSpeed;
         else if (HasAttack(AdventurerAttack.Inferno) && opponents.Count > 1) action = BattlerAction.Inferno;
         else action = defaultAction;
+        _action = action;
         return action;
     }
 
