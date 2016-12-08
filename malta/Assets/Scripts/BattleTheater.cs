@@ -14,8 +14,10 @@ public class BattleTheater : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+    {
+        if (messageBox.messageQueue.Count > 0) processing = true;
+        else processing = false;
 	}
 
     public void ProcessAction ()

@@ -31,9 +31,12 @@ public class BattleMessageBox : MonoBehaviour
     public string line1;
     public TextAsset mainStringsResource;
     public TextAsset actionNameStringsResource;
+    public Queue<BattleMessageType> messageQueue;
     public Queue<Battler> corpseQueue;
     private string[] mainStrings;
     private string[] actionNameStrings;
+    private float timer;
+    private const float messageDelay = .66f;
 
 	// Use this for initialization
 	void Start ()
@@ -41,19 +44,31 @@ public class BattleMessageBox : MonoBehaviour
         mainStrings = mainStringsResource.text.Split('\n');
         actionNameStrings = actionNameStringsResource.text.Split('\n');
         corpseQueue = new Queue<Battler>();
+        messageQueue = new Queue<BattleMessageType>();
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+    {
+	    if (messageQueue.Count > 0)
+        {
+            if (timer < messageDelay) timer += Time.deltaTime;
+            else if (timer >= messageDelay) NextMessage();
+        }
 	}
 
     public void Step(BattleMessageType message = BattleMessageType.StandardTurnMessage)
     {
+        messageQueue.Enqueue(message);
+    }
+
+    private void NextMessage ()
+    {
+        timer = 0;
+        BattleMessageType message = messageQueue.Dequeue();
         bool drawToLine1 = true;
         if (line0 == "") drawToLine1 = false;
         else if (line1 != "") line0 = line1;
-        Debug.Log(drawToLine1);
         string baseLine;
         string nextLine = "";
         switch (message)

@@ -7,9 +7,12 @@ public class BattlerPuppet : MonoBehaviour
     public Text nameText;
     public Text titleText;
     public Text hpText;
+    public BattleDamageAnimGadget damageAnimGadget;
     public BattleDamageNumbersGadget damageGadget;
+
     public bool incomingHit;
     private int cachedHP;
+    private bool killedPuppet;
 
 	// Use this for initialization
 	void Start () {
@@ -17,23 +20,26 @@ public class BattlerPuppet : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+    {
+        if (killedPuppet && !damageAnimGadget.triggeredGadget) gameObject.SetActive(false); // let hit anims play before vanishing 
 	}
 
     public void Respond ()
     {
         if (incomingHit)
         {
+            damageAnimGadget.Trigger(battler.lastDamage);
             damageGadget.Trigger(battler.lastDamage);
             incomingHit = false;
         }
         if (cachedHP != battler.currentHP) RefreshHPText();
-        if (battler.dead && gameObject.activeInHierarchy)
+        if (battler.dead && !killedPuppet)
         {
+            killedPuppet = true;
             battler.overseer.messageBox.corpseQueue.Enqueue(battler);
             battler.overseer.messageBox.Step(BattleMessageType.SomebodyDead);
-            gameObject.SetActive(false);
+            
         }
     }
 
@@ -42,6 +48,7 @@ public class BattlerPuppet : MonoBehaviour
         if (nameText != null) nameText.text = battler.adventurer.fullName;
         if (titleText != null) titleText.text = battler.adventurer.title;
         RefreshHPText();
+        killedPuppet = false;
     }
 
     void RefreshHPText ()

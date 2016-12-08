@@ -37,6 +37,8 @@ public enum BattlerActionInterruptType
 
 public class Battler : MonoBehaviour
 {
+    private static int[] actionBaseDamages = { 0, 6, 5, 0, 2, 3, 6, 0, 0, 4, 0, 8, 0, 10, 10, 5, 4, 10, 0, 6, 99 };
+    private static bool[] actionMagicStatus = { false, false, true, false, false, false, false, false, false, false, false, true, false, true, true, true, false, false, false, false, true };
     public BattleOverseer overseer;
     public BattlerPuppet puppet;
     public Adventurer adventurer;
@@ -65,8 +67,6 @@ public class Battler : MonoBehaviour
     private int shieldBlockTurns;
     private int shieldWallTurns;
     private int silentTurns;
-    private static int[] actionBaseDamages = { 0, 6, 5, 0, 2, 3, 6, 0, 0, 4, 0, 8, 0, 10, 10, 5, 4, 10, 0, 6, 99 };
-    private static bool[] actionMagicStatus = { false, false, true, false, false, false, false, false, false, false, false, true, false, true, true, true, false, false, false, false, true };
     int _damageDealt = 0;
     int _drainRounds = 0;
     int _damage;
@@ -76,15 +76,9 @@ public class Battler : MonoBehaviour
     Battler _secondaryTarget;
     BattlerAction _action;
 
-    // Use this for initialization
     void Start ()
     {
         InitializeDisposables();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
 	}
 
     private Battler AcquireTarget (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action, int baseDamage, bool isMagic)
@@ -154,13 +148,11 @@ public class Battler : MonoBehaviour
     public void ApplyBarrier (int turns = 1)
     {
         if (barrierTurns < turns) barrierTurns = turns;
-        overseer.messageBox.Step(BattleMessageType.Barrier);
     }
 
     public void ApplyHaste (int turns = 1)
     {
         if (hasteTurns < turns) hasteTurns = turns;
-        overseer.messageBox.Step(BattleMessageType.Haste);
     }
 
     public void AttackWith (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action)
@@ -171,6 +163,7 @@ public class Battler : MonoBehaviour
 
     public void ReadyAttack (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action)
     {
+        Debug.Log(adventurer.advClass);
         _damage = GetActionBaseDamage(action);
         _isMagic = GetActionMagicStatus(action);
         _target = AcquireTarget(validEnemyTargets, friends, action, _damage, _isMagic);
@@ -184,8 +177,11 @@ public class Battler : MonoBehaviour
             case BattlerAction.VampiricWinds:
                 if (validEnemyTargets.Count > 1)
                 {
+                    int ejectButton = 0;
                     while (true)
                     {
+                        ejectButton++;
+                        if (ejectButton > 100) throw new System.Exception("FUCK YOU");
                         _secondaryTarget = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
                         if (_secondaryTarget != _target) break;
                     }
@@ -207,7 +203,6 @@ public class Battler : MonoBehaviour
 
     public void ExecuteAttack (List<Battler> validEnemyTargets, List<Battler> friends)
     {
-        Debug.Log(gameObject.name + " moves with " + _action.ToString());
         int offense;
         if (_isMagic) offense = adventurer.Magic;
         else offense = adventurer.Martial;
@@ -219,16 +214,20 @@ public class Battler : MonoBehaviour
                 break;
             case BattlerAction.ShieldWall:
                 shieldWallTurns = 1;
+                overseer.messageBox.Step(BattleMessageType.ShieldWall);
                 break;
             case BattlerAction.ShieldBlock:
                 shieldBlockTurns = 1;
+                overseer.messageBox.Step(BattleMessageType.ShieldBlock);
                 break;
             case BattlerAction.Haste:
                 hasteCooldown = 1;
                 for (int i = 0; i < friends.Count; i++) friends[i].ApplyHaste();
+                overseer.messageBox.Step(BattleMessageType.Haste);
                 break;
             case BattlerAction.Barrier:
                 for (int i = 0; i < friends.Count; i++) friends[i].ApplyBarrier();
+                overseer.messageBox.Step(BattleMessageType.Barrier);
                 break;
             case BattlerAction.BurstOfSpeed:
                 burstOfSpeedCooldown = 3;
@@ -236,6 +235,7 @@ public class Battler : MonoBehaviour
                 break;
             case BattlerAction.Feedback:
                 feedbackCooldown = 3;
+                overseer.messageBox.Step(BattleMessageType.Feedback);
                 break;
             case BattlerAction.GetBehindMe: // If using this action, target needs to be the ally we're covering!!!
                 _target.Cover(this);
@@ -244,6 +244,11 @@ public class Battler : MonoBehaviour
         }
         if (_damage > 0)
         {
+            if (adventurer.special == AdventurerSpecial.HammerSmash && Random.Range(0, 11) < 3)
+            {
+                _damage *= 2;
+                overseer.messageBox.Step(BattleMessageType.Critical);
+            }
             if (_hitAll) for (int i = 0; i < validEnemyTargets.Count; i++)
                 {
                     if (_isMagic) defense = validEnemyTargets[i].adventurer.Magic;
@@ -264,6 +269,8 @@ public class Battler : MonoBehaviour
             }
             else throw new System.Exception("Battler " + gameObject.name + " tried to use a damage-dealing action, but with no target.");
         }
+        if (_drainRounds > 1) overseer.messageBox.Step(BattleMessageType.MultiHeal);
+        else if (_drainRounds > 1) overseer.messageBox.Step(BattleMessageType.Heal);
         while (_drainRounds > 0 && _damageDealt > 0)
         {
             int damageTaken = 0;
@@ -278,6 +285,7 @@ public class Battler : MonoBehaviour
                 }
             }
             weakestAlly.DealDamage(healValue);
+            _drainRounds--; // this loop caused the battle to hang for an embarrassingly long time because I forgot the decrement, lol
         }
         overseer.messageBox.Step();
     }
@@ -306,6 +314,7 @@ public class Battler : MonoBehaviour
                 bodyguard = default(Battler);
                 bodyguard.DealDamage(damage / 4);
                 damage = 0;
+                overseer.messageBox.Step(BattleMessageType.SavedAlly);
             }
             if (barrierTurns > 0) damage /= 2;
             if (shieldWallTurns > 0) damage /= 2;
@@ -323,7 +332,6 @@ public class Battler : MonoBehaviour
             Die();
         }
         lastDamage = damage;
-        Debug.Log(gameObject.name + " handled " + damage.ToString() + " damage");
         return damage;
     }
 
@@ -393,6 +401,8 @@ public class Battler : MonoBehaviour
 
     public void GenerateBattleData (Adventurer _adventurer)
     {
+        gameObject.SetActive(true);
+        dead = false;
         defaultAction = BattlerAction.None;
         battleStartInterruptActions = new List<BattlerAction>();
         onAllyHitInterruptActions = new List<BattlerAction>();
@@ -459,11 +469,6 @@ public class Battler : MonoBehaviour
         if (hasteTurns > 0) speed += 3;
         if (speed < 1) speed = 1;
         moveSpeed = Random.Range(1.0f, speed);
-    }
-
-    public void SetBattlerActive ()
-    {
-        gameObject.SetActive(true);
     }
 
     public void SetBattlerInactive ()

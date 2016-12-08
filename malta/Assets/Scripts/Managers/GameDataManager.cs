@@ -81,7 +81,7 @@ public class GameDataManager : Manager<GameDataManager>
     void Start ()
     {
         sovereignTactic = AdventurerAttack.GetBehindMe;
-        sovereignSkill = AdventurerSpecial.None;
+        sovereignSkill = AdventurerSpecial.HammerSmash;
         warriorClassUnlock = AdventurerClass.Warrior;
         mysticClassUnlock = AdventurerClass.Mystic;
         sovereignAdventurer = ScriptableObject.CreateInstance<Adventurer>();

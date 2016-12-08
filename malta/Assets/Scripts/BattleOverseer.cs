@@ -15,14 +15,13 @@ public class BattleOverseer : MonoBehaviour
     public SortedList<float, Battler> turnOrderList;
     public Battler[] allBattlers { get; private set; }
     public bool standardActionPriorityBracket;
+    private AdventureSubstage[] adventure;
     private bool currentBattleResolved;
     private bool encoreWaitingForEnemies;
     private bool encoreWaitingForPlayer;
-    private bool nextActionIsEnemyDeathblow;
-    private bool nextActionIsPlayerDeathblow;
     private int battleNo = 0;
     private int turn = 0;
-    private const float battleStepLength = 1.33f;
+    private const float battleStepLength = 1.75f;
     private List<Battler> validEnemyTargets;
     private List<Battler> validPlayerTargets;
     private float timer;
@@ -38,11 +37,6 @@ public class BattleOverseer : MonoBehaviour
         StartCoroutine(Bootstrap());
 	}
 	
-	// Update is called once per frame
-	void Update ()
-    {
-	    if (processingBattle && !processingTurn) StartCoroutine(RunTurn());
-	}
 
     IEnumerator RunTurn ()
     {
@@ -50,40 +44,38 @@ public class BattleOverseer : MonoBehaviour
         processingTurn = true;
         StartTurn();
         StartCoroutine(HandleAheadOfStandardActions());
-        while (processingTurnStep) yield return null;
-        if (currentBattleResolved)
+        while (processingTurnStep || theater.processing) yield return null;
+        if (!currentBattleResolved)
         {
-            EndBattle();
-            yield break;
+            StartCoroutine(HandleStandardPriorityActions());
+
+            while (processingTurnStep || theater.processing) yield return null;
+            if (!currentBattleResolved)
+            {
+                StartCoroutine(HandleBehindStandardActions());
+                while (processingTurnStep || theater.processing) yield return null;
+                if (!currentBattleResolved)
+                {
+                    StartCoroutine(HandleStandardPriorityActions(true));
+                    while (processingTurnStep || theater.processing) yield return null;
+                }
+            }
+            ClearBattlerHitStatuses();
         }
-        StartCoroutine(HandleStandardPriorityActions());
-        while (processingTurnStep) yield return null;
-        if (currentBattleResolved)
-        {
-            EndBattle();
-            yield break;
-        }
-        StartCoroutine(HandleBehindStandardActions());
-        while (processingTurnStep) yield return null;
-        if (currentBattleResolved)
-        {
-            EndBattle();
-            yield break;
-        }
-        StartCoroutine(HandleStandardPriorityActions(true));
-        while (processingTurnStep) yield return null;
-        if (currentBattleResolved)
-        {
-            EndBattle();
-            yield break;
-        }
-        ClearBattlerHitStatuses();
+        turn++;
+        while (theater.processing) yield return null;
+        encoreWaitingForEnemies = false;
+        encoreWaitingForPlayer = false;
+        nextAction = BattlerAction.None;
+        currentActingBattler = default(Battler);
+        currentTurnTarget = default(Battler);
         processingTurn = false;
+        if (currentBattleResolved) EndBattle();
+        else StartCoroutine(RunTurn());
     }
 
     IEnumerator HandleAheadOfStandardActions ()
     {
-        Debug.Log("Priority 0 going");
         processingTurnStep = true;
         if (turn == 0) for (int i = 0; i < turnOrderList.Count; i++)
             {
@@ -104,7 +96,6 @@ public class BattleOverseer : MonoBehaviour
 
     IEnumerator HandleStandardPriorityActions (bool isEncore = false)
     {
-        Debug.Log("Priority 1 going");
         processingTurnStep = true;
         for (int i = 0; i < turnOrderList.Count; i++)
         {
@@ -146,7 +137,6 @@ public class BattleOverseer : MonoBehaviour
 
     IEnumerator HandleBehindStandardActions ()
     {
-        Debug.Log("Priority 2 going");
         processingTurnStep = true;
         for (int i = 0; i < turnOrderList.Count; i++)
         {
@@ -175,9 +165,26 @@ public class BattleOverseer : MonoBehaviour
         processingTurnStep = false;
     }
 
+    IEnumerator WinAndContinueBattling ()
+    {
+        timer = 0;
+        while (timer < battleStepLength || theater.processing)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        StartNextBattle();
+    }
+
     public void EndBattle ()
     {
-        if (validPlayerTargets.Count > 0) messageBox.Step(BattleMessageType.Win);
+        if (validPlayerTargets.Count > 0)
+        {
+            battleNo++;
+            messageBox.Step(BattleMessageType.Win);
+            StopAllCoroutines();
+            if (battleNo < adventure.Length) StartCoroutine(WinAndContinueBattling());
+        }
         else messageBox.Step(BattleMessageType.Loss);
     }
 
@@ -209,6 +216,7 @@ public class BattleOverseer : MonoBehaviour
     bool SubTurnStep_Interrupt_BattleStart (Battler bat)
     {
         BattlerAction action;
+        currentActingBattler = bat;
         if (bat.isEnemy)
         {
             action = bat.GetInterruptAction(BattlerActionInterruptType.BattleStart, turn, validEnemyTargets, validPlayerTargets);
@@ -241,6 +249,7 @@ public class BattleOverseer : MonoBehaviour
     bool SubTurnStep_Interrupt_OnAllySideHit (Battler bat, Battler batHit, Battler[] bats)
     {
         BattlerAction action;
+        currentActingBattler = bat;
         if (bat.isEnemy)
         {
             if (bat == batHit) action = bat.GetInterruptAction(BattlerActionInterruptType.OnHit, turn, validEnemyTargets, validPlayerTargets);
@@ -259,6 +268,8 @@ public class BattleOverseer : MonoBehaviour
     IEnumerator Bootstrap ()
     {
         while (GameDataManager.Instance == null) yield return null;
+        if (GameDataManager.Instance.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) adventure = AdventureSubstageLoader.prebuiltAdventures[GameDataManager.Instance.adventureLevel];
+        else throw new System.NotImplementedException("random adventures aren't a thing yet");
         PopulatePlayerParty();
         StartNextBattle();
     }
@@ -286,18 +297,24 @@ public class BattleOverseer : MonoBehaviour
 
     private void PopulateEnemyParty ()
     {
-        Adventurer[] enemyAdventurers = enemyPartyConfigs[battleNo];
+        Adventurer[] enemyAdventurers;
+        AdventureSubstage substage = adventure[battleNo];
+        enemyAdventurers = new Adventurer[substage.enemiesClasses.Length];
+        for (int i = 0; i < enemyAdventurers.Length; i++)
+        {
+            enemyAdventurers[i] = ScriptableObject.CreateInstance<Adventurer>();
+            enemyAdventurers[i].Reroll(substage.enemiesClasses[i], substage.enemiesSpecies[i], substage.eliteStatuses[i], new int[] { 0, 0, 0, 0 });
+        }
         int i2 = 0;
         for (int i = 0; i < enemyAdventurers.Length && i2 < enemyParty.Length; i++)
         {
             if (enemyAdventurers[i] != null)
             {
-                enemyParty[i2].SetBattlerActive();
                 enemyParty[i2].GenerateBattleData(enemyAdventurers[i]);
                 i2++;
             }
         }
-        while (i2 < playerParty.Length)
+        while (i2 < enemyParty.Length)
         {
             enemyParty[i2].SetBattlerInactive();
             i2++;
@@ -345,6 +362,8 @@ public class BattleOverseer : MonoBehaviour
     private void StartNextBattle ()
     {
         processingBattle = true;
+        currentBattleResolved = false;
+        turn = 0;
         PopulateEnemyParty();
         RebuildAllBattlersArray();
         StartCoroutine(RunTurn());
@@ -360,6 +379,7 @@ public class BattleOverseer : MonoBehaviour
     {
         if (toEnemy) encoreWaitingForEnemies = true;
         else encoreWaitingForPlayer = true;
+        messageBox.Step(BattleMessageType.Encore);
     }
 
     public void ClearBattlerHitStatuses ()
