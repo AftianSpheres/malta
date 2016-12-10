@@ -17,28 +17,31 @@ public class ScreenChanger : MonoBehaviour
     public AudioSource bgmSource;
     public AudioClip whooshySoundOrSomething;
     public SceneChanegAnimType sceneChangeAnim;
+    public bool allowClickActivate = true;
 
     private void OnMouseDown()
     {
-        if (!GameStateManager.Instance.popupHasFocus)
+        if (!GameStateManager.Instance.popupHasFocus && allowClickActivate) Activate();
+    }
+
+    public void Activate ()
+    {
+        if (bgmSource != null)
         {
-            if (bgmSource != null)
-            {
-                bgmSource.Stop();
-                if (whooshySoundOrSomething != null) bgmSource.PlayOneShot(whooshySoundOrSomething);
-            }
-            switch (sceneChangeAnim)
-            {
-                case SceneChanegAnimType.None:
-                    LevelLoadManager.Instance.EnterLevel(targetSceneID);
-                    break;
-                case SceneChanegAnimType.ZoomIn:
-                    StartCoroutine(anim_Zoom(animLength, zoomDistance));
-                    break;
-                case SceneChanegAnimType.ZoomOut:
-                    StartCoroutine(anim_Zoom(animLength, zoomDistance, true));
-                    break;
-            }
+            bgmSource.Stop();
+            if (whooshySoundOrSomething != null) bgmSource.PlayOneShot(whooshySoundOrSomething);
+        }
+        switch (sceneChangeAnim)
+        {
+            case SceneChanegAnimType.None:
+                LevelLoadManager.Instance.EnterLevel(targetSceneID);
+                break;
+            case SceneChanegAnimType.ZoomIn:
+                StartCoroutine(anim_Zoom(animLength, zoomDistance));
+                break;
+            case SceneChanegAnimType.ZoomOut:
+                StartCoroutine(anim_Zoom(animLength, zoomDistance, true));
+                break;
         }
     }
 

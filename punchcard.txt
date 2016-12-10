@@ -134,7 +134,7 @@
 12:06 PM - on
 1:14 PM - off
 
--------------
+-------------145
 
 4:49 AM - start
 5:51 AM - off
@@ -144,3 +144,12 @@
 9:32 AM - off
 10:30 AM - on
 10:39 AM - off
+
+Dec.10 2016-181
+
+7:41 AM - start
+8:43 AM - off
+8:48 AM - on
+8:52 AM - off
+9:23 AM - on
+11:18 AM - off

@@ -6,14 +6,13 @@ public enum SceneIDType
 {
     UniverseBootstrapScene,
     TownScene,
-    OverworldScene
+    OverworldScene,
+    FightScene
 }
 
 public class LevelLoadManager : Manager<LevelLoadManager>
 {
     public TopLevelMenuSystem topLevelMenuSystem;
-    public const int sceneID_Overworld = 2;
-    public const int sceneID_Town = 1;
 
     public void EnterLevel (SceneIDType level, BuildingType checkBuildingOnLoad = BuildingType.None, int buildingIndex = 0)
     {
@@ -30,6 +29,7 @@ public class LevelLoadManager : Manager<LevelLoadManager>
         }
         if (checkBuildingOnLoad != BuildingType.None)
         {
+            if (sceneIndex == (int)SceneIDType.FightScene) throw new System.Exception("What the fuck are you even doing, no that argument doesn't go there, come on man");
             float tlmsTimeout = 1.0f;
             while (topLevelMenuSystem == null)
             {

@@ -12,6 +12,7 @@ public class AdventureTimePopup : MonoBehaviour
     public Text numMetal;
     public Text numPlanks;
     public TextAsset stringsResource;
+    public ScreenChanger screenChanger;
     private int cachedAdventureLv = -1;
     private string[] strings;
 
@@ -57,4 +58,10 @@ public class AdventureTimePopup : MonoBehaviour
             }
         }
 	}
+
+    public void Depart ()
+    {
+        shell.Close();
+        screenChanger.Activate();
+    }
 }

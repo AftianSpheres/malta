@@ -30,7 +30,7 @@ public class PalacePopup : MonoBehaviour
     private string[] strings;
 
 	// Use this for initialization
-	void Start ()
+	void Awake ()
     {
         strings = portalStatus.strings = sovereignInfo.strings = stringsResource.text.Split('\n');
     }

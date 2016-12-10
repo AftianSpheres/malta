@@ -16,3 +16,4 @@ Took a would-be deathblow!
 Used an ally's death to sucker-punch a foe!
 You won!
 You lost...
+You withdrew from battle!

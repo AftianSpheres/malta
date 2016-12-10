@@ -10,7 +10,7 @@ public class PortalPopup : MonoBehaviour
     private string[] strings;
 
 	// Use this for initialization
-	void Start ()
+	void Awake ()
     {
         strings = portalStatus.strings = stringsResource.text.Split('\n');
     }
