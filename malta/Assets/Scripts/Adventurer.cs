@@ -9,7 +9,7 @@ public class Adventurer : ScriptableObject
     public string title;
     public string fullTitle;
     public AdventurerAttack[] attacks;
-    public AdventurerClass advClass = AdventurerClass.Warrior;
+    public AdventurerClass advClass { get; private set; }
     public AdventurerSpecial special;
     public AdventurerSpecies species = AdventurerSpecies.Human;
     public int HP { get; private set; }

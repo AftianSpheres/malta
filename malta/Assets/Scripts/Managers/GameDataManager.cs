@@ -81,7 +81,7 @@ public class GameDataManager : Manager<GameDataManager>
     void Start ()
     {
         sovereignTactic = AdventurerAttack.GetBehindMe;
-        sovereignSkill = AdventurerSpecial.HammerSmash;
+        sovereignSkill = AdventurerSpecial.None;
         warriorClassUnlock = AdventurerClass.Warrior;
         mysticClassUnlock = AdventurerClass.Mystic;
         sovereignAdventurer = ScriptableObject.CreateInstance<Adventurer>();
@@ -100,9 +100,21 @@ public class GameDataManager : Manager<GameDataManager>
     }
 
     void Update ()
-    {
-        if (Input.GetKey(KeyCode.Pause)) Time.timeScale = 100.0f; // speed things up for testing
+    {        
+        if (Input.GetKey(KeyCode.Pause))
+        {
+            Time.timeScale = 100.0f; // speed things up for testing
+        }
         else Time.timeScale = 1.0f;
+        if (Input.GetKey(KeyCode.Backslash))
+        {
+            resBricks += 30;
+            resClay += 30;
+            resLumber += 30;
+            resOre += 30;
+            resMetal += 30;
+            resPlanks += 30;
+        }
         if (Time.time - lastSecondTimestamp >= 1.0f)
         {
             lastSecondTimestamp = Time.time;
@@ -214,22 +226,22 @@ public class GameDataManager : Manager<GameDataManager>
 
     public void PromoteMysticsTo (AdventurerClass advClass)
     {
-        mysticClassUnlock = advClass;
         for (int i = 0; i < houseAdventurers.Length; i++)
         {
-            if (houseAdventurers[i] != null && houseAdventurers[i].advClass == mysticClassUnlock) houseAdventurers[i].advClass = advClass;
+            if (houseAdventurers[i] != null && houseAdventurers[i].advClass == mysticClassUnlock) houseAdventurers[i].Reclass(advClass);
         }
-        if (forgeAdventurer != null && forgeAdventurer.advClass == mysticClassUnlock) forgeAdventurer.advClass = advClass;    
+        if (forgeAdventurer != null && forgeAdventurer.advClass == mysticClassUnlock) forgeAdventurer.Reclass(advClass);
+        mysticClassUnlock = advClass;
     }
 
     public void PromoteWarriorsTo (AdventurerClass advClass)
     {
-        warriorClassUnlock = advClass;
         for (int i = 0; i < houseAdventurers.Length; i++)
         {
-            if (houseAdventurers[i] != null && houseAdventurers[i].advClass == warriorClassUnlock) houseAdventurers[i].advClass = advClass;
+            if (houseAdventurers[i] != null && houseAdventurers[i].advClass == warriorClassUnlock) houseAdventurers[i].Reclass(advClass);
         }
-        if (forgeAdventurer != null && forgeAdventurer.advClass == warriorClassUnlock) forgeAdventurer.advClass = advClass;    
+        if (forgeAdventurer != null && forgeAdventurer.advClass == warriorClassUnlock) forgeAdventurer.Reclass(advClass);
+        warriorClassUnlock = advClass;
     }
 
     public void SetBuildingUpgradePending (BuildingType building)

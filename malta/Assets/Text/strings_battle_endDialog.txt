@@ -11,3 +11,8 @@ You made it through the adventure, but at the cost of
 's life...
 You made it through the adventure, but took heavy casualties.
 You made it through the adventure... but just barely. No one else is left standing...
+You escaped from a bad situation, but the forest's call remains.
+You retreated from battle with no casualties!
+You retreated from battle, but at the cost of 
+You managed to retreat, but took heavy casualties.
+You managed to retreat... but was there even really a point...?

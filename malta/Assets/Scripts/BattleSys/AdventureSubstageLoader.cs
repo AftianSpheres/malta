@@ -53,6 +53,7 @@ public class AdventureSubstageLoader : MonoBehaviour
     {
         adventure2_0 = new AdventureSubstage(new AdventurerClass[] { AdventurerClass.Footman, AdventurerClass.Footman }, new AdventurerSpecies[] { AdventurerSpecies.Orc, AdventurerSpecies.Orc }, new bool[] { false, false }, false, BattleBGMType.GARBO_typing);
         adventure2_1 = new AdventureSubstage(new AdventurerClass[] { AdventurerClass.Footman, AdventurerClass.Bowman, AdventurerClass.Mystic }, new AdventurerSpecies[] { AdventurerSpecies.Orc, AdventurerSpecies.Human, AdventurerSpecies.Fae }, new bool[] { false, false, false }, false, BattleBGMType.GARBO_dreamchaser);
-        adventure2_1 = new AdventureSubstage(new AdventurerClass[] { AdventurerClass.Footman, AdventurerClass.Wizard, AdventurerClass.Wizard }, new AdventurerSpecies[] { AdventurerSpecies.Orc, AdventurerSpecies.Human, AdventurerSpecies.Fae }, new bool[] { true, true, true }, false, BattleBGMType.GARBO_murder);
+        adventure2_2 = new AdventureSubstage(new AdventurerClass[] { AdventurerClass.Footman, AdventurerClass.Wizard, AdventurerClass.Wizard }, new AdventurerSpecies[] { AdventurerSpecies.Orc, AdventurerSpecies.Human, AdventurerSpecies.Fae }, new bool[] { true, true, true }, false, BattleBGMType.GARBO_murder);
+        adventure2Substages = new AdventureSubstage[] { adventure2_0, adventure2_1, adventure2_2 };
     }
 }

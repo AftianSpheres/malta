@@ -31,6 +31,7 @@ public class TownBuilding : MonoBehaviour
     public bool hasOutbuilding;
     public bool isUndeveloped;
     public bool forgeOutbuildingIsKobold;
+    private AdventurerClass _cachedAdvClass;
     private bool buildingAlteredSinceLastUpdate = true;
     private bool _adventurerUnlocked { get { if (buildingType == BuildingType.House) return GameDataManager.Instance.housesBuilt[nonUniqueBuildingsIndex]; else return GameDataManager.Instance.unlock_forgeOutbuilding && !GameDataManager.Instance.unlock_Taskmaster; } }
 
@@ -38,19 +39,18 @@ public class TownBuilding : MonoBehaviour
     void Update ()
     {
         if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
-        {          
-            if (buildingAlteredSinceLastUpdate) RefreshBuildingAssociations(); // doing it like this also lets you mark buildings as "dirty" based on timed events
+        {  
             if (buildingType == BuildingType.House || buildingType == BuildingType.Forge)
             {
                 if (associatedAdventurer == null)
                 {
-                    if (buildingType == BuildingType.House)
-                    {
-                        if (GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] != null) associatedAdventurer = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex];
-                        else associatedAdventurer = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] = ScriptableObject.CreateInstance<Adventurer>();
-                    }
-                    else if (GameDataManager.Instance.forgeAdventurer != null) associatedAdventurer = GameDataManager.Instance.forgeAdventurer;
-                    else associatedAdventurer = GameDataManager.Instance.forgeAdventurer = ScriptableObject.CreateInstance<Adventurer>();
+                    if (buildingType == BuildingType.House) associatedAdventurer = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex];
+                    else associatedAdventurer = GameDataManager.Instance.forgeAdventurer;
+                }
+                else if (_cachedAdvClass != associatedAdventurer.advClass)
+                {
+                    _cachedAdvClass = associatedAdventurer.advClass;
+                    buildingAlteredSinceLastUpdate = true;
                 }
                 if (!associatedAdventurer.initialized && _adventurerUnlocked)
                 {
@@ -62,6 +62,7 @@ public class TownBuilding : MonoBehaviour
                 if (GameDataManager.Instance.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.unlock_WizardsTower;
                 if (spriteRenderer.enabled) RefreshBuildingAssociations();
             }
+            if (buildingAlteredSinceLastUpdate) RefreshBuildingAssociations(); // doing it like this also lets you mark buildings as "dirty" based on timed events
         }
     }
 

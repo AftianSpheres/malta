@@ -26,35 +26,58 @@ public class BattleEndPopup : MonoBehaviour
 	    if (opened == false)
         {
             opened = true;
-            if (GameDataManager.Instance.adventureLevel - 1 < AdventureSubstageLoader.randomAdventureBaseLevel) // adventureLevel is already incremented, we want to get the adventure we were on
+            if (battleOverseer.retreatingAtStartOfNextBout)
             {
-                nextDestText.text = strings[GameDataManager.Instance.adventureLevel - 1];
+                nextDestText.text = strings[13];
+                switch (battleOverseer.playerDeaths)
+                {
+                    case 0:
+                        successDegreeText.text = strings[14];
+                        break;
+                    case 1:
+                        successDegreeText.text = strings[15] + battleOverseer.lastDeadPlayerAdvName + strings[10];
+                        break;
+                    case 2:
+                        successDegreeText.text = strings[16];
+                        break;
+                    case 3:
+                        successDegreeText.text = strings[17];
+                        break;
+                }
             }
-            else nextDestText.text = strings[AdventureSubstageLoader.randomAdventureBaseLevel];
-            switch (battleOverseer.playerDeaths)
+            else
             {
-                case 0:
-                    successDegreeText.text = strings[8];
-                    break;
-                case 1:
-                    successDegreeText.text = strings[9] + battleOverseer.lastDeadPlayerAdvName + strings[10];
-                    break;
-                case 2:
-                    successDegreeText.text = strings[11];
-                    break;
-                case 3:
-                    successDegreeText.text = strings[12];
-                    break;
+                if (GameDataManager.Instance.adventureLevel - 1 < AdventureSubstageLoader.randomAdventureBaseLevel) // adventureLevel is already incremented, we want to get the adventure we were on
+                {
+                    nextDestText.text = strings[GameDataManager.Instance.adventureLevel - 1];
+                }
+                else nextDestText.text = strings[AdventureSubstageLoader.randomAdventureBaseLevel];
+                switch (battleOverseer.playerDeaths)
+                {
+                    case 0:
+                        successDegreeText.text = strings[8];
+                        break;
+                    case 1:
+                        successDegreeText.text = strings[9] + battleOverseer.lastDeadPlayerAdvName + strings[10];
+                        break;
+                    case 2:
+                        successDegreeText.text = strings[11];
+                        break;
+                    case 3:
+                        successDegreeText.text = strings[12];
+                        break;
+                }
+                if (GameDataManager.Instance.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel)
+                {
+                    Debug.Log("this isn't a thing yet");
+                }
+                else if (GameDataManager.Instance.adventureLevel == 2)
+                {
+                    announcementPanel.SetActive(true);
+                    announcementText.text = strings[4];
+                }
             }
-            if (GameDataManager.Instance.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel)
-            {
-                Debug.Log("this isn't a thing yet");
-            }
-            else if (GameDataManager.Instance.adventureLevel == 2)
-            {
-                announcementPanel.SetActive(true);
-                announcementText.text = strings[4];
-            }
+
         }
 	}
 

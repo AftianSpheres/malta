@@ -77,7 +77,7 @@ public class Battler : MonoBehaviour
     int _damage;
     bool _hitAll;
     bool _isMagic;
-    Battler _target;
+    public Battler _target { get; private set; }
     Battler _secondaryTarget;
     BattlerAction _action;
     Queue<BattleMessageType> _effectMessages;
@@ -230,6 +230,7 @@ public class Battler : MonoBehaviour
 
     public void ExecuteAttack (List<Battler> validEnemyTargets, List<Battler> friends)
     {
+        if (!isValidTarget) throw new System.Exception("Dead guy " + gameObject.name + " is trying to attack");
         int offense;
         if (_isMagic) offense = adventurer.Magic;
         else offense = adventurer.Martial;
@@ -378,7 +379,7 @@ public class Battler : MonoBehaviour
         if (!isEnemy)
         {
             overseer.playerDeaths++;
-            overseer.lastDeadPlayerAdvName = adventurer.name;
+            overseer.lastDeadPlayerAdvName = adventurer.fullName;
             if (adventurer.advClass != AdventurerClass.Sovereign) adventurer.Permadeath();
         }
         dead = true;

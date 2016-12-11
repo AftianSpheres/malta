@@ -6,6 +6,7 @@ public class BattleTheater : MonoBehaviour
 {
     public AudioClip ffLose;
     public AudioClip ffWin;
+    public AudioClip bgmAdventureWin;
     public AudioClip retreatSFX;
     public AudioSource source;
     public AudioSource sfxSource;
@@ -17,6 +18,7 @@ public class BattleTheater : MonoBehaviour
     public TextAsset turnInfoStringsResource;
     public Text turnInfoPanel;
     public bool processing { get; private set; }
+    private bool coroutineRunning;
     private bool _listenForSourceToStopPlaying;
     private string[] turnInfoStrings;
     const float retreatAnimLength = 2.5f;
@@ -37,8 +39,8 @@ public class BattleTheater : MonoBehaviour
             if (source.isPlaying) processing = true;
             else _listenForSourceToStopPlaying = false;
         }
-        else processing = false;
-	}
+        else if (!coroutineRunning) processing = false;
+    }
 
     public void StartOfTurn ()
     {
@@ -65,6 +67,12 @@ public class BattleTheater : MonoBehaviour
         _listenForSourceToStopPlaying = true;
     }
 
+    public void WinAdventure ()
+    {
+        source.clip = bgmAdventureWin;
+        source.Play();
+    }
+
     public void WinBattle ()
     {
         source.Stop();
@@ -80,6 +88,7 @@ public class BattleTheater : MonoBehaviour
     IEnumerator _Retreat ()
     {
         float timer = 0;
+        coroutineRunning = processing = true;
         sfxSource.PlayOneShot(retreatSFX);
         Vector3 battleBGBasePos = battleBG.transform.position;
         Vector3 enemyPartyBasePos = enemyParty.transform.position;
@@ -90,6 +99,7 @@ public class BattleTheater : MonoBehaviour
             enemyParty.transform.position = Vector3.Lerp(enemyPartyBasePos, enemyPartyBasePos + (Vector3.right * retreatAnimUIDist), timer / retreatAnimLength);
             yield return null;
         }
+        coroutineRunning = false;
     }
 
     private void RefreshTurnInfoPanel ()
