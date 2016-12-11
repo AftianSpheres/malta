@@ -6,12 +6,12 @@ public class BattleOverseer : MonoBehaviour
 {
     public BattleTheater theater;
     public BattleMessageBox messageBox;
-    public Adventurer[][] enemyPartyConfigs;
     public Battler[] enemyParty;
     public Battler[] playerParty;
     public Battler currentActingBattler;
     public Battler currentTurnTarget;
     public BattlerAction nextAction;
+    public PopupMenu battleEndPopup;
     public SortedList<float, Battler> turnOrderList;
     public Battler[] allBattlers { get; private set; }
     public bool standardActionPriorityBracket;
@@ -21,8 +21,9 @@ public class BattleOverseer : MonoBehaviour
     private bool currentBattleResolved;
     public bool encoreWaitingForEnemies { get; private set; }
     public bool encoreWaitingForPlayer { get; private set; }
-
+    public int playerDeaths;
     public int turn { get; private set; }
+    public string lastDeadPlayerAdvName = "If this appears report it";
     private const float battleStepLength = 1.75f;
     private List<Battler> validEnemyTargets;
     private List<Battler> validPlayerTargets;
@@ -34,8 +35,6 @@ public class BattleOverseer : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        enemyPartyConfigs = new Adventurer[][] { new Adventurer[] { ScriptableObject.CreateInstance<Adventurer>(), ScriptableObject.CreateInstance<Adventurer>(), ScriptableObject.CreateInstance<Adventurer>(), ScriptableObject.CreateInstance<Adventurer>() } };
-        for (int i = 0; i < enemyPartyConfigs[0].Length; i++) enemyPartyConfigs[0][i].Reroll(AdventurerClass.Bowman, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
         StartCoroutine(Bootstrap());
 	}
 	
@@ -200,6 +199,11 @@ public class BattleOverseer : MonoBehaviour
             StopAllCoroutines();
             theater.WinBattle();
             if (battleNo < adventure.Length) StartCoroutine(WinAndContinueBattling());
+            else
+            {
+                GameDataManager.Instance.adventureLevel++;
+                battleEndPopup.Open();
+            }
         }
         else
         {

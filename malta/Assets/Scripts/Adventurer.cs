@@ -324,4 +324,9 @@ public class Adventurer : ScriptableObject
         }
         return term;
     }
+
+    public void Permadeath ()
+    {
+        initialized = false;
+    }
 }

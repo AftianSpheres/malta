@@ -375,6 +375,12 @@ public class Battler : MonoBehaviour
     public void Die ()
     {
         currentHP = 0;
+        if (!isEnemy)
+        {
+            overseer.playerDeaths++;
+            overseer.lastDeadPlayerAdvName = adventurer.name;
+            if (adventurer.advClass != AdventurerClass.Sovereign) adventurer.Permadeath();
+        }
         dead = true;
     }
 

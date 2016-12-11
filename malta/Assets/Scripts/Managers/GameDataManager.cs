@@ -85,6 +85,15 @@ public class GameDataManager : Manager<GameDataManager>
         warriorClassUnlock = AdventurerClass.Warrior;
         mysticClassUnlock = AdventurerClass.Mystic;
         sovereignAdventurer = ScriptableObject.CreateInstance<Adventurer>();
+        forgeAdventurer = ScriptableObject.CreateInstance<Adventurer>();
+        for (int i = 0; i < housesBuilt.Length; i++)
+        {
+            houseAdventurers[i] = ScriptableObject.CreateInstance<Adventurer>();
+            if (housesBuilt[i])
+            {             
+                houseAdventurers[i].Reroll(warriorClassUnlock, AdventurerSpecies.Human, housesOutbuildingsBuilt[i], new int[] { 0, 0, 0, 0 });
+            }
+        }
         sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
         lastSecondTimestamp = Time.time;
         RecalculateResourceMaximums();
@@ -107,18 +116,12 @@ public class GameDataManager : Manager<GameDataManager>
             HandlePendingUpgrade(ref pendingUpgradeTimer_Smith, ref buildingLv_Smith, ref pendingUpgrade_Smith, ref resMetal_maxUpgrades);
             HandlePendingUpgrade(ref pendingUpgradeTimer_Woodlands, ref harvestLv_Woodlands, ref pendingUpgrade_Woodlands, ref resLumber_maxUpgrades);
         }
-        for (int i = 0; i < housesBuilt.Length; i++)
+        for (int i = 0; i < housesBuilt.Length; i++) if (housesBuilt[i] && !houseAdventurers[i].initialized) houseAdventurers[i].Reroll(warriorClassUnlock, AdventurerSpecies.Human, housesOutbuildingsBuilt[i], new int[] { 0, 0, 0, 0 });
+        if (unlock_forgeOutbuilding && !unlock_Taskmaster && !forgeAdventurer.initialized) forgeAdventurer.Reroll(warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
+        if (adventureLevel > 1 && (unlock_raceFae != true || unlock_raceOrc != true))
         {
-            if (housesBuilt[i] && houseAdventurers[i] == null)
-            {
-                houseAdventurers[i] = ScriptableObject.CreateInstance<Adventurer>();
-                houseAdventurers[i].Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, housesOutbuildingsBuilt[i], new int[] { 0, 0, 0, 0 });
-            }
-        }
-        if (unlock_forgeOutbuilding && !unlock_Taskmaster && forgeAdventurer != null)
-        {
-            forgeAdventurer = ScriptableObject.CreateInstance<Adventurer>();
-            forgeAdventurer.Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
+            unlock_raceFae = true;
+            unlock_raceOrc = true;
         }
 
     }
@@ -211,22 +214,22 @@ public class GameDataManager : Manager<GameDataManager>
 
     public void PromoteMysticsTo (AdventurerClass advClass)
     {
+        mysticClassUnlock = advClass;
         for (int i = 0; i < houseAdventurers.Length; i++)
         {
             if (houseAdventurers[i] != null && houseAdventurers[i].advClass == mysticClassUnlock) houseAdventurers[i].advClass = advClass;
         }
-        if (forgeAdventurer != null && forgeAdventurer.advClass == mysticClassUnlock) forgeAdventurer.advClass = advClass;
-        mysticClassUnlock = advClass;
+        if (forgeAdventurer != null && forgeAdventurer.advClass == mysticClassUnlock) forgeAdventurer.advClass = advClass;    
     }
 
     public void PromoteWarriorsTo (AdventurerClass advClass)
     {
+        warriorClassUnlock = advClass;
         for (int i = 0; i < houseAdventurers.Length; i++)
         {
             if (houseAdventurers[i] != null && houseAdventurers[i].advClass == warriorClassUnlock) houseAdventurers[i].advClass = advClass;
         }
-        if (forgeAdventurer != null && forgeAdventurer.advClass == warriorClassUnlock) forgeAdventurer.advClass = advClass;
-        warriorClassUnlock = advClass;
+        if (forgeAdventurer != null && forgeAdventurer.advClass == warriorClassUnlock) forgeAdventurer.advClass = advClass;    
     }
 
     public void SetBuildingUpgradePending (BuildingType building)
