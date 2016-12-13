@@ -10,13 +10,15 @@ public class BattleOverseer : MonoBehaviour
     public Battler[] playerParty;
     public Battler currentActingBattler;
     public Battler currentTurnTarget;
+    public Battler standardPriorityActingBattler;
     public BattlerAction nextAction;
     public PopupMenu battleEndPopup;
     public SortedList<float, Battler> turnOrderList;
     public Battler[] allBattlers { get; private set; }
+    public ScreenChanger screenChanger;
     public GameObject retreatButton;
     public bool standardActionPriorityBracket;
-    public bool retreatingAtStartOfNextBout { get; private set; }
+    public bool retreatingAtStartOfNextTurn { get; private set; }
     [System.NonSerialized] public AdventureSubstage[] adventure;
     [System.NonSerialized] public int battleNo = 0;
     private bool currentBattleResolved;
@@ -43,8 +45,7 @@ public class BattleOverseer : MonoBehaviour
 
     IEnumerator RunTurn ()
     {
-        Debug.Log("Start turn " + turn.ToString());
-        if (retreatingAtStartOfNextBout) Retreat();
+        if (retreatingAtStartOfNextTurn) Retreat();
         processingTurn = true;
         StartTurn();
         theater.StartOfTurn();
@@ -68,16 +69,8 @@ public class BattleOverseer : MonoBehaviour
             }
             ClearBattlerHitStatuses();
         }
-        turn++;
         while (theater.processing) yield return null;
-        encoreWaitingForEnemies = false;
-        encoreWaitingForPlayer = false;
-        nextAction = BattlerAction.None;
-        currentActingBattler = default(Battler);
-        currentTurnTarget = default(Battler);
-        processingTurn = false;
-        if (currentBattleResolved) EndBattle();
-        else StartCoroutine(RunTurn());
+        EndTurn();
     }
 
     IEnumerator HandleAheadOfStandardActions ()
@@ -115,9 +108,13 @@ public class BattleOverseer : MonoBehaviour
                 continue;
             }
             SubTurnStep_StandardAction_Fetch(bat);
-            if (currentActingBattler.deathblowList.Count > 0)
+            if (standardPriorityActingBattler.deathblowList.Count > 0)
             {
-                for (int i2 = 0; i2 < turnOrderList.Count; i2++) if (SubTurnStep_Interrupt_Deathblow(turnOrderList[turnOrderList.Keys[i2]]))
+                Battler exBat;
+                for (int i2 = 0; i2 < turnOrderList.Count; i2++)
+                {
+                    exBat = turnOrderList[turnOrderList.Keys[i2]];
+                    if (exBat.isEnemy != standardPriorityActingBattler.isEnemy && SubTurnStep_Interrupt_Deathblow(exBat))
                     {
                         timer = 0;
                         theater.ProcessAction();
@@ -128,9 +125,12 @@ public class BattleOverseer : MonoBehaviour
                         }
                         if (CheckIfBattleResolved()) yield break;
                     }
+                }
+
             }
             standardActionPriorityBracket = true;
-            if (currentActingBattler._target != null) // there should probably be some fancy target redirection stuff happening but this is the quick "don't crash" solution: hit a dead guy, lose your turn
+            currentActingBattler = standardPriorityActingBattler;
+            if (currentActingBattler._target != null && currentActingBattler.isValidTarget) // there should probably be some fancy target redirection stuff happening but this is the quick "don't crash" solution: hit a dead guy, lose your turn
             {
                 if (currentActingBattler.isEnemy) currentActingBattler.ExecuteAttack(validPlayerTargets, validEnemyTargets);
                 else currentActingBattler.ExecuteAttack(validEnemyTargets, validPlayerTargets);
@@ -183,6 +183,8 @@ public class BattleOverseer : MonoBehaviour
     {
         retreatButton.SetActive(true);
         timer = 0;
+        messageBox.Step(BattleMessageType.Win);
+        theater.WinBattle();
         while (timer < battleStepLength * 3 || theater.processing)
         {
             timer += Time.deltaTime;
@@ -195,6 +197,8 @@ public class BattleOverseer : MonoBehaviour
     IEnumerator WinAndPrepareForAdventureExit ()
     {
         timer = 0;
+        messageBox.Step(BattleMessageType.Win);
+        theater.WinBattle();
         while (timer < battleStepLength * 3 || theater.processing)
         {
             timer += Time.deltaTime;
@@ -208,36 +212,42 @@ public class BattleOverseer : MonoBehaviour
 
     IEnumerator RetreatAndPrepareForAdventureExit ()
     {
+        messageBox.Step(BattleMessageType.Retreat);
         theater.Retreat();
         while (theater.processing) yield return null;
         battleEndPopup.Open();
     }
 
+    IEnumerator LoseAndPrepareForAdventureExit ()
+    {
+        timer = 0;
+        messageBox.Step(BattleMessageType.Loss);
+        theater.LoseBattle();
+        while (timer < battleStepLength * 3 || theater.processing)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        screenChanger.Activate();
+    }
+
     public void EndBattle ()
     {
-        if (retreatingAtStartOfNextBout)
-        {
-            messageBox.Step(BattleMessageType.Retreat);
-            StartCoroutine(RetreatAndPrepareForAdventureExit());
-        }
-        else if (validPlayerTargets.Count > 0)
+        if (validEnemyTargets.Count == 0)
         {
             battleNo++;
-            messageBox.Step(BattleMessageType.Win);
             StopAllCoroutines();
-            theater.WinBattle();
             if (battleNo < adventure.Length) StartCoroutine(WinAndContinueBattling());
             else StartCoroutine(WinAndPrepareForAdventureExit());
         }
-        else
-        {
-            messageBox.Step(BattleMessageType.Loss);
-            theater.LoseBattle();
-        }
+        else if (validPlayerTargets.Count == 0) StartCoroutine(LoseAndPrepareForAdventureExit());
+        else if (retreatingAtStartOfNextTurn) StartCoroutine(RetreatAndPrepareForAdventureExit());
+        else throw new System.Exception("Tried to end battle... but both parties are still capable of righting, and the player isn't retreating???");
     }
 
     bool CheckIfBattleResolved ()
     {
+        if (playerParty[0].dead) SetToRetreat(); // first slot is always the sovereign, so if first slot is dead sovereign is dead
         for (int i = 0; i < validEnemyTargets.Count; i++) if (validEnemyTargets[i].dead) validEnemyTargets.RemoveAt(i);
         for (int i = 0; i < validPlayerTargets.Count; i++) if (validPlayerTargets[i].dead) validPlayerTargets.RemoveAt(i);
         currentBattleResolved = (validEnemyTargets.Count < 1 || validPlayerTargets.Count < 1);
@@ -248,7 +258,7 @@ public class BattleOverseer : MonoBehaviour
 
     void SubTurnStep_StandardAction_Fetch (Battler bat)
     {
-        currentActingBattler = bat;
+        standardPriorityActingBattler = bat;
         if (bat.isEnemy)
         {
             nextAction = bat.GetAction(turn, validEnemyTargets, validPlayerTargets);
@@ -267,12 +277,12 @@ public class BattleOverseer : MonoBehaviour
         currentActingBattler = bat;
         if (bat.isEnemy)
         {
-            action = bat.GetInterruptAction(BattlerActionInterruptType.BattleStart, turn, validEnemyTargets, validPlayerTargets);
+            action = bat.GetInterruptAction(BattlerActionInterruptType.BattleStart);
             if (action != BattlerAction.None) bat.AttackWith(validPlayerTargets, validEnemyTargets, action);
         }
         else
         {
-            action = bat.GetInterruptAction(BattlerActionInterruptType.BattleStart, turn, validPlayerTargets, validEnemyTargets);
+            action = bat.GetInterruptAction(BattlerActionInterruptType.BattleStart);
             if (action != BattlerAction.None) bat.AttackWith(validEnemyTargets, validPlayerTargets, action);
         }
         return action != BattlerAction.None;     
@@ -281,14 +291,15 @@ public class BattleOverseer : MonoBehaviour
     bool SubTurnStep_Interrupt_Deathblow (Battler bat)
     {
         BattlerAction action;
+        currentActingBattler = bat;
         if (bat.isEnemy)
         {
-            action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyDeathblow, turn, validEnemyTargets, validPlayerTargets);
+            action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyDeathblow);
             if (action != BattlerAction.None) bat.AttackWith(validPlayerTargets, validEnemyTargets, action);
         }
         else
         {
-            action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyDeathblow, turn, validPlayerTargets, validEnemyTargets);
+            action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyDeathblow);
             if (action != BattlerAction.None) bat.AttackWith(validEnemyTargets, validPlayerTargets, action);
         }
         return action != BattlerAction.None;
@@ -300,14 +311,14 @@ public class BattleOverseer : MonoBehaviour
         currentActingBattler = bat;
         if (bat.isEnemy)
         {
-            if (bat == batHit) action = bat.GetInterruptAction(BattlerActionInterruptType.OnHit, turn, validEnemyTargets, validPlayerTargets);
-            else action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyHit, turn, validEnemyTargets, validPlayerTargets);
+            if (bat == batHit) action = bat.GetInterruptAction(BattlerActionInterruptType.OnHit);
+            else action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyHit);
             if (action != BattlerAction.None) bat.AttackWith(validPlayerTargets, validEnemyTargets, action);
         }
         else
         {
-            if (bat == batHit) action = bat.GetInterruptAction(BattlerActionInterruptType.OnHit, turn, validPlayerTargets, validEnemyTargets);
-            else action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyHit, turn, validPlayerTargets, validEnemyTargets);
+            if (bat == batHit) action = bat.GetInterruptAction(BattlerActionInterruptType.OnHit);
+            else action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyHit);
             if (action != BattlerAction.None) bat.AttackWith(validEnemyTargets, validPlayerTargets, action);
         }
         return action != BattlerAction.None;
@@ -317,7 +328,7 @@ public class BattleOverseer : MonoBehaviour
     {
         while (GameDataManager.Instance == null) yield return null;
         if (GameDataManager.Instance.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) adventure = AdventureSubstageLoader.prebuiltAdventures[GameDataManager.Instance.adventureLevel];
-        else throw new System.NotImplementedException("random adventures aren't a thing yet");
+        else adventure = AdventureSubstageLoader.randomAdventure;
         PopulatePlayerParty();
         StartNextBattle();
     }
@@ -425,6 +436,19 @@ public class BattleOverseer : MonoBehaviour
         BuildLists();
     }
 
+    private void EndTurn ()
+    {
+        turn++;
+        encoreWaitingForEnemies = false;
+        encoreWaitingForPlayer = false;
+        nextAction = BattlerAction.None;
+        currentActingBattler = default(Battler);
+        currentTurnTarget = default(Battler);
+        processingTurn = false;
+        if (currentBattleResolved) EndBattle();
+        else StartCoroutine(RunTurn());
+    }
+
     public void GiveEncore (bool toEnemy)
     {
         if (toEnemy) encoreWaitingForEnemies = true;
@@ -440,7 +464,7 @@ public class BattleOverseer : MonoBehaviour
     public void SetToRetreat ()
     {
         retreatButton.SetActive(false);
-        retreatingAtStartOfNextBout = true;
+        retreatingAtStartOfNextTurn = true;
     }
 
     private void Retreat ()

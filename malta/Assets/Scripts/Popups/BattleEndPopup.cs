@@ -26,10 +26,11 @@ public class BattleEndPopup : MonoBehaviour
 	    if (opened == false)
         {
             opened = true;
-            if (battleOverseer.retreatingAtStartOfNextBout)
+            if (battleOverseer.retreatingAtStartOfNextTurn)
             {
                 nextDestText.text = strings[13];
-                switch (battleOverseer.playerDeaths)
+                if (battleOverseer.playerParty[0].dead) successDegreeText.text = strings[18];
+                else switch (battleOverseer.playerDeaths)
                 {
                     case 0:
                         successDegreeText.text = strings[14];

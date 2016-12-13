@@ -16,3 +16,4 @@ You retreated from battle with no casualties!
 You retreated from battle, but at the cost of 
 You managed to retreat, but took heavy casualties.
 You managed to retreat... but was there even really a point...?
+The remaining party members were forced to retreat in order to protect their wounded sovereign...

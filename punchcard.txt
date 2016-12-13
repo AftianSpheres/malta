@@ -160,3 +160,14 @@ Dec.11 2016-149
 11:11 AM - off
 1:25 PM - on
 2:38 PM - off
+
+Dec.13 2016-137
+
+12:01 PM - start
+12:52 PM - off
+1:34 PM - on
+1:43 PM - off
+1:52 PM - on
+2:05 PM - off
+3:43 PM - on
+4:35 PM - off

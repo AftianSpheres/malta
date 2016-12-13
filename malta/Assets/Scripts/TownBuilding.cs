@@ -101,7 +101,6 @@ public class TownBuilding : MonoBehaviour
                 }
                 buildingAlteredSinceLastUpdate = true;
                 GameDataManager.Instance.unlock_forgeOutbuilding = true;
-                Debug.Log(associatedAdventurer.name);
                 break;
             default:
                 throw new System.Exception("Can't add outbuilding to building of type " + buildingType.ToString());

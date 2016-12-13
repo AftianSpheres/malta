@@ -141,7 +141,7 @@ public class Battler : MonoBehaviour
                 target = overseer.currentTurnTarget;
                 break;
             case BattlerAction.Flanking:
-                target = overseer.currentActingBattler;
+                target = overseer.standardPriorityActingBattler;
                 break;
             case BattlerAction.RainOfArrows:
             case BattlerAction.Inferno:
@@ -158,7 +158,7 @@ public class Battler : MonoBehaviour
                 if (damage >= validEnemyTargets[i].currentHP) deathblowList.Add(validEnemyTargets[i]);
             }
         }
-        if (overseer.currentActingBattler == this) overseer.currentTurnTarget = target;
+        if (overseer.standardPriorityActingBattler == this) overseer.currentTurnTarget = target;
         return target;
     }
 
@@ -342,11 +342,11 @@ public class Battler : MonoBehaviour
         {
             if (bodyguard != null)
             {
-                bodyguard = default(Battler);
                 bodyguard.DealDamage(damage / 4);
                 damage = 0;
                 puppet.incomingBuff = true;
                 overseer.messageBox.Step(BattleMessageType.SavedAlly);
+                bodyguard = default(Battler); // IF YOU NULL BODYGUARD AND THEN TRY TO DAMAGE BODYGUARD NO SHIT IT'S GONNA CRASH
             }
             if (barrierTurns > 0)
             {
@@ -408,7 +408,7 @@ public class Battler : MonoBehaviour
         return action;
     }
 
-    public BattlerAction GetInterruptAction (BattlerActionInterruptType interrupt, int turn, List<Battler> allies, List<Battler> opponents)
+    public BattlerAction GetInterruptAction (BattlerActionInterruptType interrupt)
     {
         BattlerAction action = BattlerAction.None;
         switch (interrupt)
@@ -457,7 +457,8 @@ public class Battler : MonoBehaviour
         RefreshCooldownsAndShit();
         for (int i = 0; i < adventurer.attacks.Length; i++)
         {
-            switch (adventurer.attacks[i])
+            RegisterAttack(adventurer.attacks[i]);
+            if (defaultAction == BattlerAction.None) switch (adventurer.attacks[i])
             {
                 case AdventurerAttack.MaceSwing:
                     defaultAction = BattlerAction.MaceSwing;
@@ -484,7 +485,6 @@ public class Battler : MonoBehaviour
                     defaultAction = BattlerAction.Rend;
                     break;
             }
-            if (defaultAction != BattlerAction.None) break;
         }
         if (adventurer.special == AdventurerSpecial.ShieldWall) battleStartInterruptActions.Add(BattlerAction.ShieldWall);
         else if (adventurer.special == AdventurerSpecial.Barrier) battleStartInterruptActions.Add(BattlerAction.Barrier);
@@ -493,6 +493,12 @@ public class Battler : MonoBehaviour
         if (HasAttack(AdventurerAttack.GetBehindMe)) onAllyDeathblowInterruptActions.Add(BattlerAction.GetBehindMe);
         if (HasAttack(AdventurerAttack.Flanking)) onAllyDeathblowInterruptActions.Add(BattlerAction.Flanking);
         puppet.Setup();
+    }
+
+    private void RegisterAttack (AdventurerAttack attack)
+    {
+        if (attack0 == AdventurerAttack.None) attack0 = attack;
+        else attack1 = attack;
     }
 
     public void TickCooldownsAndShit ()

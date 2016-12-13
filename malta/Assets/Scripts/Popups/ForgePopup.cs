@@ -59,40 +59,6 @@ public class ForgePopup : MonoBehaviour
             {
                 explainArea.SetActive(false);
             }
-            if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && (bowmanButton.activeInHierarchy || footmanButton.activeInHierarchy))
-            {
-                bowmanButton.SetActive(false);
-                footmanButton.SetActive(false);
-                warriorUpgradeText.gameObject.SetActive(true);
-                if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Bowman) warriorUpgradeText.text = strings[4];
-                else warriorUpgradeText.text = strings[5];
-            }
-            if (GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && (sageButton.activeInHierarchy || wizardButton.activeInHierarchy))
-            {
-                sageButton.SetActive(false);
-                wizardButton.SetActive(false);
-                mysticUpgradeText.gameObject.SetActive(true);
-                if (GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Sage) mysticUpgradeText.text = strings[6];
-                else warriorUpgradeText.text = strings[7];
-            }
-            if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic)
-            {
-                if (!GameDataManager.Instance.unlock_forgeOutbuilding)
-                {
-                    if (!adventurerButton.activeInHierarchy) adventurerButton.SetActive(true);
-                    if (!taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(true);
-                }
-                else
-                {
-                    if (adventurerButton.activeInHierarchy) adventurerButton.SetActive(false);
-                    if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
-                    if (GameDataManager.Instance.unlock_Taskmaster)
-                    {
-                        if (!taskmasterArea.activeInHierarchy) taskmasterArea.SetActive(true);
-                    }
-                    else if (!adventurerArea.activeInHierarchy && townBuilding.associatedAdventurer != null) adventurerArea.SetActive(true);
-                }
-            }
             switch (status) // this is gross. probably rip it out & do something cleaner later on. (probably the one thing that'd ever be made more elegant by switch fallthrough, lol)
             {
                 case ForgeStatus.Uninitialized:
@@ -102,9 +68,40 @@ public class ForgePopup : MonoBehaviour
                     _in_FuckingAwfulSwitchStatement(2);
                     break;
                 case ForgeStatus.AtLeastOneUpgrade:
+                    if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && (bowmanButton.activeInHierarchy || footmanButton.activeInHierarchy))
+                    {
+                        bowmanButton.SetActive(false);
+                        footmanButton.SetActive(false);
+                        warriorUpgradeText.gameObject.SetActive(true);
+                        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Bowman) warriorUpgradeText.text = strings[4];
+                        else warriorUpgradeText.text = strings[5];
+                    }
+                    if (GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && (sageButton.activeInHierarchy || wizardButton.activeInHierarchy))
+                    {
+                        sageButton.SetActive(false);
+                        wizardButton.SetActive(false);
+                        mysticUpgradeText.gameObject.SetActive(true);
+                        if (GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Sage) mysticUpgradeText.text = strings[6];
+                        else warriorUpgradeText.text = strings[7];
+                    }
                     _in_FuckingAwfulSwitchStatement(1);
                     break;
                 case ForgeStatus.ReadyForOutbuilding:
+                    if (!GameDataManager.Instance.unlock_forgeOutbuilding)
+                    {
+                        if (!adventurerButton.activeInHierarchy) adventurerButton.SetActive(true);
+                        if (!taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(true);
+                    }
+                    else
+                    {
+                        if (adventurerButton.activeInHierarchy) adventurerButton.SetActive(false);
+                        if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
+                        if (GameDataManager.Instance.unlock_Taskmaster)
+                        {
+                            if (!taskmasterArea.activeInHierarchy) taskmasterArea.SetActive(true);
+                        }
+                        else if (!adventurerArea.activeInHierarchy && townBuilding.associatedAdventurer != null) adventurerArea.SetActive(true);
+                    }
                     _in_FuckingAwfulSwitchStatement(0);
                     break;
             }
@@ -123,14 +120,14 @@ public class ForgePopup : MonoBehaviour
             else status = ForgeStatus.Outbuilding_Adventurer;
             RefreshReqsLabels();
         }
-        else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && steps > 0)
-        {
-            status = ForgeStatus.AtLeastOneUpgrade;
-            RefreshReqsLabels();
-        }
-        else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && steps > 1)
+        else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && steps > 0)
         {
             status = ForgeStatus.ReadyForOutbuilding;
+            RefreshReqsLabels();
+        }
+        else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && steps > 1)
+        {
+            status = ForgeStatus.AtLeastOneUpgrade;
             RefreshReqsLabels();
         }
         else if (steps > 2)

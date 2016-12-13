@@ -130,11 +130,12 @@ public class GameDataManager : Manager<GameDataManager>
         }
         for (int i = 0; i < housesBuilt.Length; i++) if (housesBuilt[i] && !houseAdventurers[i].initialized) houseAdventurers[i].Reroll(warriorClassUnlock, AdventurerSpecies.Human, housesOutbuildingsBuilt[i], new int[] { 0, 0, 0, 0 });
         if (unlock_forgeOutbuilding && !unlock_Taskmaster && !forgeAdventurer.initialized) forgeAdventurer.Reroll(warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
-        if (adventureLevel > 1 && (unlock_raceFae != true || unlock_raceOrc != true))
+        if (adventureLevel > 1 && (!unlock_raceFae || !unlock_raceOrc))
         {
             unlock_raceFae = true;
             unlock_raceOrc = true;
         }
+        if (adventureLevel > 2 && !unlock_WizardsTower) unlock_WizardsTower = true;
 
     }
 
