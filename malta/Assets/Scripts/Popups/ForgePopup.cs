@@ -68,41 +68,26 @@ public class ForgePopup : MonoBehaviour
                     _in_FuckingAwfulSwitchStatement(2);
                     break;
                 case ForgeStatus.AtLeastOneUpgrade:
-                    if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && (bowmanButton.activeInHierarchy || footmanButton.activeInHierarchy))
-                    {
-                        bowmanButton.SetActive(false);
-                        footmanButton.SetActive(false);
-                        warriorUpgradeText.gameObject.SetActive(true);
-                        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Bowman) warriorUpgradeText.text = strings[4];
-                        else warriorUpgradeText.text = strings[5];
-                    }
-                    if (GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && (sageButton.activeInHierarchy || wizardButton.activeInHierarchy))
-                    {
-                        sageButton.SetActive(false);
-                        wizardButton.SetActive(false);
-                        mysticUpgradeText.gameObject.SetActive(true);
-                        if (GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Sage) mysticUpgradeText.text = strings[6];
-                        else warriorUpgradeText.text = strings[7];
-                    }
+                    ConformClassUpgradeButtonsToGameState();
                     _in_FuckingAwfulSwitchStatement(1);
                     break;
                 case ForgeStatus.ReadyForOutbuilding:
-                    if (!GameDataManager.Instance.unlock_forgeOutbuilding)
-                    {
-                        if (!adventurerButton.activeInHierarchy) adventurerButton.SetActive(true);
-                        if (!taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(true);
-                    }
-                    else
-                    {
-                        if (adventurerButton.activeInHierarchy) adventurerButton.SetActive(false);
-                        if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
-                        if (GameDataManager.Instance.unlock_Taskmaster)
-                        {
-                            if (!taskmasterArea.activeInHierarchy) taskmasterArea.SetActive(true);
-                        }
-                        else if (!adventurerArea.activeInHierarchy && townBuilding.associatedAdventurer != null) adventurerArea.SetActive(true);
-                    }
+                    ConformClassUpgradeButtonsToGameState();
+                    if (!adventurerButton.activeInHierarchy) adventurerButton.SetActive(true);
+                    if (!taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(true);
                     _in_FuckingAwfulSwitchStatement(0);
+                    break;
+                case ForgeStatus.Outbuilding_Adventurer:
+                    ConformClassUpgradeButtonsToGameState();
+                    if (adventurerButton.activeInHierarchy) adventurerButton.SetActive(false);
+                    if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
+                    if (!adventurerArea.activeInHierarchy) adventurerArea.SetActive(true);
+                    break;
+                case ForgeStatus.Outbuilding_Taskmaster:
+                    ConformClassUpgradeButtonsToGameState();
+                    if (adventurerButton.activeInHierarchy) adventurerButton.SetActive(false);
+                    if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
+                    if (!taskmasterArea.activeInHierarchy) taskmasterArea.SetActive(true);
                     break;
             }
         }
@@ -134,6 +119,26 @@ public class ForgePopup : MonoBehaviour
         {
             status = ForgeStatus.NoUpgrades;
             RefreshReqsLabels();
+        }
+    }
+
+    private void ConformClassUpgradeButtonsToGameState ()
+    {
+        if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && (bowmanButton.activeInHierarchy || footmanButton.activeInHierarchy))
+        {
+            bowmanButton.SetActive(false);
+            footmanButton.SetActive(false);
+            warriorUpgradeText.gameObject.SetActive(true);
+            if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Bowman) warriorUpgradeText.text = strings[4];
+            else warriorUpgradeText.text = strings[5];
+        }
+        if (GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && (sageButton.activeInHierarchy || wizardButton.activeInHierarchy))
+        {
+            sageButton.SetActive(false);
+            wizardButton.SetActive(false);
+            mysticUpgradeText.gameObject.SetActive(true);
+            if (GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Sage) mysticUpgradeText.text = strings[6];
+            else mysticUpgradeText.text = strings[7];
         }
     }
 

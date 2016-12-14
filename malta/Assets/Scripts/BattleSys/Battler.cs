@@ -62,7 +62,7 @@ public class Battler : MonoBehaviour
     public float moveSpeed;
     public int currentHP;
     public int lastDamage;
-    public bool isValidTarget { get { return (!dead); } }
+    public bool isValidTarget { get { return (!dead && activeBattler); } }
     private bool getBehindMeProc;
     private int barrierTurns;
     private int burstOfSpeedCooldown;
@@ -72,6 +72,7 @@ public class Battler : MonoBehaviour
     private int shieldBlockTurns;
     private int shieldWallTurns;
     private int silentTurns;
+    private bool activeBattler = true;
     int _damageDealt = 0;
     int _drainRounds = 0;
     int _damage;
@@ -146,6 +147,9 @@ public class Battler : MonoBehaviour
             case BattlerAction.RainOfArrows:
             case BattlerAction.Inferno:
                 _hitAll = true;
+                break;
+            case BattlerAction.Protect:
+                target = overseer.standardPriorityActingBattler;
                 break;
         }
         if (_hitAll)
@@ -230,6 +234,7 @@ public class Battler : MonoBehaviour
 
     public void ExecuteAttack (List<Battler> validEnemyTargets, List<Battler> friends)
     {
+        if (_action == BattlerAction.BurstOfSpeed) Debug.Log(true);
         if (!isValidTarget) throw new System.Exception("Dead guy " + gameObject.name + " is trying to attack");
         int offense;
         if (_isMagic) offense = adventurer.Magic;
@@ -408,6 +413,7 @@ public class Battler : MonoBehaviour
         return action;
     }
 
+
     public BattlerAction GetInterruptAction (BattlerActionInterruptType interrupt)
     {
         BattlerAction action = BattlerAction.None;
@@ -424,12 +430,19 @@ public class Battler : MonoBehaviour
                 }
                 break;
             case BattlerActionInterruptType.OnAllyHit:
-                if (onAllyHitInterruptActions.Count > 1) action = onAllyHitInterruptActions[0];
+                if (onAllyHitInterruptActions.Count > 0) action = onAllyHitInterruptActions[0]; // COUNT > 1, NO SHIT, OF COURSE IT WASN'T RETURNING AN ACTION
                 break;
             case BattlerActionInterruptType.OnHit:
-                if (onHitInterruptActions.Count > 1) action = onHitInterruptActions[0];
+                if (onHitInterruptActions.Count > 0) action = onHitInterruptActions[0];
                 break;
         }
+        switch (action)
+        {
+            case BattlerAction.Barrier:
+                if (barrierTurns > 0) action = BattlerAction.None; // don't barrier if we've already barriered our barrier
+                break;
+        }
+        
         return action;
     }
 
@@ -445,7 +458,7 @@ public class Battler : MonoBehaviour
 
     public void GenerateBattleData (Adventurer _adventurer)
     {
-        gameObject.SetActive(true);
+        SetBattlerActive();
         dead = false;
         defaultAction = BattlerAction.None;
         battleStartInterruptActions = new List<BattlerAction>();
@@ -521,9 +534,16 @@ public class Battler : MonoBehaviour
         moveSpeed = Random.Range(1.0f, speed);
     }
 
+    public void SetBattlerActive ()
+    {
+        activeBattler = true;
+        puppet.AliveDisplay();
+    }
+
     public void SetBattlerInactive ()
     {
-        gameObject.SetActive(false);
+        activeBattler = false;
+        puppet.KillDisplay();
     }
 
     public void Silence (int turns = 1)

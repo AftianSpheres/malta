@@ -55,17 +55,11 @@ public class BattleOverseer : MonoBehaviour
         if (!currentBattleResolved)
         {
             StartCoroutine(HandleStandardPriorityActions());
-
             while (processingTurnStep || theater.processing) yield return null;
-            if (!currentBattleResolved)
+            if (!currentBattleResolved && (encoreWaitingForEnemies || encoreWaitingForPlayer))
             {
-                StartCoroutine(HandleBehindStandardActions());
+                StartCoroutine(HandleStandardPriorityActions(true));
                 while (processingTurnStep || theater.processing) yield return null;
-                if (!currentBattleResolved)
-                {
-                    StartCoroutine(HandleStandardPriorityActions(true));
-                    while (processingTurnStep || theater.processing) yield return null;
-                }
             }
             ClearBattlerHitStatuses();
         }
@@ -126,12 +120,11 @@ public class BattleOverseer : MonoBehaviour
                         if (CheckIfBattleResolved()) yield break;
                     }
                 }
-
             }
-            standardActionPriorityBracket = true;
             currentActingBattler = standardPriorityActingBattler;
             if (currentActingBattler._target != null && currentActingBattler.isValidTarget) // there should probably be some fancy target redirection stuff happening but this is the quick "don't crash" solution: hit a dead guy, lose your turn
             {
+                standardActionPriorityBracket = true;
                 if (currentActingBattler.isEnemy) currentActingBattler.ExecuteAttack(validPlayerTargets, validEnemyTargets);
                 else currentActingBattler.ExecuteAttack(validEnemyTargets, validPlayerTargets);
                 timer = 0;
@@ -141,40 +134,40 @@ public class BattleOverseer : MonoBehaviour
                     timer += Time.deltaTime;
                     yield return null;
                 }
-            }
-            standardActionPriorityBracket = false;
-            if (CheckIfBattleResolved()) yield break;
-        }
-        processingTurnStep = false;
-    }
-
-    IEnumerator HandleBehindStandardActions ()
-    {
-        processingTurnStep = true;
-        for (int i = 0; i < turnOrderList.Count; i++)
-        {
-            Battler bat = turnOrderList[turnOrderList.Keys[i]];
-            if (!bat.isValidTarget) continue;
-            Battler[] bats;
-            if (bat.isEnemy) bats = enemyParty;
-            else bats = playerParty; 
-            for (int i2 = 0; i2 < bats.Length; i2++)
-            {
-                if (bats[i2] != null && bats[i2].incomingHit && bats[i2].isValidTarget)
+                Battler[] bats;
+                standardActionPriorityBracket = false;
+                if (currentActingBattler.isEnemy) bats = playerParty; // dumbest bug ever: "why don't I run hit interrupts when I'm checking for the enemy party???"
+                else bats = enemyParty;
+                for (int i2 = 0; i2 < bats.Length; i2++)
                 {
-                    if (SubTurnStep_Interrupt_OnAllySideHit(bat, bats[i2], bats))
+                    if (bats[i2] != null && bats[i2].isValidTarget)
                     {
-                        timer = 0;
-                        theater.ProcessAction();
-                        while (timer < battleStepLength || theater.processing)
+                        if (SubTurnStep_Interrupt_AllyHit(bats[i2], bats))
                         {
-                            timer += Time.deltaTime;
-                            yield return null;
+                            timer = 0;
+                            theater.ProcessAction();
+                            while (timer < battleStepLength || theater.processing)
+                            {
+                                timer += Time.deltaTime;
+                                yield return null;
+                            }
+                            if (CheckIfBattleResolved()) yield break;
                         }
-                        if (CheckIfBattleResolved()) yield break;
+                        if (SubTurnStep_Interrupt_SelfHit(bats[i2]))
+                        {
+                            timer = 0;
+                            theater.ProcessAction();
+                            while (timer < battleStepLength || theater.processing)
+                            {
+                                timer += Time.deltaTime;
+                                yield return null;
+                            }
+                            if (CheckIfBattleResolved()) yield break;
+                        }
                     }
                 }
             }
+            if (CheckIfBattleResolved()) yield break;
         }
         processingTurnStep = false;
     }
@@ -305,21 +298,43 @@ public class BattleOverseer : MonoBehaviour
         return action != BattlerAction.None;
     }
 
-    bool SubTurnStep_Interrupt_OnAllySideHit (Battler bat, Battler batHit, Battler[] bats)
+    bool SubTurnStep_Interrupt_AllyHit (Battler bat, Battler[] bats)
     {
-        BattlerAction action;
-        currentActingBattler = bat;
-        if (bat.isEnemy)
+        BattlerAction action = BattlerAction.None;
+        bool tryToCutIn = false;
+        for (int i = 0; i < bats.Length; i++) if (bats[i].isValidTarget && bats[i].incomingHit && bats[i] != bat)
         {
-            if (bat == batHit) action = bat.GetInterruptAction(BattlerActionInterruptType.OnHit);
-            else action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyHit);
-            if (action != BattlerAction.None) bat.AttackWith(validPlayerTargets, validEnemyTargets, action);
+            tryToCutIn = true;
+            break;
         }
-        else
+        if (tryToCutIn)
         {
-            if (bat == batHit) action = bat.GetInterruptAction(BattlerActionInterruptType.OnHit);
-            else action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyHit);
-            if (action != BattlerAction.None) bat.AttackWith(validEnemyTargets, validPlayerTargets, action);
+            action = bat.GetInterruptAction(BattlerActionInterruptType.OnAllyHit);
+            if (action != BattlerAction.None)
+            {
+                currentActingBattler = bat;
+                if (bat.isEnemy) bat.AttackWith(validPlayerTargets, validEnemyTargets, action);
+                else bat.AttackWith(validEnemyTargets, validPlayerTargets, action);
+            }
+            else Debug.Log(bat);
+        }
+        return action != BattlerAction.None;
+    }
+
+    bool SubTurnStep_Interrupt_SelfHit(Battler bat)
+    {
+        BattlerAction action = BattlerAction.None;
+        if (bat.incomingHit)
+        {
+            action = bat.GetInterruptAction(BattlerActionInterruptType.OnHit);
+            if (action != BattlerAction.None)
+            {
+                Debug.Log(action);
+                currentActingBattler = bat;
+                if (bat.isEnemy) bat.AttackWith(validPlayerTargets, validEnemyTargets, action);
+                else bat.AttackWith(validEnemyTargets, validPlayerTargets, action);
+            }
+            else Debug.Log(bat);
         }
         return action != BattlerAction.None;
     }
@@ -404,12 +419,12 @@ public class BattleOverseer : MonoBehaviour
     {
         Battler[] longAllBattlers = new Battler[playerParty.Length + enemyParty.Length];
         int i2 = 0;
-        for (int i = 0; i < playerParty.Length; i++) if (playerParty[i].gameObject.activeInHierarchy)
+        for (int i = 0; i < playerParty.Length; i++) if (playerParty[i].isValidTarget)
             {
                 longAllBattlers[i2] = playerParty[i];
                 i2++;
             }
-        for (int i = 0; i < enemyParty.Length; i++) if (enemyParty[i].gameObject.activeInHierarchy)
+        for (int i = 0; i < enemyParty.Length; i++) if (enemyParty[i].isValidTarget)
             {
                 longAllBattlers[i2] = enemyParty[i];
                 i2++;

@@ -4,6 +4,8 @@ using UnityEngine.UI;
 public class BattlerPuppet : MonoBehaviour
 {
     public Battler battler;
+    public Image panel;
+    public Image mugshot;
     public Text conditionText;
     public Text nameText;
     public Text titleText;
@@ -25,7 +27,7 @@ public class BattlerPuppet : MonoBehaviour
 
     void Update ()
     {
-        if (killedPuppet && !damageAnimGadget.triggeredGadget) gameObject.SetActive(false); // let hit anims play before vanishing 
+        if (killedPuppet && !damageAnimGadget.triggeredGadget) KillDisplay(); // let hit anims play before vanishing 
 	}
 
     public void Respond ()
@@ -57,6 +59,26 @@ public class BattlerPuppet : MonoBehaviour
         if (titleText != null) titleText.text = battler.adventurer.title;
         RefreshHPText();
         killedPuppet = false;
+    }
+
+    public void AliveDisplay()
+    {
+        if (mugshot != null) mugshot.enabled = true;
+        if (panel != null) panel.enabled = true;
+        if (conditionText != null) conditionText.enabled = true;
+        if (nameText != null) nameText.enabled = true;
+        if (titleText != null) titleText.enabled = true;
+        if (hpText != null) hpText.enabled = true;
+    }
+
+    public void KillDisplay ()
+    {
+        if (mugshot != null) mugshot.enabled = false;
+        if (panel != null) panel.enabled = false;
+        if (conditionText != null) conditionText.enabled = false;
+        if (nameText != null) nameText.enabled = false;
+        if (titleText != null) titleText.enabled = false;
+        if (hpText != null) hpText.enabled = false;
     }
 
     void RefreshConditionText ()
