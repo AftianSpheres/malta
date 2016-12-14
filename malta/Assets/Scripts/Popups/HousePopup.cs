@@ -58,7 +58,7 @@ public class HousePopup : MonoBehaviour
         if (adventurerAttacksCached == null || adventurerAttacksCached.Length != associatedHouse.associatedAdventurer.attacks.Length) attacksChanged = true;
         else
         {
-            for (int i = 0; i < adventurerAttacksCached.Length && i < associatedHouse.associatedAdventurer.attacks.Length; i++)
+            for (int i = 0; (i < adventurerAttacksCached.Length && i < associatedHouse.associatedAdventurer.attacks.Length); i++)
             {
                 attacksChanged = true;
                 break;
