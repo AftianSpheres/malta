@@ -27,7 +27,7 @@ public class TowerPopup : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-            if (upgradeButton.activeInHierarchy != (GameDataManager.Instance.buildingLv_WizardsTower <= TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]))
+            if (upgradeButton.activeInHierarchy != (GameDataManager.Instance.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]))
             {
                 upgradeButton.SetActive(GameDataManager.Instance.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]);
             }

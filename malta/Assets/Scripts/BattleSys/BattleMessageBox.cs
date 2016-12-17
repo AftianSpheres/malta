@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using MovementEffects;
 
 public enum BattleMessageType
 {
@@ -21,7 +22,8 @@ public enum BattleMessageType
     SomebodyDead,
     Win,
     Loss,
-    Retreat
+    Retreat,
+    FailedCast
 }
 
 public class BattleMessageBox : MonoBehaviour
@@ -36,10 +38,13 @@ public class BattleMessageBox : MonoBehaviour
     public Queue<Battler> actorQueue;
     public Queue<Battler> corpseQueue;
     public Queue<BattlerAction> actionQueue;
+    public bool processing { get { return _processing || messageQueue.Count > 0 || !_clear; } }
     private string[] mainStrings;
     private string[] actionNameStrings;
     private float timer = messageDelay;
+    private bool _processing;
     private const float messageDelay = .33f;
+    private bool _clear = true;
 
 	// Use this for initialization
 	void Start ()
@@ -56,18 +61,47 @@ public class BattleMessageBox : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-	    if (messageQueue.Count > 0)
+        if (messageQueue.Count > 0)
         {
-            if (timer < messageDelay) timer += Time.deltaTime;
+            if (timer < messageDelay) timer += Timing.DeltaTime;
             else if (timer >= messageDelay) NextMessage();
+            if (messageQueue.Count == 0) timer = 0;
+        }
+        else if (!_clear)
+        {
+            if (timer < messageDelay) timer += Timing.DeltaTime;
+            else if (timer >= messageDelay) _clear = true;
         }
 	}
 
     public void Step(BattleMessageType message = BattleMessageType.StandardTurnMessage, Battler actor = default(Battler), BattlerAction action = BattlerAction.None)
     {
+        _clear = false;
         messageQueue.Enqueue(message);
         actorQueue.Enqueue(actor);
         actionQueue.Enqueue(action);
+    }
+
+    public void FlushWhenReady ()
+    {
+        Timing.RunCoroutine(_FlushWhenReady());
+    }
+
+    IEnumerator<float> _FlushWhenReady ()
+    {
+        _processing = true;
+        while (messageQueue.Count > 0 || timer < messageDelay) yield return 0f;
+        Flush();
+        timer = 0;
+        _processing = false;
+        _clear = false;
+    }
+
+    private void Flush ()
+    {
+        uiText.text = "";
+        line0 = "";
+        line1 = "";
     }
 
     private void NextMessage ()
@@ -142,6 +176,10 @@ public class BattleMessageBox : MonoBehaviour
                 break;
             case BattleMessageType.Retreat:
                 nextLine = mainStrings[18];
+                break;
+            case BattleMessageType.FailedCast:
+                if (overseer.currentActingBattler.isEnemy) nextLine = actor.adventurer.title + mainStrings[19];
+                else nextLine = actor.adventurer.fullName + mainStrings[19];
                 break;
         }
         if (drawToLine1) line1 = nextLine;

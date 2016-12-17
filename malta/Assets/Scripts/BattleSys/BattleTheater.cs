@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using MovementEffects;
 
 public class BattleTheater : MonoBehaviour
 {
@@ -17,10 +18,9 @@ public class BattleTheater : MonoBehaviour
     public Sprite[] battleBG_bgs;
     public TextAsset turnInfoStringsResource;
     public Text turnInfoPanel;
-    public bool processing { get; private set; }
-    private bool coroutineRunning;
-    private bool _listenForSourceToStopPlaying;
+    public bool processing { get { return _processing || messageBox.processing; } }
     private string[] turnInfoStrings;
+    private bool _processing;
     const float retreatAnimLength = 2.5f;
     const float retreatAnimUIDist = 1000;
     const float retreatAnimWorldDist = 20;
@@ -30,21 +30,15 @@ public class BattleTheater : MonoBehaviour
         turnInfoStrings = turnInfoStringsResource.text.Split('\n');
     }
 
-	// Update is called once per frame
-	void Update ()
+    private void Update()
     {
-        if (messageBox.messageQueue.Count > 0) processing = true;
-        else if (_listenForSourceToStopPlaying)
-        {
-            if (source.isPlaying) processing = true;
-            else _listenForSourceToStopPlaying = false;
-        }
-        else if (!coroutineRunning) processing = false;
+
     }
 
     public void StartOfTurn ()
     {
         RefreshTurnInfoPanel();
+        messageBox.FlushWhenReady();
     }
 
     public void ProcessAction ()
@@ -60,11 +54,16 @@ public class BattleTheater : MonoBehaviour
         source.Play();
     }
 
-    public void LoseBattle ()
+    IEnumerator<float> _PlayFanfare (AudioClip ff)
     {
         source.Stop();
-        source.PlayOneShot(ffLose);
-        _listenForSourceToStopPlaying = true;
+        source.PlayOneShot(ff);
+        while (source.isPlaying) yield return 0f;
+    }
+
+    public IEnumerator<float> LoseBattle ()
+    {
+        return Timing.RunCoroutine(_PlayFanfare(ffLose));
     }
 
     public void WinAdventure ()
@@ -73,33 +72,31 @@ public class BattleTheater : MonoBehaviour
         source.Play();
     }
 
-    public void WinBattle ()
+    public IEnumerator<float> WinBattle ()
     {
-        source.Stop();
-        source.PlayOneShot(ffWin);
-        _listenForSourceToStopPlaying = true;
+        return Timing.RunCoroutine(_PlayFanfare(ffWin));
     }
 
     public void Retreat ()
     {
-        StartCoroutine(_Retreat());
+        Timing.RunCoroutine(_Retreat());
     }
 
-    IEnumerator _Retreat ()
+    IEnumerator<float> _Retreat ()
     {
         float timer = 0;
-        coroutineRunning = processing = true;
+        _processing = true;
         sfxSource.PlayOneShot(retreatSFX);
         Vector3 battleBGBasePos = battleBG.transform.position;
         Vector3 enemyPartyBasePos = enemyParty.transform.position;
         while (timer < retreatAnimLength)
         {
-            timer += Time.deltaTime;
+            timer += Timing.DeltaTime;
             battleBG.transform.position = Vector3.Lerp(battleBGBasePos, battleBGBasePos + (Vector3.left * retreatAnimWorldDist), timer / retreatAnimLength);
             enemyParty.transform.position = Vector3.Lerp(enemyPartyBasePos, enemyPartyBasePos + (Vector3.right * retreatAnimUIDist), timer / retreatAnimLength);
-            yield return null;
-        }
-        coroutineRunning = false;
+            yield return 0f;
+        }   
+        _processing = false;
     }
 
     private void RefreshTurnInfoPanel ()

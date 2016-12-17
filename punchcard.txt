@@ -27,7 +27,7 @@
 8:14 PM - on
 9:05 PM - off
 
--------------
+-------------281
 
 11:36 AM - start
 1:14 PM - off
@@ -38,7 +38,7 @@
 6:52 PM - on
 8:05 PM - off
 
--------------
+-------------46
 
 12:11 PM - start
 1:57 PM - off
@@ -182,3 +182,22 @@ Dec.14 2016-090
 1:26 PM - off
 3:06 PM - on
 3:41 PM - off
+
+Dec.16 2016-181
+
+10:12 AM - start
+10:50 AM - off
+11:42 AM - on
+12:01 AM - off
+1:17 PM - on
+1:36 PM - off
+1:45 PM - on
+2:02 PM - off
+2:12 PM - on
+2:23 PM - off
+6:01 PM - on
+6:11 PM - off
+6:14 PM - on
+7:09 PM - off
+7:49 PM - on
+8:11 PM - off
