@@ -45,6 +45,12 @@ public class BattleEndPopup : MonoBehaviour
                         successDegreeText.text = strings[17];
                         break;
                 }
+                if (GameDataManager.Instance.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel)
+                {
+                    announcementPanel.SetActive(true);
+                    if (battleOverseer.playerParty[0].dead) announcementText.text = strings[7];
+                    else announcementText.text = strings[6];
+                }
             }
             else
             {
@@ -70,7 +76,8 @@ public class BattleEndPopup : MonoBehaviour
                 }
                 if (GameDataManager.Instance.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel)
                 {
-                    Debug.Log("this isn't a thing yet");
+                    announcementPanel.SetActive(true);
+                    announcementText.text = strings[5];
                 }
                 else if (GameDataManager.Instance.adventureLevel == 2)
                 {

@@ -6,6 +6,7 @@ public class AdventureTimePopup : MonoBehaviour
     public PopupMenu shell;
     public SovereignInfoPanel sovereignInfo;
     public GameObject matsNeededSection;
+    public PopupMenu insufficientResourcesPopup;
     public Text adventureDestination;
     public Text adventureDetails;
     public Text numBricks;
@@ -61,7 +62,20 @@ public class AdventureTimePopup : MonoBehaviour
 
     public void Depart ()
     {
-        shell.Close();
-        screenChanger.Activate();
+        int[] costs = { 0, 0, 0, GameDataManager.Instance.nextRandomAdventureAnte, GameDataManager.Instance.nextRandomAdventureAnte, GameDataManager.Instance.nextRandomAdventureAnte };
+        if (GameDataManager.Instance.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
+        {
+            if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
+            {
+                shell.Close();
+                screenChanger.Activate();
+            }
+            else insufficientResourcesPopup.Open();
+        }
+        else
+        {
+            shell.Close();
+            screenChanger.Activate();
+        }
     }
 }

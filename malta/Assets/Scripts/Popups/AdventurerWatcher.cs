@@ -6,6 +6,7 @@ public class AdventurerWatcher : MonoBehaviour
     public bool isForgeAdventurer;
     public int houseAdventurerIndex;
     public GameObject interior;
+    public Image mugshot;
     public Text adventurerName;
     public Text adventurerTitle;
     public Text adventurerStats;
@@ -16,6 +17,7 @@ public class AdventurerWatcher : MonoBehaviour
     private int[] cachedAdventurerStats = { -1, -1, -1, -1 };
     private AdventurerAttack[] cachedAdventurerAttacks = { AdventurerAttack.None, AdventurerAttack.None };
     private AdventurerSpecial cachedAdventurerSpecial = AdventurerSpecial.LoseBattle;
+    private AdventurerMugshot cachedAdventurerMugshot = AdventurerMugshot.None;
     private string[] strings;
 
 	// Use this for initialization
@@ -40,6 +42,11 @@ public class AdventurerWatcher : MonoBehaviour
             if (!interior.activeInHierarchy) interior.SetActive(true);
             if (adventurerName.text != adventurer.fullName) adventurerName.text = adventurer.fullName;
             if (adventurerTitle.text != adventurer.title) adventurerTitle.text = adventurer.title;
+            if (cachedAdventurerMugshot != adventurer.mugshot)
+            {
+                cachedAdventurerMugshot = adventurer.mugshot;
+                mugshot.sprite = Adventurer.GetMugshot(cachedAdventurerMugshot);
+            }
             if (cachedAdventurerStats[0] != adventurer.HP || cachedAdventurerStats[1] != adventurer.Martial || cachedAdventurerStats[2] != adventurer.Magic || cachedAdventurerStats[3] != adventurer.Speed)
             {
                 cachedAdventurerStats = new int[] { adventurer.HP, adventurer.Martial, adventurer.Magic, adventurer.Speed };

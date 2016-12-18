@@ -433,7 +433,6 @@ public class Battler : MonoBehaviour
         else if (HasAttack(AdventurerAttack.Inferno) && opponents.Count > 1) action = BattlerAction.Inferno;
         else action = defaultAction;
         _action = action;
-        if (action != defaultAction) Debug.Log(action);
         return action;
     }
 
@@ -472,12 +471,18 @@ public class Battler : MonoBehaviour
 
     public static int GetActionBaseDamage (BattlerAction action)
     {
-        return actionBaseDamages[(int)action];
+        int v;
+        if (action == BattlerAction._CantMove_Silenced) v = 0;
+        else v = actionBaseDamages[(int)action];
+        return v;
     }
 
     public static bool GetActionMagicStatus (BattlerAction action)
     {
-        return actionMagicStatus[(int)action];
+        bool v;
+        if (action == BattlerAction._CantMove_Silenced) v = false;
+        else v = actionMagicStatus[(int)action];
+        return v;
     }
 
     public void GenerateBattleData (Adventurer _adventurer)

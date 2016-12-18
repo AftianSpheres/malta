@@ -33,12 +33,14 @@ public class BattleOverseer : MonoBehaviour
     private bool processingBattle = false;
     private bool processingTurn = false;
     const string _owned = "_BattleOverseerCoroutine";
+    private int[] baseEndlessAdventurePayout;
 
     // Use this for initialization
     void Start ()
     {
         retreatButton.SetActive(false);
         Timing.RunCoroutine(Bootstrap(), _owned);
+        baseEndlessAdventurePayout = new int[] { 0, 0, 0, GameDataManager.Instance.nextRandomAdventureAnte, GameDataManager.Instance.nextRandomAdventureAnte, GameDataManager.Instance.nextRandomAdventureAnte };
 	}
 
     IEnumerator<float> RunTurn ()
@@ -154,7 +156,6 @@ public class BattleOverseer : MonoBehaviour
         yield return Timing.WaitForSeconds(battleStepLength * 3);
         retreatButton.SetActive(false);
         StartNextBattle();
-        Debug.Log(true);
     }
 
     IEnumerator<float> WinAndPrepareForAdventureExit ()
@@ -164,6 +165,13 @@ public class BattleOverseer : MonoBehaviour
         yield return Timing.WaitForSeconds(battleStepLength * 3);
         theater.WinAdventure();
         while (theater.processing) yield return 0f;
+        if (GameDataManager.Instance.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
+        {
+            GameDataManager.Instance.nextRandomAdventureAnte += Random.Range(1, 4);
+            GameDataManager.Instance.resBricks += baseEndlessAdventurePayout[3];
+            GameDataManager.Instance.resPlanks += baseEndlessAdventurePayout[4];
+            GameDataManager.Instance.resMetal += baseEndlessAdventurePayout[5];
+        }
         GameDataManager.Instance.adventureLevel++;
         battleEndPopup.Open();
     }
@@ -173,6 +181,12 @@ public class BattleOverseer : MonoBehaviour
         messageBox.Step(BattleMessageType.Retreat);
         theater.Retreat();
         while (theater.processing) yield return 0f;
+        if (GameDataManager.Instance.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel && !playerParty[0].dead)
+        {
+            GameDataManager.Instance.resBricks += baseEndlessAdventurePayout[3] / 2;
+            GameDataManager.Instance.resPlanks += baseEndlessAdventurePayout[4] / 2;
+            GameDataManager.Instance.resMetal += baseEndlessAdventurePayout[5] / 2;
+        }
         yield return Timing.WaitForSeconds(battleStepLength * 3);
         battleEndPopup.Open();
     }
@@ -335,7 +349,14 @@ public class BattleOverseer : MonoBehaviour
         for (int i = 0; i < enemyAdventurers.Length; i++)
         {
             enemyAdventurers[i] = ScriptableObject.CreateInstance<Adventurer>();
-            enemyAdventurers[i].Reroll(substage.enemiesClasses[i], substage.enemiesSpecies[i], substage.eliteStatuses[i], new int[] { 0, 0, 0, 0 });
+            int[] bonus;
+            if (GameDataManager.Instance.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) bonus = new int[] { 0, 0, 0, 0 };
+            else
+            {
+                int a = GameDataManager.Instance.adventureLevel - AdventureSubstageLoader.randomAdventureBaseLevel;
+                bonus = new int[] { 0, a, a, a };
+            }
+            enemyAdventurers[i].Reroll(substage.enemiesClasses[i], substage.enemiesSpecies[i], substage.eliteStatuses[i], bonus);
         }
         int i2 = 0;
         for (int i = 0; i < enemyAdventurers.Length && i2 < enemyParty.Length; i++)
@@ -426,8 +447,6 @@ public class BattleOverseer : MonoBehaviour
     {
         if (toEnemy) encoreWaitingForEnemies = true;
         else encoreWaitingForPlayer = true;
-        if (toEnemy) Debug.Log("Encore given to enemies");
-        else Debug.Log("Encore given to player");
     }
 
     public void ClearBattlerHitStatuses ()

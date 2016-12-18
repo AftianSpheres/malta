@@ -10,6 +10,7 @@ public class HousePopup : MonoBehaviour
     public RetrainPopup retrainPopup;
     public EvictPopup evictPopup;
     public Button outbuildingButton;
+    public Image mugshot;
     public Text nameLabel;
     public Text titleLabel;
     public Text attacksLabel;
@@ -22,6 +23,7 @@ public class HousePopup : MonoBehaviour
     private int adventurerSpeedCached;
     private AdventurerAttack[] adventurerAttacksCached;
     private AdventurerSpecial adventurerSpecialCached = AdventurerSpecial.UninitializedValue;
+    private AdventurerMugshot cachedAdventurerMugshot;
     private string cachedName;
     private string[] strings;
 
@@ -43,6 +45,11 @@ public class HousePopup : MonoBehaviour
         {
             cachedName = associatedHouse.associatedAdventurer.fullName;
             nameLabel.text = strings[4] + associatedHouse.associatedAdventurer.fullName;
+        }
+        if (cachedAdventurerMugshot != associatedHouse.associatedAdventurer.mugshot)
+        {
+            cachedAdventurerMugshot = associatedHouse.associatedAdventurer.mugshot;
+            mugshot.sprite = Adventurer.GetMugshot(cachedAdventurerMugshot);
         }
         if (associatedHouse.associatedAdventurer.title != titleLabel.text) titleLabel.text = associatedHouse.associatedAdventurer.title;
         if (adventurerHPCached != associatedHouse.associatedAdventurer.HP || adventurerMartialCached != associatedHouse.associatedAdventurer.Martial

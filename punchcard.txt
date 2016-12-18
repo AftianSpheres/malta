@@ -201,3 +201,13 @@ Dec.16 2016-181
 7:09 PM - off
 7:49 PM - on
 8:11 PM - off
+
+Dec.17 2016-71
+8:30 PM - start
+8:45 PM - off
+9:05 PM - on
+9:18 PM - off
+9:40 PM - on
+10:16 PM - off
+10:30 PM - on
+10:37 PM - off

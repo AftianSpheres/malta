@@ -1,6 +1,44 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum AdventurerMugshot
+{
+    None,
+    Sovereign0,
+    Sovereign1,
+    Sovereign2,
+    Sovereign3,
+    Sovereign4,
+    Sovereign5,
+    Sovereign6,
+    Sovereign7,
+    Human0,
+    Human1,
+    Human2,
+    Human3,
+    Human4,
+    Human5,
+    Human6,
+    Human7,
+    Fae0,
+    Fae1,
+    Fae2,
+    Fae3,
+    Fae4,
+    Fae5,
+    Fae6,
+    Fae7,
+    Orc0,
+    Orc1,
+    Orc2,
+    Orc3,
+    Orc4,
+    Orc5,
+    Orc6,
+    Orc7,
+    Aeon
+}
+
 public class Adventurer : ScriptableObject
 {
     public string firstName;
@@ -12,6 +50,7 @@ public class Adventurer : ScriptableObject
     public AdventurerClass advClass { get; private set; }
     public AdventurerSpecial special;
     public AdventurerSpecies species = AdventurerSpecies.Human;
+    public AdventurerMugshot mugshot { get; private set; }
     public int HP { get; private set; }
     public int individualHP { get; private set; }
     public int Martial { get; private set; }
@@ -35,6 +74,7 @@ public class Adventurer : ScriptableObject
     private static string[] aeonLastNames = { "Johnson" };
     private const string attackDescsResourcePath = "attack_descs/";
     private const string specialDescsResourcePath = "special_descs/";
+    private const string mugshotsResourcePath = "mugshots/";
 
     void CalcStats ()
     {
@@ -52,6 +92,29 @@ public class Adventurer : ScriptableObject
         Speed = baseStats[3] + statMods[3] + individualSpeed;
         if (isElite) Speed += 2;
         if (Speed < 0) Speed = 0;
+    }
+
+    void RerollMugshot ()
+    {
+        if (advClass == AdventurerClass.Sovereign) mugshot = GameDataManager.Instance.sovereignMugshot;
+        else
+        {
+            switch (species)
+            {
+                case AdventurerSpecies.Human:
+                    mugshot = (AdventurerMugshot)Random.Range((int)AdventurerMugshot.Human0, (int)AdventurerMugshot.Human7 + 1);
+                    break;
+                case AdventurerSpecies.Fae:
+                    mugshot = (AdventurerMugshot)Random.Range((int)AdventurerMugshot.Fae0, (int)AdventurerMugshot.Fae7 + 1);
+                    break;
+                case AdventurerSpecies.Orc:
+                    mugshot = (AdventurerMugshot)Random.Range((int)AdventurerMugshot.Orc0, (int)AdventurerMugshot.Orc7 + 1);
+                    break;
+                case AdventurerSpecies.Aeon:
+                    mugshot = AdventurerMugshot.Aeon;
+                    break;
+            }
+        }
     }
 
     void RerollFullTitle ()
@@ -129,6 +192,7 @@ public class Adventurer : ScriptableObject
         RerollName();
         RerollFullTitle();
         RecalcStatsAndReloadMoves();
+        RerollMugshot();
         initialized = true;
     }
 
@@ -137,6 +201,12 @@ public class Adventurer : ScriptableObject
         CalcStats();
         attacks = GetClassAttacks(advClass);
         special = GetClassSpecial(advClass);
+    }
+
+    public static Sprite GetMugshot (AdventurerMugshot mugshot)
+    {
+        Sprite mugSprite = Resources.Load<Sprite>(mugshotsResourcePath + mugshot.ToString());
+        return mugSprite;
     }
 
     public static string GetAttackName (AdventurerAttack attack)

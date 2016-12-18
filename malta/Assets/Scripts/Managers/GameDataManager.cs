@@ -15,6 +15,7 @@ public class GameDataManager : Manager<GameDataManager>
     public AdventurerClass mysticClassUnlock { get; private set; }
     public AdventurerAttack sovereignTactic { get; private set; }
     public AdventurerSpecial sovereignSkill { get; private set; }
+    public AdventurerMugshot sovereignMugshot { get; private set; }
     public string sovereignFirstName = "Dude";
     public string sovereignLastName = "Huge";
     public string sovereignName { get { return sovereignAdventurer.fullName; } }
@@ -84,6 +85,7 @@ public class GameDataManager : Manager<GameDataManager>
         sovereignSkill = AdventurerSpecial.None;
         warriorClassUnlock = AdventurerClass.Warrior;
         mysticClassUnlock = AdventurerClass.Mystic;
+        sovereignMugshot = (AdventurerMugshot)Random.Range((int)AdventurerMugshot.Sovereign0, (int)AdventurerMugshot.Sovereign7 + 1);
         sovereignAdventurer = ScriptableObject.CreateInstance<Adventurer>();
         forgeAdventurer = ScriptableObject.CreateInstance<Adventurer>();
         for (int i = 0; i < housesBuilt.Length; i++)

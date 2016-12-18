@@ -6,6 +6,7 @@ public class SovereignInfoPanel : MonoBehaviour
     public PopupMenu shell;
     public PopupMenu sovereignSpecialPopup;
     public PopupMenu sovereignTacticsPopup;
+    public Image sovereignMugshot;
     public Text sovereignNameLabel;
     public Text sovereignSpecialDesc;
     public Text sovereignTitleArea;
@@ -19,6 +20,7 @@ public class SovereignInfoPanel : MonoBehaviour
     private AdventurerAttack cachedSovereignTactic = AdventurerAttack.None;
     private AdventurerAttack[] cachedSovereignAttacks = { AdventurerAttack.None, AdventurerAttack.None };
     private AdventurerSpecial cachedSovereignSpecial = AdventurerSpecial.LoseBattle;
+    private AdventurerMugshot cachedSovereignMugshot;
     private const string dividerString = " | ";
 	
 	// Update is called once per frame
@@ -28,6 +30,11 @@ public class SovereignInfoPanel : MonoBehaviour
         {
             cachedSovereignName = GameDataManager.Instance.sovereignName;
             sovereignNameLabel.text = strings[0] + GameDataManager.Instance.sovereignName;
+        }
+        if (cachedSovereignMugshot != GameDataManager.Instance.sovereignMugshot)
+        {
+            cachedSovereignMugshot = GameDataManager.Instance.sovereignMugshot;
+            sovereignMugshot.sprite = Adventurer.GetMugshot(cachedSovereignMugshot);
         }
         if (cachedSovereignTactic != GameDataManager.Instance.sovereignTactic)
         {
