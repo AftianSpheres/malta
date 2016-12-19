@@ -50,18 +50,21 @@ public class BattleOverseer : MonoBehaviour
         StartTurn();
         theater.StartOfTurn();
         while (theater.processing) yield return 0f;
-        yield return Timing.WaitUntilDone(Timing.RunCoroutine(HandleAheadOfStandardActions(), _owned));
-        while (theater.processing) yield return 0f;
         if (!currentBattleResolved)
         {
-            yield return Timing.WaitUntilDone(Timing.RunCoroutine(HandleStandardPriorityActions(), _owned));
+            yield return Timing.WaitUntilDone(Timing.RunCoroutine(HandleAheadOfStandardActions(), _owned));
             while (theater.processing) yield return 0f;
-            if (!currentBattleResolved && (encoreWaitingForEnemies || encoreWaitingForPlayer))
+            if (!currentBattleResolved)
             {
                 yield return Timing.WaitUntilDone(Timing.RunCoroutine(HandleStandardPriorityActions(), _owned));
                 while (theater.processing) yield return 0f;
+                if (!currentBattleResolved && (encoreWaitingForEnemies || encoreWaitingForPlayer))
+                {
+                    yield return Timing.WaitUntilDone(Timing.RunCoroutine(HandleStandardPriorityActions(), _owned));
+                    while (theater.processing) yield return 0f;
+                }
+                ClearBattlerHitStatuses();
             }
-            ClearBattlerHitStatuses();
         }
         while (theater.processing) yield return 0f;
         EndTurn();

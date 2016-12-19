@@ -211,3 +211,11 @@ Dec.17 2016-71
 10:16 PM - off
 10:30 PM - on
 10:37 PM - off
+
+Dec.18 2016-082
+1:20 PM - start
+2:20 PM - off
+10:59 PM - on
+11:12 PM - off
+11:17 PM - on
+11:26 PM - off
