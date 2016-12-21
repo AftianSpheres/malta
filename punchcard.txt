@@ -219,3 +219,15 @@ Dec.18 2016-082
 11:12 PM - off
 11:17 PM - on
 11:26 PM - off
+
+Dec.19 2016-076
+9:34 PM - start
+10:50 PM - off
+
+Dec.20 2016-161
+10:48 PM - start
+12:06 AM - off
+2:49 AM - on
+3:45 AM - off
+4:10 AM - on
+4:27 AM - off

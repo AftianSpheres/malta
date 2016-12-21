@@ -17,13 +17,13 @@ internal static class BattleBGMLoader
         switch (bgm)
         {
             case BattleBGMType.GARBO_typing:
-                clip = Resources.Load<AudioClip>("garbo/typing");
+                clip = Resources.Load<AudioClip>("Audio/Music/typing");
                 break;
             case BattleBGMType.GARBO_dreamchaser:
-                clip = Resources.Load<AudioClip>("garbo/dreamchaser");
+                clip = Resources.Load<AudioClip>("Audio/Music/dreamchaser");
                 break;
             case BattleBGMType.GARBO_murder:
-                clip = Resources.Load<AudioClip>("garbo/longdistance");
+                clip = Resources.Load<AudioClip>("Audio/Music/longdistance");
                 break;
 
         }
