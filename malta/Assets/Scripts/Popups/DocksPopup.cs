@@ -32,27 +32,27 @@ public class DocksPopup : MonoBehaviour
     {
         if (GameDataManager.Instance != null)
         {
-            if (GameDataManager.Instance.pendingUpgrade_Docks)
+            if (GameDataManager.Instance.dataStore.pendingUpgrade_Docks)
             {
                 if (upgradeButton.activeInHierarchy) upgradeButton.SetActive(false);
                 if (!timerArea.gameObject.activeInHierarchy) timerArea.gameObject.SetActive(true);
-                if (cachedPendingUpgradeTimer != GameDataManager.Instance.pendingUpgradeTimer_Docks)
+                if (cachedPendingUpgradeTimer != GameDataManager.Instance.dataStore.pendingUpgradeTimer_Docks)
                 {
-                    cachedPendingUpgradeTimer = GameDataManager.Instance.pendingUpgradeTimer_Docks;
-                    timerArea.text = PopupMenu.GetTimerReadout(GameDataManager.Instance.pendingUpgradeTimer_Docks, GameDataManager.Instance.buildingLv_Docks + 1);
+                    cachedPendingUpgradeTimer = GameDataManager.Instance.dataStore.pendingUpgradeTimer_Docks;
+                    timerArea.text = PopupMenu.GetTimerReadout(GameDataManager.Instance.dataStore.pendingUpgradeTimer_Docks, GameDataManager.Instance.dataStore.buildingLv_Docks + 1);
                 }
             }
             else if (timerArea.gameObject.activeInHierarchy) timerArea.gameObject.SetActive(false);
-            if (cachedLv != GameDataManager.Instance.buildingLv_Docks || cachedPendingUpgradeStatus != GameDataManager.Instance.pendingUpgrade_Docks)
+            if (cachedLv != GameDataManager.Instance.dataStore.buildingLv_Docks || cachedPendingUpgradeStatus != GameDataManager.Instance.dataStore.pendingUpgrade_Docks)
             {
-                cachedLv = GameDataManager.Instance.buildingLv_Docks;
-                cachedPendingUpgradeStatus = GameDataManager.Instance.pendingUpgrade_Docks;
-                headerArea.text = strings[0] + GameDataManager.Instance.buildingLv_Docks.ToString();
+                cachedLv = GameDataManager.Instance.dataStore.buildingLv_Docks;
+                cachedPendingUpgradeStatus = GameDataManager.Instance.dataStore.pendingUpgrade_Docks;
+                headerArea.text = strings[0] + GameDataManager.Instance.dataStore.buildingLv_Docks.ToString();
                 string line0;
-                if (GameDataManager.Instance.pendingUpgrade_Docks) line0 = strings[4];
-                else if (GameDataManager.Instance.buildingLv_Docks > TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Docks]) line0 = strings[3];
+                if (GameDataManager.Instance.dataStore.pendingUpgrade_Docks) line0 = strings[4];
+                else if (GameDataManager.Instance.dataStore.buildingLv_Docks > TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Docks]) line0 = strings[3];
                 else line0 = strings[2];
-                switch (GameDataManager.Instance.buildingLv_Docks)
+                switch (GameDataManager.Instance.dataStore.buildingLv_Docks)
                 {
                     case 0:
                         infoArea.text = line0 + System.Environment.NewLine + strings[5];
@@ -88,10 +88,10 @@ public class DocksPopup : MonoBehaviour
                         infoArea.text = line0 + System.Environment.NewLine + strings[15];
                         break;
                 }
-                if (GameDataManager.Instance.buildingLv_Docks < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Docks])
+                if (GameDataManager.Instance.dataStore.buildingLv_Docks < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Docks])
                 {
                     if (!upgradeButton.activeInHierarchy) upgradeButton.SetActive(true);
-                    int[] costs = TownBuilding.GetUpgradeCost_Docks(GameDataManager.Instance.buildingLv_Docks);
+                    int[] costs = TownBuilding.GetUpgradeCost_Docks(GameDataManager.Instance.dataStore.buildingLv_Docks);
                     clayCount.text = costs[0].ToString();
                     woodCount.text = costs[1].ToString();
                     oreCount.text = costs[2].ToString();
@@ -106,9 +106,9 @@ public class DocksPopup : MonoBehaviour
 
     public void UpgradeButtonInteraction()
     {
-        if (GameDataManager.Instance.buildingLv_Docks < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Docks])
+        if (GameDataManager.Instance.dataStore.buildingLv_Docks < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Docks])
         {
-            int[] costs = TownBuilding.GetUpgradeCost_Docks(GameDataManager.Instance.buildingLv_Docks);
+            int[] costs = TownBuilding.GetUpgradeCost_Docks(GameDataManager.Instance.dataStore.buildingLv_Docks);
             if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
             {
                 GameDataManager.Instance.SetBuildingUpgradePending(BuildingType.Docks);

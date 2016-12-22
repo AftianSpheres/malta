@@ -14,8 +14,8 @@ public class MyTownLabeler : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-            if (textMesh != null && textMesh.text != GameDataManager.Instance.yourTownName) textMesh.text = GameDataManager.Instance.yourTownName;
-            if (uiText != null && uiText.text != GameDataManager.Instance.yourTownName) uiText.text = GameDataManager.Instance.yourTownName;
+            if (textMesh != null && textMesh.text != GameDataManager.Instance.dataStore.yourTownName) textMesh.text = GameDataManager.Instance.dataStore.yourTownName;
+            if (uiText != null && uiText.text != GameDataManager.Instance.dataStore.yourTownName) uiText.text = GameDataManager.Instance.dataStore.yourTownName;
         }
 	}
 }

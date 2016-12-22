@@ -33,19 +33,19 @@ public class TownBuilding : MonoBehaviour
     public bool forgeOutbuildingIsKobold;
     private AdventurerClass _cachedAdvClass;
     private bool buildingAlteredSinceLastUpdate = true;
-    private bool _adventurerUnlocked { get { if (buildingType == BuildingType.House) return GameDataManager.Instance.housesBuilt[nonUniqueBuildingsIndex]; else return GameDataManager.Instance.unlock_forgeOutbuilding && !GameDataManager.Instance.unlock_Taskmaster; } }
+    private bool _adventurerUnlocked { get { if (buildingType == BuildingType.House) return GameDataManager.Instance.dataStore.housesBuilt[nonUniqueBuildingsIndex]; else return GameDataManager.Instance.dataStore.unlock_forgeOutbuilding && !GameDataManager.Instance.dataStore.unlock_Taskmaster; } }
 
     // Update is called once per frame
     void Update ()
     {
-        if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
+        if (GameDataManager.Instance.dataStore != null) // only matters in editor, but prevents silly timing-related crashes
         {  
             if (buildingType == BuildingType.House || buildingType == BuildingType.Forge)
             {
                 if (associatedAdventurer == null)
                 {
-                    if (buildingType == BuildingType.House) associatedAdventurer = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex];
-                    else associatedAdventurer = GameDataManager.Instance.forgeAdventurer;
+                    if (buildingType == BuildingType.House) associatedAdventurer = GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex];
+                    else associatedAdventurer = GameDataManager.Instance.dataStore.forgeAdventurer;
                 }
                 else if (_cachedAdvClass != associatedAdventurer.advClass)
                 {
@@ -54,12 +54,12 @@ public class TownBuilding : MonoBehaviour
                 }
                 if (!associatedAdventurer.initialized && _adventurerUnlocked)
                 {
-                    associatedAdventurer.Reroll(GameDataManager.Instance.warriorClassUnlock, AdventurerSpecies.Human, hasOutbuilding && (buildingType == BuildingType.House), new int[] { 0, 0, 0, 0 });
+                    associatedAdventurer.Reroll(GameDataManager.Instance.dataStore.warriorClassUnlock, AdventurerSpecies.Human, hasOutbuilding && (buildingType == BuildingType.House), new int[] { 0, 0, 0, 0 });
                 }
             }
             else if (buildingType == BuildingType.Tower)
             {
-                if (GameDataManager.Instance.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.unlock_WizardsTower;
+                if (GameDataManager.Instance.dataStore.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.dataStore.unlock_WizardsTower;
                 if (spriteRenderer.enabled) RefreshBuildingAssociations();
             }
             if (buildingAlteredSinceLastUpdate) RefreshBuildingAssociations(); // doing it like this also lets you mark buildings as "dirty" based on timed events
@@ -77,7 +77,7 @@ public class TownBuilding : MonoBehaviour
     public void BuildFromFoundation()
     {
         if (!isUndeveloped) throw new System.Exception("Can't build from foundation because building " + gameObject.name + " is already developed!");
-        GameDataManager.Instance.housesBuilt[nonUniqueBuildingsIndex] = true;
+        GameDataManager.Instance.dataStore.housesBuilt[nonUniqueBuildingsIndex] = true;
         buildingStateIndex = 0;
         isUndeveloped = false;
         buildingAlteredSinceLastUpdate = true;
@@ -89,18 +89,18 @@ public class TownBuilding : MonoBehaviour
         switch (buildingType)
         {
             case BuildingType.House:
-                GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] = true;
+                GameDataManager.Instance.dataStore.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] = true;
                 associatedAdventurer.Promote();
                 buildingAlteredSinceLastUpdate = true;
                 break;
             case BuildingType.Forge:
-                if (koboldIfForge) GameDataManager.Instance.unlock_Taskmaster = true;
+                if (koboldIfForge) GameDataManager.Instance.dataStore.unlock_Taskmaster = true;
                 else
                 {
-                    associatedAdventurer.Reroll(GameDataManager.Instance.warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
+                    associatedAdventurer.Reroll(GameDataManager.Instance.dataStore.warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
                 }
                 buildingAlteredSinceLastUpdate = true;
-                GameDataManager.Instance.unlock_forgeOutbuilding = true;
+                GameDataManager.Instance.dataStore.unlock_forgeOutbuilding = true;
                 break;
             default:
                 throw new System.Exception("Can't add outbuilding to building of type " + buildingType.ToString());
@@ -159,11 +159,11 @@ public class TownBuilding : MonoBehaviour
     public static int[] GetUpgradeCost_Forge ()
     {
         int[] costs;
-        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
+        if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Warrior && GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Mystic)
         {
             costs = new int[] { 5, 5, 5, 5, 5, 5 };
         }
-        else if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
+        else if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Mystic)
         {
             costs = new int[] { 15, 15, 15, 15, 15, 15 };
         }
@@ -413,17 +413,17 @@ public class TownBuilding : MonoBehaviour
         switch (buildingType)
         {
             case BuildingType.House:
-                if (GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] != associatedAdventurer)
+                if (GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex] != associatedAdventurer)
                 {
-                    if (GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] == null) GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex] = associatedAdventurer;
-                    else associatedAdventurer = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex];
+                    if (GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex] == null) GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex] = associatedAdventurer;
+                    else associatedAdventurer = GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex];
                 }
-                if (GameDataManager.Instance.housesBuilt[nonUniqueBuildingsIndex] == true && isUndeveloped)
+                if (GameDataManager.Instance.dataStore.housesBuilt[nonUniqueBuildingsIndex] == true && isUndeveloped)
                 {
                     isUndeveloped = false;
                     buildingStateIndex = 0;
                 }
-                if (hasOutbuilding == false && GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex])
+                if (hasOutbuilding == false && GameDataManager.Instance.dataStore.housesOutbuildingsBuilt[nonUniqueBuildingsIndex])
                 {
                     hasOutbuilding = true;
                     buildingStateIndex = 1;
@@ -438,7 +438,7 @@ public class TownBuilding : MonoBehaviour
                 }
                 break;
             case BuildingType.Portal:
-                if (GameDataManager.Instance.buildingLv_WizardsTower < buildingTypeMaxLevels[(int)BuildingType.Tower]) buildingStateIndex = 0;
+                if (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < buildingTypeMaxLevels[(int)BuildingType.Tower]) buildingStateIndex = 0;
                 else buildingStateIndex = 1;
                 break;
         }

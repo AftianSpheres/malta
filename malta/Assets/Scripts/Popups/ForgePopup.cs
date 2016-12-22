@@ -99,18 +99,18 @@ public class ForgePopup : MonoBehaviour
     /// <param name="steps">How far down do we want to follow this piece of shit?</param>
     private void _in_FuckingAwfulSwitchStatement(int steps)
     {
-        if (GameDataManager.Instance.unlock_forgeOutbuilding)
+        if (GameDataManager.Instance.dataStore.unlock_forgeOutbuilding)
         {
-            if (GameDataManager.Instance.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
+            if (GameDataManager.Instance.dataStore.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
             else status = ForgeStatus.Outbuilding_Adventurer;
             RefreshReqsLabels();
         }
-        else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && steps > 0)
+        else if (GameDataManager.Instance.dataStore.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.dataStore.mysticClassUnlock != AdventurerClass.Mystic && steps > 0)
         {
             status = ForgeStatus.ReadyForOutbuilding;
             RefreshReqsLabels();
         }
-        else if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && steps > 1)
+        else if (GameDataManager.Instance.dataStore.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.dataStore.mysticClassUnlock != AdventurerClass.Mystic && steps > 1)
         {
             status = ForgeStatus.AtLeastOneUpgrade;
             RefreshReqsLabels();
@@ -124,20 +124,20 @@ public class ForgePopup : MonoBehaviour
 
     private void ConformClassUpgradeButtonsToGameState ()
     {
-        if (GameDataManager.Instance.warriorClassUnlock != AdventurerClass.Warrior && (bowmanButton.activeInHierarchy || footmanButton.activeInHierarchy))
+        if (GameDataManager.Instance.dataStore.warriorClassUnlock != AdventurerClass.Warrior && (bowmanButton.activeInHierarchy || footmanButton.activeInHierarchy))
         {
             bowmanButton.SetActive(false);
             footmanButton.SetActive(false);
             warriorUpgradeText.gameObject.SetActive(true);
-            if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Bowman) warriorUpgradeText.text = strings[4];
+            if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Bowman) warriorUpgradeText.text = strings[4];
             else warriorUpgradeText.text = strings[5];
         }
-        if (GameDataManager.Instance.mysticClassUnlock != AdventurerClass.Mystic && (sageButton.activeInHierarchy || wizardButton.activeInHierarchy))
+        if (GameDataManager.Instance.dataStore.mysticClassUnlock != AdventurerClass.Mystic && (sageButton.activeInHierarchy || wizardButton.activeInHierarchy))
         {
             sageButton.SetActive(false);
             wizardButton.SetActive(false);
             mysticUpgradeText.gameObject.SetActive(true);
-            if (GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Sage) mysticUpgradeText.text = strings[6];
+            if (GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Sage) mysticUpgradeText.text = strings[6];
             else mysticUpgradeText.text = strings[7];
         }
     }

@@ -39,7 +39,8 @@ public enum AdventurerMugshot
     Aeon
 }
 
-public class Adventurer : ScriptableObject
+[System.Serializable]
+public class Adventurer
 {
     public string firstName;
     public string lastName;
@@ -96,7 +97,7 @@ public class Adventurer : ScriptableObject
 
     void RerollMugshot ()
     {
-        if (advClass == AdventurerClass.Sovereign) mugshot = GameDataManager.Instance.sovereignMugshot;
+        if (advClass == AdventurerClass.Sovereign) mugshot = GameDataManager.Instance.dataStore.sovereignMugshot;
         else
         {
             switch (species)
@@ -128,8 +129,8 @@ public class Adventurer : ScriptableObject
     {
         if (advClass == AdventurerClass.Sovereign)
         {
-            firstName = GameDataManager.Instance.sovereignFirstName;
-            lastName = GameDataManager.Instance.sovereignLastName;
+            firstName = GameDataManager.Instance.dataStore.sovereignFirstName;
+            lastName = GameDataManager.Instance.dataStore.sovereignLastName;
         }
         else
         {
@@ -273,7 +274,7 @@ public class Adventurer : ScriptableObject
                 attacks = new AdventurerAttack[] { AdventurerAttack.Inferno, AdventurerAttack.Lightning };
                 break;
             case AdventurerClass.Sovereign:
-                attacks = new AdventurerAttack[] { AdventurerAttack.HammerBlow, GameDataManager.Instance.sovereignTactic };
+                attacks = new AdventurerAttack[] { AdventurerAttack.HammerBlow, GameDataManager.Instance.dataStore.sovereignTactic };
                 break;
             case AdventurerClass.Avatar:
                 attacks = new AdventurerAttack[] { AdventurerAttack.Rend, AdventurerAttack.None };
@@ -300,7 +301,7 @@ public class Adventurer : ScriptableObject
                 special = AdventurerSpecial.Feedback;
                 break;
             case AdventurerClass.Sovereign:
-                special = GameDataManager.Instance.sovereignSkill;
+                special = GameDataManager.Instance.dataStore.sovereignSkill;
                 break;
             case AdventurerClass.Avatar:
                 special = AdventurerSpecial.LoseBattle;

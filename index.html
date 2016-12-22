@@ -9,7 +9,7 @@
     </style>
   </head>
   <body>
-    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="675px" width="1200px"></canvas>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="675px" width="1200px" align="center"></canvas>
     <script type='text/javascript'>
   var Module = {
     TOTAL_MEMORY: 536870912,
@@ -23,5 +23,6 @@
 </script>
 <script src="Release/UnityLoader.js"></script>
 
-  </body>
+<script type='text/javascript'>function sync () {FS.syncfs(false, function (err) {    });}</script>
+</body>
 </html>

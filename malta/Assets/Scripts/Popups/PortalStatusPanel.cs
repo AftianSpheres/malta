@@ -49,7 +49,7 @@ public class PortalStatusPanel : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-            if (!GameDataManager.Instance.unlock_WizardsTower)
+            if (!GameDataManager.Instance.dataStore.unlock_WizardsTower)
             {
                 if (cachedPortalStatus != PortalStatus.NoTower)
                 {
@@ -65,12 +65,12 @@ public class PortalStatusPanel : MonoBehaviour
             }
             else
             {
-                if (GameDataManager.Instance.buildingLv_WizardsTower == 10)
+                if (GameDataManager.Instance.dataStore.buildingLv_WizardsTower == 10)
                 {
                     if (matsNeededSection.activeInHierarchy) matsNeededSection.SetActive(false);
                 }
                 else if (!matsNeededSection.activeInHierarchy) matsNeededSection.SetActive(true);
-                switch (GameDataManager.Instance.buildingLv_WizardsTower)
+                switch (GameDataManager.Instance.dataStore.buildingLv_WizardsTower)
                 {
                     case 1:
                         if (cachedPortalStatus != PortalStatus.TowerLv1)
@@ -128,7 +128,7 @@ public class PortalStatusPanel : MonoBehaviour
 
     private void _in_UpdateProcessing_PortalArea_preLv7()
     {
-        int[] recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.buildingLv_WizardsTower);
+        int[] recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
         _in_UpdateProcessing_PortalArea_reqs(ref recs);
         if (GameDataManager.Instance.CheckMaterialAvailability(recs))
         {
@@ -138,7 +138,7 @@ public class PortalStatusPanel : MonoBehaviour
                 cachedPortalNextSteps = PortalNextSteps.TowerPreLv7_ReadyForUpgrade;
             }
         }
-        else if (GameDataManager.Instance.resBricks >= recs[3] && GameDataManager.Instance.resPlanks >= recs[4])
+        else if (GameDataManager.Instance.dataStore.resBricks >= recs[3] && GameDataManager.Instance.dataStore.resPlanks >= recs[4])
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_NotEnoughMetal)
             {
@@ -147,7 +147,7 @@ public class PortalStatusPanel : MonoBehaviour
             }
 
         }
-        else if (GameDataManager.Instance.resMetal >= recs[5] && GameDataManager.Instance.resPlanks >= recs[4])
+        else if (GameDataManager.Instance.dataStore.resMetal >= recs[5] && GameDataManager.Instance.dataStore.resPlanks >= recs[4])
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_NotEnoughBrick)
             {
@@ -155,7 +155,7 @@ public class PortalStatusPanel : MonoBehaviour
                 cachedPortalNextSteps = PortalNextSteps.TowerPreLv7_NotEnoughBrick;
             }
         }
-        else if (GameDataManager.Instance.resMetal >= recs[5] && GameDataManager.Instance.resBricks >= recs[3])
+        else if (GameDataManager.Instance.dataStore.resMetal >= recs[5] && GameDataManager.Instance.dataStore.resBricks >= recs[3])
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_NotEnoughPlanks)
             {
@@ -173,7 +173,7 @@ public class PortalStatusPanel : MonoBehaviour
 
     private void _in_UpdateProcessing_PortalArea_postLv7()
     {
-        int[] recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.buildingLv_WizardsTower);
+        int[] recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
         _in_UpdateProcessing_PortalArea_reqs(ref recs);
         if (GameDataManager.Instance.CheckMaterialAvailability(recs))
         {
@@ -183,7 +183,7 @@ public class PortalStatusPanel : MonoBehaviour
                 cachedPortalNextSteps = PortalNextSteps.TowerLv7_ReadyForUpgrade;
             }
         }
-        else if (GameDataManager.Instance.resBricks >= recs[3] && GameDataManager.Instance.resPlanks >= recs[4])
+        else if (GameDataManager.Instance.dataStore.resBricks >= recs[3] && GameDataManager.Instance.dataStore.resPlanks >= recs[4])
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_NotEnoughMetal)
             {
@@ -192,7 +192,7 @@ public class PortalStatusPanel : MonoBehaviour
             }
 
         }
-        else if (GameDataManager.Instance.resMetal >= recs[5] && GameDataManager.Instance.resPlanks >= recs[4])
+        else if (GameDataManager.Instance.dataStore.resMetal >= recs[5] && GameDataManager.Instance.dataStore.resPlanks >= recs[4])
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_NotEnoughBrick)
             {
@@ -200,7 +200,7 @@ public class PortalStatusPanel : MonoBehaviour
                 cachedPortalNextSteps = PortalNextSteps.TowerLv7_NotEnoughBrick;
             }
         }
-        else if (GameDataManager.Instance.resMetal >= recs[5] && GameDataManager.Instance.resBricks >= recs[3])
+        else if (GameDataManager.Instance.dataStore.resMetal >= recs[5] && GameDataManager.Instance.dataStore.resBricks >= recs[3])
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_NotEnoughPlanks)
             {

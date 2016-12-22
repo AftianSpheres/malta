@@ -6,6 +6,12 @@ public class TitleScreen : MonoBehaviour
 
     public void NewGameButtonInteraction ()
     {
+        GameDataManager.Instance.RegenerateDataStore();
+        LevelLoadManager.Instance.EnterLevel(SceneIDType.OverworldScene);
+    }
+
+    public void ContinueButtonInteraction ()
+    {
         LevelLoadManager.Instance.EnterLevel(SceneIDType.OverworldScene);
     }
 

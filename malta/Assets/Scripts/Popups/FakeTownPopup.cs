@@ -23,7 +23,7 @@ public class FakeTownPopup : MonoBehaviour
     {
         if (GameDataManager.Instance != null)
         {
-            if (cachedLv_ClayPit != GameDataManager.Instance.harvestLv_ClayPit || cachedLv_Mines != GameDataManager.Instance.harvestLv_Mine || cachedLv_Woodlands != GameDataManager.Instance.harvestLv_Woodlands)
+            if (cachedLv_ClayPit != GameDataManager.Instance.dataStore.harvestLv_ClayPit || cachedLv_Mines != GameDataManager.Instance.dataStore.harvestLv_Mine || cachedLv_Woodlands != GameDataManager.Instance.dataStore.harvestLv_Woodlands)
             {
                 RefreshFakeNumbersFakelyForFakeTown();
             }
@@ -34,7 +34,7 @@ public class FakeTownPopup : MonoBehaviour
     {
         shell.Open();
         currentFakeTownIndex = index;
-        fakeTownName.text = GameDataManager.Instance.fakeTownNames[currentFakeTownIndex];
+        fakeTownName.text = GameDataManager.Instance.dataStore.fakeTownNames[currentFakeTownIndex];
         RefreshFakeNumbersFakelyForFakeTown();
     }
 
@@ -43,9 +43,9 @@ public class FakeTownPopup : MonoBehaviour
     /// </summary>
     private void RefreshFakeNumbersFakelyForFakeTown ()
     {
-        cachedLv_ClayPit = GameDataManager.Instance.harvestLv_ClayPit;
-        cachedLv_Mines = GameDataManager.Instance.harvestLv_Mine;
-        cachedLv_Woodlands = GameDataManager.Instance.harvestLv_Woodlands;
+        cachedLv_ClayPit = GameDataManager.Instance.dataStore.harvestLv_ClayPit;
+        cachedLv_Mines = GameDataManager.Instance.dataStore.harvestLv_Mine;
+        cachedLv_Woodlands = GameDataManager.Instance.dataStore.harvestLv_Woodlands;
         int fakeNo;
         fakeNo = GameDataManager.Instance.GetResourceGainRate(cachedLv_ClayPit - 1, 4);
         bricksText.text = fakeNo.ToString() + " / " + (fakeNo / 4).ToString();

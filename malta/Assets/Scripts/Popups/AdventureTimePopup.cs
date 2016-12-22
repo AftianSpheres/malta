@@ -28,9 +28,9 @@ public class AdventureTimePopup : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-            if (cachedAdventureLv != GameDataManager.Instance.adventureLevel)
+            if (cachedAdventureLv != GameDataManager.Instance.dataStore.adventureLevel)
             {
-                cachedAdventureLv = GameDataManager.Instance.adventureLevel;
+                cachedAdventureLv = GameDataManager.Instance.dataStore.adventureLevel;
                 switch (cachedAdventureLv)
                 {
                     case 0:
@@ -54,7 +54,7 @@ public class AdventureTimePopup : MonoBehaviour
                 else
                 {
                     matsNeededSection.SetActive(true);
-                    numBricks.text = numMetal.text = numPlanks.text = GameDataManager.Instance.nextRandomAdventureAnte.ToString();
+                    numBricks.text = numMetal.text = numPlanks.text = GameDataManager.Instance.dataStore.nextRandomAdventureAnte.ToString();
                 }
             }
         }
@@ -62,8 +62,8 @@ public class AdventureTimePopup : MonoBehaviour
 
     public void Depart ()
     {
-        int[] costs = { 0, 0, 0, GameDataManager.Instance.nextRandomAdventureAnte, GameDataManager.Instance.nextRandomAdventureAnte, GameDataManager.Instance.nextRandomAdventureAnte };
-        if (GameDataManager.Instance.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
+        int[] costs = { 0, 0, 0, GameDataManager.Instance.dataStore.nextRandomAdventureAnte, GameDataManager.Instance.dataStore.nextRandomAdventureAnte, GameDataManager.Instance.dataStore.nextRandomAdventureAnte };
+        if (GameDataManager.Instance.dataStore.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
         {
             if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
             {

@@ -30,8 +30,6 @@ public class BattleOverseer : MonoBehaviour
     private const float battleStepLength = .66f;
     private List<Battler> validEnemyTargets;
     private List<Battler> validPlayerTargets;
-    private bool processingBattle = false;
-    private bool processingTurn = false;
     const string _owned = "_BattleOverseerCoroutine";
     private int[] baseEndlessAdventurePayout;
 
@@ -40,13 +38,12 @@ public class BattleOverseer : MonoBehaviour
     {
         retreatButton.SetActive(false);
         Timing.RunCoroutine(Bootstrap(), _owned);
-        baseEndlessAdventurePayout = new int[] { 0, 0, 0, GameDataManager.Instance.nextRandomAdventureAnte, GameDataManager.Instance.nextRandomAdventureAnte, GameDataManager.Instance.nextRandomAdventureAnte };
+        baseEndlessAdventurePayout = new int[] { 0, 0, 0, GameDataManager.Instance.dataStore.nextRandomAdventureAnte, GameDataManager.Instance.dataStore.nextRandomAdventureAnte, GameDataManager.Instance.dataStore.nextRandomAdventureAnte };
 	}
 
     IEnumerator<float> RunTurn ()
     {
         if (retreatingAtStartOfNextTurn) Retreat();
-        processingTurn = true;
         StartTurn();
         theater.StartOfTurn();
         while (theater.processing) yield return 0f;
@@ -168,14 +165,14 @@ public class BattleOverseer : MonoBehaviour
         yield return Timing.WaitForSeconds(battleStepLength * 3);
         theater.WinAdventure();
         while (theater.processing) yield return 0f;
-        if (GameDataManager.Instance.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
+        if (GameDataManager.Instance.dataStore.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
         {
-            GameDataManager.Instance.nextRandomAdventureAnte += Random.Range(1, 4);
-            GameDataManager.Instance.resBricks += baseEndlessAdventurePayout[3];
-            GameDataManager.Instance.resPlanks += baseEndlessAdventurePayout[4];
-            GameDataManager.Instance.resMetal += baseEndlessAdventurePayout[5];
+            GameDataManager.Instance.dataStore.nextRandomAdventureAnte += Random.Range(1, 4);
+            GameDataManager.Instance.dataStore.resBricks += baseEndlessAdventurePayout[3];
+            GameDataManager.Instance.dataStore.resPlanks += baseEndlessAdventurePayout[4];
+            GameDataManager.Instance.dataStore.resMetal += baseEndlessAdventurePayout[5];
         }
-        GameDataManager.Instance.adventureLevel++;
+        GameDataManager.Instance.dataStore.adventureLevel++;
         battleEndPopup.Open();
     }
 
@@ -184,11 +181,11 @@ public class BattleOverseer : MonoBehaviour
         messageBox.Step(BattleMessageType.Retreat);
         theater.Retreat();
         while (theater.processing) yield return 0f;
-        if (GameDataManager.Instance.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel && !playerParty[0].dead)
+        if (GameDataManager.Instance.dataStore.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel && !playerParty[0].dead)
         {
-            GameDataManager.Instance.resBricks += baseEndlessAdventurePayout[3] / 2;
-            GameDataManager.Instance.resPlanks += baseEndlessAdventurePayout[4] / 2;
-            GameDataManager.Instance.resMetal += baseEndlessAdventurePayout[5] / 2;
+            GameDataManager.Instance.dataStore.resBricks += baseEndlessAdventurePayout[3] / 2;
+            GameDataManager.Instance.dataStore.resPlanks += baseEndlessAdventurePayout[4] / 2;
+            GameDataManager.Instance.dataStore.resMetal += baseEndlessAdventurePayout[5] / 2;
         }
         yield return Timing.WaitForSeconds(battleStepLength * 3);
         battleEndPopup.Open();
@@ -223,7 +220,6 @@ public class BattleOverseer : MonoBehaviour
         for (int i = 0; i < validEnemyTargets.Count; i++) if (validEnemyTargets[i].dead) validEnemyTargets.RemoveAt(i);
         for (int i = 0; i < validPlayerTargets.Count; i++) if (validPlayerTargets[i].dead) validPlayerTargets.RemoveAt(i);
         currentBattleResolved = (validEnemyTargets.Count < 1 || validPlayerTargets.Count < 1);
-        processingBattle = !currentBattleResolved;
         return currentBattleResolved;
     }
 
@@ -316,8 +312,8 @@ public class BattleOverseer : MonoBehaviour
 
     IEnumerator<float> Bootstrap ()
     {
-        while (GameDataManager.Instance == null) yield return 0f;
-        if (GameDataManager.Instance.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) adventure = AdventureSubstageLoader.prebuiltAdventures[GameDataManager.Instance.adventureLevel];
+        while (GameDataManager.Instance.dataStore == null) yield return 0f;
+        if (GameDataManager.Instance.dataStore.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) adventure = AdventureSubstageLoader.prebuiltAdventures[GameDataManager.Instance.dataStore.adventureLevel];
         else adventure = AdventureSubstageLoader.randomAdventure;
         PopulatePlayerParty();
         StartNextBattle();
@@ -351,12 +347,12 @@ public class BattleOverseer : MonoBehaviour
         enemyAdventurers = new Adventurer[substage.enemiesClasses.Length];
         for (int i = 0; i < enemyAdventurers.Length; i++)
         {
-            enemyAdventurers[i] = ScriptableObject.CreateInstance<Adventurer>();
+            enemyAdventurers[i] = new Adventurer();
             int[] bonus;
-            if (GameDataManager.Instance.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) bonus = new int[] { 0, 0, 0, 0 };
+            if (GameDataManager.Instance.dataStore.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) bonus = new int[] { 0, 0, 0, 0 };
             else
             {
-                int a = GameDataManager.Instance.adventureLevel - AdventureSubstageLoader.randomAdventureBaseLevel;
+                int a = GameDataManager.Instance.dataStore.adventureLevel - AdventureSubstageLoader.randomAdventureBaseLevel;
                 bonus = new int[] { 0, a, a, a };
             }
             enemyAdventurers[i].Reroll(substage.enemiesClasses[i], substage.enemiesSpecies[i], substage.eliteStatuses[i], bonus);
@@ -379,8 +375,8 @@ public class BattleOverseer : MonoBehaviour
 
     private void PopulatePlayerParty ()
     {
-        Adventurer[] playerAdventurers = new Adventurer[] { GameDataManager.Instance.sovereignAdventurer, GameDataManager.Instance.houseAdventurers[0],
-                                                            GameDataManager.Instance.houseAdventurers[1], GameDataManager.Instance.forgeAdventurer };
+        Adventurer[] playerAdventurers = new Adventurer[] { GameDataManager.Instance.dataStore.sovereignAdventurer, GameDataManager.Instance.dataStore.houseAdventurers[0],
+                                                            GameDataManager.Instance.dataStore.houseAdventurers[1], GameDataManager.Instance.dataStore.forgeAdventurer };
         int i2 = 0;
         for (int i = 0; i < playerAdventurers.Length && i2 < playerParty.Length; i++)
         {
@@ -417,7 +413,6 @@ public class BattleOverseer : MonoBehaviour
 
     private void StartNextBattle ()
     {
-        processingBattle = true;
         currentBattleResolved = false;
         turn = 0;
         PopulateEnemyParty();
@@ -441,7 +436,6 @@ public class BattleOverseer : MonoBehaviour
         nextAction = BattlerAction.None;
         currentActingBattler = default(Battler);
         currentTurnTarget = default(Battler);
-        processingTurn = false;
         if (currentBattleResolved) EndBattle();
         else Timing.RunCoroutine(RunTurn(), _owned);
     }

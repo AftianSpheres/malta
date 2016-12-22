@@ -30,11 +30,6 @@ public class BattleTheater : MonoBehaviour
         turnInfoStrings = turnInfoStringsResource.text.Split('\n');
     }
 
-    private void Update()
-    {
-
-    }
-
     public void StartOfTurn ()
     {
         RefreshTurnInfoPanel();
@@ -48,7 +43,7 @@ public class BattleTheater : MonoBehaviour
 
     public void StartBattle ()
     {
-        if (GameDataManager.Instance.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) battleBG.sprite = battleBG_bgs[GameDataManager.Instance.adventureLevel];
+        if (GameDataManager.Instance.dataStore.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) battleBG.sprite = battleBG_bgs[GameDataManager.Instance.dataStore.adventureLevel];
         else battleBG.sprite = battleBG_bgs[AdventureSubstageLoader.randomAdventureBaseLevel];
         source.clip = overseer.adventure[overseer.battleNo].battleBGM;
         source.Play();
@@ -102,8 +97,8 @@ public class BattleTheater : MonoBehaviour
     private void RefreshTurnInfoPanel ()
     {
         string line0;
-        if (GameDataManager.Instance.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel) line0 = turnInfoStrings[AdventureSubstageLoader.randomAdventureBaseLevel];
-        else line0 = turnInfoStrings[GameDataManager.Instance.adventureLevel];
+        if (GameDataManager.Instance.dataStore.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel) line0 = turnInfoStrings[AdventureSubstageLoader.randomAdventureBaseLevel];
+        else line0 = turnInfoStrings[GameDataManager.Instance.dataStore.adventureLevel];
         string line1 = turnInfoStrings[4] + (overseer.battleNo + 1).ToString() + turnInfoStrings[5];
         string line2 = turnInfoStrings[6] + (overseer.turn + 1).ToString();
         turnInfoPanel.text = line0 + System.Environment.NewLine + line1 + System.Environment.NewLine + line2;

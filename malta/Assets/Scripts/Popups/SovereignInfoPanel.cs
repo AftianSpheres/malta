@@ -26,45 +26,45 @@ public class SovereignInfoPanel : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if (cachedSovereignName != GameDataManager.Instance.sovereignName)
+        if (cachedSovereignName != GameDataManager.Instance.dataStore.sovereignName)
         {
-            cachedSovereignName = GameDataManager.Instance.sovereignName;
-            sovereignNameLabel.text = strings[0] + GameDataManager.Instance.sovereignName;
+            cachedSovereignName = GameDataManager.Instance.dataStore.sovereignName;
+            sovereignNameLabel.text = strings[0] + GameDataManager.Instance.dataStore.sovereignName;
         }
-        if (cachedSovereignMugshot != GameDataManager.Instance.sovereignMugshot)
+        if (cachedSovereignMugshot != GameDataManager.Instance.dataStore.sovereignMugshot)
         {
-            cachedSovereignMugshot = GameDataManager.Instance.sovereignMugshot;
+            cachedSovereignMugshot = GameDataManager.Instance.dataStore.sovereignMugshot;
             sovereignMugshot.sprite = Adventurer.GetMugshot(cachedSovereignMugshot);
         }
-        if (cachedSovereignTactic != GameDataManager.Instance.sovereignTactic)
+        if (cachedSovereignTactic != GameDataManager.Instance.dataStore.sovereignTactic)
         {
-            cachedSovereignTactic = GameDataManager.Instance.sovereignTactic;
-            sovereignTacticDesc.text = Adventurer.GetAttackDescription(GameDataManager.Instance.sovereignTactic);
+            cachedSovereignTactic = GameDataManager.Instance.dataStore.sovereignTactic;
+            sovereignTacticDesc.text = Adventurer.GetAttackDescription(GameDataManager.Instance.dataStore.sovereignTactic);
         }
-        if (cachedSovereignSpecial != GameDataManager.Instance.sovereignSkill)
+        if (cachedSovereignSpecial != GameDataManager.Instance.dataStore.sovereignSkill)
         {
-            cachedSovereignSpecial = GameDataManager.Instance.sovereignSkill;
-            sovereignSpecialDesc.text = Adventurer.GetSpecialDescription(GameDataManager.Instance.sovereignSkill);
+            cachedSovereignSpecial = GameDataManager.Instance.dataStore.sovereignSkill;
+            sovereignSpecialDesc.text = Adventurer.GetSpecialDescription(GameDataManager.Instance.dataStore.sovereignSkill);
         }
-        if (cachedSovereignTitle != GameDataManager.Instance.sovereignAdventurer.fullTitle)
+        if (cachedSovereignTitle != GameDataManager.Instance.dataStore.sovereignAdventurer.fullTitle)
         {
-            cachedSovereignTitle = GameDataManager.Instance.sovereignAdventurer.fullTitle;
+            cachedSovereignTitle = GameDataManager.Instance.dataStore.sovereignAdventurer.fullTitle;
             sovereignTitleArea.text = cachedSovereignTitle;
         }
-        if (cachedSovereignStats[0] != GameDataManager.Instance.sovereignAdventurer.HP ||
-            cachedSovereignStats[1] != GameDataManager.Instance.sovereignAdventurer.Martial ||
-            cachedSovereignStats[2] != GameDataManager.Instance.sovereignAdventurer.Magic ||
-            cachedSovereignStats[3] != GameDataManager.Instance.sovereignAdventurer.Speed)
+        if (cachedSovereignStats[0] != GameDataManager.Instance.dataStore.sovereignAdventurer.HP ||
+            cachedSovereignStats[1] != GameDataManager.Instance.dataStore.sovereignAdventurer.Martial ||
+            cachedSovereignStats[2] != GameDataManager.Instance.dataStore.sovereignAdventurer.Magic ||
+            cachedSovereignStats[3] != GameDataManager.Instance.dataStore.sovereignAdventurer.Speed)
         {
-            cachedSovereignStats = new int[] { GameDataManager.Instance.sovereignAdventurer.HP, GameDataManager.Instance.sovereignAdventurer.Martial,
-                GameDataManager.Instance.sovereignAdventurer.Magic, GameDataManager.Instance.sovereignAdventurer.Speed };
+            cachedSovereignStats = new int[] { GameDataManager.Instance.dataStore.sovereignAdventurer.HP, GameDataManager.Instance.dataStore.sovereignAdventurer.Martial,
+                GameDataManager.Instance.dataStore.sovereignAdventurer.Magic, GameDataManager.Instance.dataStore.sovereignAdventurer.Speed };
             sovereignStatsArea.text = strings[2] + cachedSovereignStats[0] + dividerString + strings[3] + cachedSovereignStats[1] + dividerString +
                                       strings[4] + cachedSovereignStats[2] + dividerString + strings[5] + cachedSovereignStats[3];
         }
-        if (cachedSovereignAttacks[0] != GameDataManager.Instance.sovereignAdventurer.attacks[0] ||
-            cachedSovereignAttacks[1] != GameDataManager.Instance.sovereignAdventurer.attacks[1])
+        if (cachedSovereignAttacks[0] != GameDataManager.Instance.dataStore.sovereignAdventurer.attacks[0] ||
+            cachedSovereignAttacks[1] != GameDataManager.Instance.dataStore.sovereignAdventurer.attacks[1])
         {
-            cachedSovereignAttacks = GameDataManager.Instance.sovereignAdventurer.attacks.Clone() as AdventurerAttack[];
+            cachedSovereignAttacks = GameDataManager.Instance.dataStore.sovereignAdventurer.attacks.Clone() as AdventurerAttack[];
             if (cachedSovereignAttacks[1] == AdventurerAttack.None) sovereignAttacksArea.text = Adventurer.GetAttackName(cachedSovereignAttacks[0]);
             else sovereignAttacksArea.text = Adventurer.GetAttackName(cachedSovereignAttacks[0]) + dividerString + Adventurer.GetAttackName(cachedSovereignAttacks[1]);
         }

@@ -29,10 +29,10 @@ public class EvictPopup : MonoBehaviour
                 cachedName = associatedAdventurer.fullName;
                 inquiryLabel.text = strings[0] + cachedName + strings[1];
             }
-            if (faeButton.gameObject.activeInHierarchy && !GameDataManager.Instance.unlock_raceFae) faeButton.gameObject.SetActive(false);
-            else if (!faeButton.gameObject.activeInHierarchy && GameDataManager.Instance.unlock_raceFae) faeButton.gameObject.SetActive(true);
-            if (orcButton.gameObject.activeInHierarchy && !GameDataManager.Instance.unlock_raceOrc) orcButton.gameObject.SetActive(false);
-            else if (!orcButton.gameObject.activeInHierarchy && GameDataManager.Instance.unlock_raceOrc) orcButton.gameObject.SetActive(true);
+            if (faeButton.gameObject.activeInHierarchy && !GameDataManager.Instance.dataStore.unlock_raceFae) faeButton.gameObject.SetActive(false);
+            else if (!faeButton.gameObject.activeInHierarchy && GameDataManager.Instance.dataStore.unlock_raceFae) faeButton.gameObject.SetActive(true);
+            if (orcButton.gameObject.activeInHierarchy && !GameDataManager.Instance.dataStore.unlock_raceOrc) orcButton.gameObject.SetActive(false);
+            else if (!orcButton.gameObject.activeInHierarchy && GameDataManager.Instance.dataStore.unlock_raceOrc) orcButton.gameObject.SetActive(true);
         }
 	}
 

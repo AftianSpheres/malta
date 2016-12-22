@@ -55,32 +55,32 @@ public class BuildingInfoPanel : MonoBehaviour
                     UpdateProcessing_Forge();
                     break;
                 case BuildingType.Docks:
-                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.pendingUpgrade_Docks, ref GameDataManager.Instance.pendingUpgradeTimer_Docks, 
-                        ref GameDataManager.Instance.buildingLv_Docks, 22, TownBuilding.GetUpgradeCost_Docks);
+                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.dataStore.pendingUpgrade_Docks, ref GameDataManager.Instance.dataStore.pendingUpgradeTimer_Docks, 
+                        ref GameDataManager.Instance.dataStore.buildingLv_Docks, 22, TownBuilding.GetUpgradeCost_Docks);
                     break;
                 case BuildingType.Mason:
-                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.pendingUpgrade_Mason, ref GameDataManager.Instance.pendingUpgradeTimer_Mason,
-                        ref GameDataManager.Instance.buildingLv_Mason, 23, TownBuilding.GetUpgradeCost_MasonClaypit);
+                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.dataStore.pendingUpgrade_Mason, ref GameDataManager.Instance.dataStore.pendingUpgradeTimer_Mason,
+                        ref GameDataManager.Instance.dataStore.buildingLv_Mason, 23, TownBuilding.GetUpgradeCost_MasonClaypit);
                     break;
                 case BuildingType.Sawmill:
-                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.pendingUpgrade_Sawmill, ref GameDataManager.Instance.pendingUpgradeTimer_Sawmill,
-                        ref GameDataManager.Instance.buildingLv_Sawmill, 24, TownBuilding.GetUpgradeCost_SawmillWoodlands);
+                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.dataStore.pendingUpgrade_Sawmill, ref GameDataManager.Instance.dataStore.pendingUpgradeTimer_Sawmill,
+                        ref GameDataManager.Instance.dataStore.buildingLv_Sawmill, 24, TownBuilding.GetUpgradeCost_SawmillWoodlands);
                     break;
                 case BuildingType.Smith:
-                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.pendingUpgrade_Smith, ref GameDataManager.Instance.pendingUpgradeTimer_Smith,
-                        ref GameDataManager.Instance.buildingLv_Smith, 25, TownBuilding.GetUpgradeCost_SmithMines);
+                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.dataStore.pendingUpgrade_Smith, ref GameDataManager.Instance.dataStore.pendingUpgradeTimer_Smith,
+                        ref GameDataManager.Instance.dataStore.buildingLv_Smith, 25, TownBuilding.GetUpgradeCost_SmithMines);
                     break;
                 case BuildingType.ClayPit:
-                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.pendingUpgrade_ClayPit, ref GameDataManager.Instance.pendingUpgradeTimer_ClayPit,
-                        ref GameDataManager.Instance.harvestLv_ClayPit, 28, TownBuilding.GetUpgradeCost_MasonClaypit);
+                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.dataStore.pendingUpgrade_ClayPit, ref GameDataManager.Instance.dataStore.pendingUpgradeTimer_ClayPit,
+                        ref GameDataManager.Instance.dataStore.harvestLv_ClayPit, 28, TownBuilding.GetUpgradeCost_MasonClaypit);
                     break;
                 case BuildingType.Woodlands:
-                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.pendingUpgrade_Woodlands, ref GameDataManager.Instance.pendingUpgradeTimer_Woodlands,
-                        ref GameDataManager.Instance.harvestLv_Woodlands, 27, TownBuilding.GetUpgradeCost_SawmillWoodlands);
+                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.dataStore.pendingUpgrade_Woodlands, ref GameDataManager.Instance.dataStore.pendingUpgradeTimer_Woodlands,
+                        ref GameDataManager.Instance.dataStore.harvestLv_Woodlands, 27, TownBuilding.GetUpgradeCost_SawmillWoodlands);
                     break;
                 case BuildingType.Mine:
-                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.pendingUpgrade_Mine, ref GameDataManager.Instance.pendingUpgradeTimer_Mine,
-                        ref GameDataManager.Instance.harvestLv_Mine, 26, TownBuilding.GetUpgradeCost_SmithMines);
+                    UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.dataStore.pendingUpgrade_Mine, ref GameDataManager.Instance.dataStore.pendingUpgradeTimer_Mine,
+                        ref GameDataManager.Instance.dataStore.harvestLv_Mine, 26, TownBuilding.GetUpgradeCost_SmithMines);
                     break;
             }
         }
@@ -103,18 +103,18 @@ public class BuildingInfoPanel : MonoBehaviour
 
     private void UpdateProcessing_Forge ()
     {
-        if (GameDataManager.Instance.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.mysticClassUnlock == AdventurerClass.Mystic)
+        if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Mystic)
         {
             if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-            if (GameDataManager.Instance.resClay != cachedMaterialQuantities[0] ||
-                GameDataManager.Instance.resLumber != cachedMaterialQuantities[1] ||
-                GameDataManager.Instance.resOre != cachedMaterialQuantities[2] ||
-                GameDataManager.Instance.resBricks != cachedMaterialQuantities[3] ||
-                GameDataManager.Instance.resPlanks != cachedMaterialQuantities[4] ||
-                GameDataManager.Instance.resMetal != cachedMaterialQuantities[5])
+            if (GameDataManager.Instance.dataStore.resClay != cachedMaterialQuantities[0] ||
+                GameDataManager.Instance.dataStore.resLumber != cachedMaterialQuantities[1] ||
+                GameDataManager.Instance.dataStore.resOre != cachedMaterialQuantities[2] ||
+                GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[3] ||
+                GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[4] ||
+                GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[5])
             {
-                cachedMaterialQuantities = new int[] {GameDataManager.Instance.resClay, GameDataManager.Instance.resLumber, GameDataManager.Instance.resOre,
-                                                                  GameDataManager.Instance.resBricks, GameDataManager.Instance.resPlanks, GameDataManager.Instance.resMetal};
+                cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resClay, GameDataManager.Instance.dataStore.resLumber, GameDataManager.Instance.dataStore.resOre,
+                                                                  GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
                 int[] costs = TownBuilding.GetUpgradeCost_Forge();
                 RefreshResourceCounters(costs);
                 if (GameDataManager.Instance.CheckMaterialAvailability(costs))
@@ -124,18 +124,18 @@ public class BuildingInfoPanel : MonoBehaviour
                 else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
             }
         }
-        else if (!GameDataManager.Instance.unlock_forgeOutbuilding)
+        else if (!GameDataManager.Instance.dataStore.unlock_forgeOutbuilding)
         {
             if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-            if (GameDataManager.Instance.resClay != cachedMaterialQuantities[0] ||
-                GameDataManager.Instance.resLumber != cachedMaterialQuantities[1] ||
-                GameDataManager.Instance.resOre != cachedMaterialQuantities[2] ||
-                GameDataManager.Instance.resBricks != cachedMaterialQuantities[3] ||
-                GameDataManager.Instance.resPlanks != cachedMaterialQuantities[4] ||
-                GameDataManager.Instance.resMetal != cachedMaterialQuantities[5])
+            if (GameDataManager.Instance.dataStore.resClay != cachedMaterialQuantities[0] ||
+                GameDataManager.Instance.dataStore.resLumber != cachedMaterialQuantities[1] ||
+                GameDataManager.Instance.dataStore.resOre != cachedMaterialQuantities[2] ||
+                GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[3] ||
+                GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[4] ||
+                GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[5])
             {
-                cachedMaterialQuantities = new int[] {GameDataManager.Instance.resClay, GameDataManager.Instance.resLumber, GameDataManager.Instance.resOre,
-                                                                  GameDataManager.Instance.resBricks, GameDataManager.Instance.resPlanks, GameDataManager.Instance.resMetal};
+                cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resClay, GameDataManager.Instance.dataStore.resLumber, GameDataManager.Instance.dataStore.resOre,
+                                                                  GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
                 int[] costs = TownBuilding.GetUpgradeCost_Forge();
                 RefreshResourceCounters(costs);
                 if (GameDataManager.Instance.CheckMaterialAvailability(costs))
@@ -154,19 +154,19 @@ public class BuildingInfoPanel : MonoBehaviour
 
     private void UpdateProcessing_Houses ()
     {
-        if (GameDataManager.Instance.housesBuilt[nonUniqueBuildingsIndex] == false)
+        if (GameDataManager.Instance.dataStore.housesBuilt[nonUniqueBuildingsIndex] == false)
         {
             if (devTypeLabel.text != strings[18]) devTypeLabel.text = strings[18];
             if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-            if (GameDataManager.Instance.resClay != cachedMaterialQuantities[0] ||
-                GameDataManager.Instance.resLumber != cachedMaterialQuantities[1] ||
-                GameDataManager.Instance.resOre != cachedMaterialQuantities[2] ||
-                GameDataManager.Instance.resBricks != cachedMaterialQuantities[3] ||
-                GameDataManager.Instance.resPlanks != cachedMaterialQuantities[4] ||
-                GameDataManager.Instance.resMetal != cachedMaterialQuantities[5])
+            if (GameDataManager.Instance.dataStore.resClay != cachedMaterialQuantities[0] ||
+                GameDataManager.Instance.dataStore.resLumber != cachedMaterialQuantities[1] ||
+                GameDataManager.Instance.dataStore.resOre != cachedMaterialQuantities[2] ||
+                GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[3] ||
+                GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[4] ||
+                GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[5])
             {
-                cachedMaterialQuantities = new int[] {GameDataManager.Instance.resClay, GameDataManager.Instance.resLumber, GameDataManager.Instance.resOre,
-                                                                  GameDataManager.Instance.resBricks, GameDataManager.Instance.resPlanks, GameDataManager.Instance.resMetal};
+                cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resClay, GameDataManager.Instance.dataStore.resLumber, GameDataManager.Instance.dataStore.resOre,
+                                                                  GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
                 RefreshResourceCounters(TownBuilding.houseConstructionCosts);
                 if (GameDataManager.Instance.CheckMaterialAvailability(TownBuilding.houseConstructionCosts))
                 {
@@ -177,12 +177,12 @@ public class BuildingInfoPanel : MonoBehaviour
         }
         else
         {
-            if (GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex]!= null && GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex].initialized)
+            if (GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex]!= null && GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex].initialized)
             {
-                if (devTypeLabel.text != GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex].fullTitle) devTypeLabel.text = GameDataManager.Instance.houseAdventurers[nonUniqueBuildingsIndex].fullTitle;
+                if (devTypeLabel.text != GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex].fullTitle) devTypeLabel.text = GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex].fullTitle;
             }
             else if (devTypeLabel.text != strings[19]) devTypeLabel.text = strings[19];
-            if (GameDataManager.Instance.housesOutbuildingsBuilt[nonUniqueBuildingsIndex])
+            if (GameDataManager.Instance.dataStore.housesOutbuildingsBuilt[nonUniqueBuildingsIndex])
             {
                 if (materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(false);
                 if (devStatusLabel.text != strings[17]) devStatusLabel.text = strings[17];
@@ -190,15 +190,15 @@ public class BuildingInfoPanel : MonoBehaviour
             else
             {
                 if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-                if (GameDataManager.Instance.resClay != cachedMaterialQuantities[0] ||
-                    GameDataManager.Instance.resLumber != cachedMaterialQuantities[1] ||
-                    GameDataManager.Instance.resOre != cachedMaterialQuantities[2] ||
-                    GameDataManager.Instance.resBricks != cachedMaterialQuantities[3] ||
-                    GameDataManager.Instance.resPlanks != cachedMaterialQuantities[4] ||
-                    GameDataManager.Instance.resMetal != cachedMaterialQuantities[5])
+                if (GameDataManager.Instance.dataStore.resClay != cachedMaterialQuantities[0] ||
+                    GameDataManager.Instance.dataStore.resLumber != cachedMaterialQuantities[1] ||
+                    GameDataManager.Instance.dataStore.resOre != cachedMaterialQuantities[2] ||
+                    GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[3] ||
+                    GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[4] ||
+                    GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[5])
                 {
-                    cachedMaterialQuantities = new int[] {GameDataManager.Instance.resClay, GameDataManager.Instance.resLumber, GameDataManager.Instance.resOre,
-                                                                  GameDataManager.Instance.resBricks, GameDataManager.Instance.resPlanks, GameDataManager.Instance.resMetal};
+                    cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resClay, GameDataManager.Instance.dataStore.resLumber, GameDataManager.Instance.dataStore.resOre,
+                                                                  GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
                     RefreshResourceCounters(TownBuilding.houseOutbuildingCosts);
                     if (GameDataManager.Instance.CheckMaterialAvailability(TownBuilding.houseOutbuildingCosts))
                     {
@@ -240,20 +240,20 @@ public class BuildingInfoPanel : MonoBehaviour
             if (buildingUpgradeTimerCached != pendingUpgradeTimer)
             {
                 buildingUpgradeTimerCached = pendingUpgradeTimer;
-                RefreshTimer(pendingUpgradeTimer, GameDataManager.Instance.buildingLv_Docks + 1);
+                RefreshTimer(pendingUpgradeTimer, GameDataManager.Instance.dataStore.buildingLv_Docks + 1);
             }
         }
         else
         {
-            if (GameDataManager.Instance.resClay != cachedMaterialQuantities[0] ||
-                GameDataManager.Instance.resLumber != cachedMaterialQuantities[1] ||
-                GameDataManager.Instance.resOre != cachedMaterialQuantities[2] ||
-                GameDataManager.Instance.resBricks != cachedMaterialQuantities[3] ||
-                GameDataManager.Instance.resPlanks != cachedMaterialQuantities[4] ||
-                GameDataManager.Instance.resMetal != cachedMaterialQuantities[5])
+            if (GameDataManager.Instance.dataStore.resClay != cachedMaterialQuantities[0] ||
+                GameDataManager.Instance.dataStore.resLumber != cachedMaterialQuantities[1] ||
+                GameDataManager.Instance.dataStore.resOre != cachedMaterialQuantities[2] ||
+                GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[3] ||
+                GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[4] ||
+                GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[5])
             {
-                cachedMaterialQuantities = new int[] {GameDataManager.Instance.resClay, GameDataManager.Instance.resLumber, GameDataManager.Instance.resOre,
-                                                                  GameDataManager.Instance.resBricks, GameDataManager.Instance.resPlanks, GameDataManager.Instance.resMetal};
+                cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resClay, GameDataManager.Instance.dataStore.resLumber, GameDataManager.Instance.dataStore.resOre,
+                                                                  GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
                 if (GameDataManager.Instance.CheckMaterialAvailability(costsLookupFunction(baseBuildingLv)))
                 {
                     if (cachedDevStatus != DevStatusOptions.UpgradeReady)

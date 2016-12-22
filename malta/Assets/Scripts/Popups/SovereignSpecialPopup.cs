@@ -27,7 +27,7 @@ public class SovereignSpecialPopup : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-            if (GameDataManager.Instance.unlock_sovSpe_CalledShots)
+            if (GameDataManager.Instance.dataStore.unlock_sovSpe_CalledShots)
             {
                 if (calledShotsCosts.activeInHierarchy) calledShotsCosts.SetActive(false);
                 if (calledShotsNewLabel.activeInHierarchy) calledShotsNewLabel.SetActive(false);
@@ -37,7 +37,7 @@ public class SovereignSpecialPopup : MonoBehaviour
                 if (!calledShotsCosts.activeInHierarchy) calledShotsCosts.SetActive(true);
                 if (!calledShotsNewLabel.activeInHierarchy) calledShotsNewLabel.SetActive(true);
             }
-            if (GameDataManager.Instance.unlock_sovSpe_HammerSmash)
+            if (GameDataManager.Instance.dataStore.unlock_sovSpe_HammerSmash)
             {
                 if (hammerSmashCosts.activeInHierarchy) hammerSmashCosts.SetActive(false);
                 if (hammerSmashNewLabel.activeInHierarchy) hammerSmashNewLabel.SetActive(false);
@@ -47,7 +47,7 @@ public class SovereignSpecialPopup : MonoBehaviour
                 if (!hammerSmashCosts.activeInHierarchy) hammerSmashCosts.SetActive(true);
                 if (!hammerSmashNewLabel.activeInHierarchy) hammerSmashNewLabel.SetActive(true);
             }
-            if (GameDataManager.Instance.unlock_sovSpe_Protect)
+            if (GameDataManager.Instance.dataStore.unlock_sovSpe_Protect)
             {
                 if (protectCosts.activeInHierarchy) protectCosts.SetActive(false);
                 if (protectNewLabel.activeInHierarchy) protectNewLabel.SetActive(false);
@@ -62,14 +62,14 @@ public class SovereignSpecialPopup : MonoBehaviour
 
     public void CalledShotsButtonInteraction ()
     {
-        if (GameDataManager.Instance.unlock_sovSpe_CalledShots)
+        if (GameDataManager.Instance.dataStore.unlock_sovSpe_CalledShots)
         {
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.CalledShots);
             shell.Close();
         }
         else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5, 5, 5, 5))
         {
-            GameDataManager.Instance.unlock_sovSpe_CalledShots = true;
+            GameDataManager.Instance.dataStore.unlock_sovSpe_CalledShots = true;
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.CalledShots);
             shell.Close();
         }
@@ -82,14 +82,14 @@ public class SovereignSpecialPopup : MonoBehaviour
 
     public void HammerSmashButtonInteraction()
     {
-        if (GameDataManager.Instance.unlock_sovSpe_HammerSmash)
+        if (GameDataManager.Instance.dataStore.unlock_sovSpe_HammerSmash)
         {
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.HammerSmash);
             shell.Close();
         }
         else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5, 5, 5, 5))
         {
-            GameDataManager.Instance.unlock_sovSpe_HammerSmash = true;
+            GameDataManager.Instance.dataStore.unlock_sovSpe_HammerSmash = true;
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.HammerSmash);
             shell.Close();
         }
@@ -102,14 +102,14 @@ public class SovereignSpecialPopup : MonoBehaviour
 
     public void ProtectButtonInteraction()
     {
-        if (GameDataManager.Instance.unlock_sovSpe_Protect)
+        if (GameDataManager.Instance.dataStore.unlock_sovSpe_Protect)
         {
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.Protect);
             shell.Close();
         }
         else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5, 5, 5, 5))
         {
-            GameDataManager.Instance.unlock_sovSpe_Protect = true;
+            GameDataManager.Instance.dataStore.unlock_sovSpe_Protect = true;
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.Protect);
             shell.Close();
         }

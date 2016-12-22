@@ -27,13 +27,13 @@ public class TowerPopup : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-            if (upgradeButton.activeInHierarchy != (GameDataManager.Instance.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]))
+            if (upgradeButton.activeInHierarchy != (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]))
             {
-                upgradeButton.SetActive(GameDataManager.Instance.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]);
+                upgradeButton.SetActive(GameDataManager.Instance.dataStore.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]);
             }
-            if (cachedWizardsTowerLv != GameDataManager.Instance.buildingLv_WizardsTower)
+            if (cachedWizardsTowerLv != GameDataManager.Instance.dataStore.buildingLv_WizardsTower)
             {
-                cachedWizardsTowerLv = GameDataManager.Instance.buildingLv_WizardsTower;
+                cachedWizardsTowerLv = GameDataManager.Instance.dataStore.buildingLv_WizardsTower;
                 headerLabel.text = strings[0] + cachedWizardsTowerLv.ToString();
                 infoLabel.text = strings[baseResGainStringIndex + cachedWizardsTowerLv]; 
                 int[] costs = TownBuilding.GetUpgradeCost_WizardsTower(cachedWizardsTowerLv);
@@ -46,10 +46,10 @@ public class TowerPopup : MonoBehaviour
 
     public void UpgradeButtonInteraction ()
     {
-        int[] costs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.buildingLv_WizardsTower);
+        int[] costs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
         if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
         {
-            if (GameDataManager.Instance.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]) GameDataManager.Instance.buildingLv_WizardsTower++;
+            if (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]) GameDataManager.Instance.dataStore.buildingLv_WizardsTower++;
         }
         else
         {

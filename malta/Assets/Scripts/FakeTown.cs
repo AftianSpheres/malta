@@ -15,7 +15,7 @@ public class FakeTown : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-            if (nameLabel.text != GameDataManager.Instance.fakeTownNames[fakeTownsIndex]) nameLabel.text = GameDataManager.Instance.fakeTownNames[fakeTownsIndex];
+            if (nameLabel.text != GameDataManager.Instance.dataStore.fakeTownNames[fakeTownsIndex]) nameLabel.text = GameDataManager.Instance.dataStore.fakeTownNames[fakeTownsIndex];
         }
 	}
 

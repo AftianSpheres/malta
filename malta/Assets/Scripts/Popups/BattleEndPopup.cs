@@ -45,7 +45,7 @@ public class BattleEndPopup : MonoBehaviour
                         successDegreeText.text = strings[17];
                         break;
                 }
-                if (GameDataManager.Instance.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel)
+                if (GameDataManager.Instance.dataStore.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel)
                 {
                     announcementPanel.SetActive(true);
                     if (battleOverseer.playerParty[0].dead) announcementText.text = strings[7];
@@ -54,9 +54,9 @@ public class BattleEndPopup : MonoBehaviour
             }
             else
             {
-                if (GameDataManager.Instance.adventureLevel - 1 < AdventureSubstageLoader.randomAdventureBaseLevel) // adventureLevel is already incremented, we want to get the adventure we were on
+                if (GameDataManager.Instance.dataStore.adventureLevel - 1 < AdventureSubstageLoader.randomAdventureBaseLevel) // adventureLevel is already incremented, we want to get the adventure we were on
                 {
-                    nextDestText.text = strings[GameDataManager.Instance.adventureLevel - 1];
+                    nextDestText.text = strings[GameDataManager.Instance.dataStore.adventureLevel - 1];
                 }
                 else nextDestText.text = strings[AdventureSubstageLoader.randomAdventureBaseLevel];
                 switch (battleOverseer.playerDeaths)
@@ -74,12 +74,12 @@ public class BattleEndPopup : MonoBehaviour
                         successDegreeText.text = strings[12];
                         break;
                 }
-                if (GameDataManager.Instance.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel)
+                if (GameDataManager.Instance.dataStore.adventureLevel > AdventureSubstageLoader.randomAdventureBaseLevel)
                 {
                     announcementPanel.SetActive(true);
                     announcementText.text = strings[5];
                 }
-                else if (GameDataManager.Instance.adventureLevel == 2)
+                else if (GameDataManager.Instance.dataStore.adventureLevel == 2)
                 {
                     announcementPanel.SetActive(true);
                     announcementText.text = strings[4];

@@ -33,9 +33,9 @@ public class AdventurerWatcher : MonoBehaviour
         {
             if (isForgeAdventurer)
             {
-                if (GameDataManager.Instance.forgeAdventurer != null && GameDataManager.Instance.unlock_forgeOutbuilding && !GameDataManager.Instance.unlock_Taskmaster) adventurer = GameDataManager.Instance.forgeAdventurer;
+                if (GameDataManager.Instance.dataStore.forgeAdventurer != null && GameDataManager.Instance.dataStore.unlock_forgeOutbuilding && !GameDataManager.Instance.dataStore.unlock_Taskmaster) adventurer = GameDataManager.Instance.dataStore.forgeAdventurer;
             }             
-            else if (GameDataManager.Instance.houseAdventurers[houseAdventurerIndex] != null && GameDataManager.Instance.housesBuilt[houseAdventurerIndex]) adventurer = GameDataManager.Instance.houseAdventurers[houseAdventurerIndex];
+            else if (GameDataManager.Instance.dataStore.houseAdventurers[houseAdventurerIndex] != null && GameDataManager.Instance.dataStore.housesBuilt[houseAdventurerIndex]) adventurer = GameDataManager.Instance.dataStore.houseAdventurers[houseAdventurerIndex];
         }
         if (adventurer != null && adventurer.initialized)
         {

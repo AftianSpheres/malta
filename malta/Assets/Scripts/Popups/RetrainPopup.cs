@@ -35,19 +35,19 @@ public class RetrainPopup : MonoBehaviour
             {
                 if (associatedAdventurer.advClass == warriorClassEvolutions[i])
                 {
-                    if (cachedClass != GameDataManager.Instance.mysticClassUnlock)
+                    if (cachedClass != GameDataManager.Instance.dataStore.mysticClassUnlock)
                     {
-                        cachedClass = GameDataManager.Instance.mysticClassUnlock;
-                        reclassButtonLabel.text = strings[2] + Adventurer.GetClassName(GameDataManager.Instance.mysticClassUnlock);
+                        cachedClass = GameDataManager.Instance.dataStore.mysticClassUnlock;
+                        reclassButtonLabel.text = strings[2] + Adventurer.GetClassName(GameDataManager.Instance.dataStore.mysticClassUnlock);
                     }
                     break;
                 }
                 else if (associatedAdventurer.advClass == mysticClassEvolutions[i])
                 {
-                    if (cachedClass != GameDataManager.Instance.warriorClassUnlock)
+                    if (cachedClass != GameDataManager.Instance.dataStore.warriorClassUnlock)
                     {
-                        cachedClass = GameDataManager.Instance.warriorClassUnlock;
-                        reclassButtonLabel.text = strings[2] + Adventurer.GetClassName(GameDataManager.Instance.warriorClassUnlock);
+                        cachedClass = GameDataManager.Instance.dataStore.warriorClassUnlock;
+                        reclassButtonLabel.text = strings[2] + Adventurer.GetClassName(GameDataManager.Instance.dataStore.warriorClassUnlock);
                     }
                     break;
                 }

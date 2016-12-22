@@ -20,7 +20,7 @@ public class PortalPopup : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if (GameDataManager.Instance.buildingLv_WizardsTower >= TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower])
+        if (GameDataManager.Instance.dataStore.buildingLv_WizardsTower >= TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower])
         {
             winButton.gameObject.SetActive(true);
             if (portalText.text != strings[22]) portalText.text = strings[22];
