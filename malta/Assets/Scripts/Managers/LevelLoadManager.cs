@@ -5,6 +5,7 @@ using System.Collections;
 public enum SceneIDType
 {
     UniverseBootstrapScene,
+    TitleScene,
     TownScene,
     OverworldScene,
     FightScene

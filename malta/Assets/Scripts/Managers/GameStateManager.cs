@@ -7,7 +7,9 @@ using System.Collections.Generic;
 public class GameStateManager : Manager<GameStateManager>
 {
     public int sessionFingerprint;
-    public bool popupHasFocus { get; private set; }
+    public bool somethingHasFocus { get { return popupHasFocus || cutsceneHasFocus; } }
+    private bool popupHasFocus;
+    private bool cutsceneHasFocus;
     private Stack<PopupMenu> controllingPopupsStack;
 
     /// <summary>
@@ -24,11 +26,15 @@ public class GameStateManager : Manager<GameStateManager>
     /// </summary>
 	void Update ()
     {
-        if (popupHasFocus && !controllingPopupsStack.Peek().isActive)
+        if (!cutsceneHasFocus)
         {
-            controllingPopupsStack.Pop();
-            if (controllingPopupsStack.Count == 0) popupHasFocus = false;
+            if (popupHasFocus && !controllingPopupsStack.Peek().isActive)
+            {
+                controllingPopupsStack.Pop();
+                if (controllingPopupsStack.Count == 0) popupHasFocus = false;
+            }
         }
+
     }
 
     /// <summary>
@@ -44,6 +50,16 @@ public class GameStateManager : Manager<GameStateManager>
         sessionFingerprint = r;
     }
 
+    public void GiveFocusToCutscene ()
+    {
+        cutsceneHasFocus = true;
+    }
+
+    public void CutsceneHasCededFocus ()
+    {
+        cutsceneHasFocus = false;
+    }
+
     public void GiveFocusToPopup (PopupMenu popup)
     {
         popupHasFocus = true;
@@ -54,12 +70,15 @@ public class GameStateManager : Manager<GameStateManager>
     {
         bool result = false;
         PopupMenu topPopup = controllingPopupsStack.Peek();
-        if (popup == topPopup) result = true;
-        else if (topPopup.focusSharers != null)
+        if (!cutsceneHasFocus)
         {
-            for (int i = 0; i < topPopup.focusSharers.Length; i++)
+            if (popup == topPopup) result = true;
+            else if (topPopup.focusSharers != null)
             {
-                if (topPopup.focusSharers[i] == popup) result = true;
+                for (int i = 0; i < topPopup.focusSharers.Length; i++)
+                {
+                    if (topPopup.focusSharers[i] == popup) result = true;
+                }
             }
         }
         return result;

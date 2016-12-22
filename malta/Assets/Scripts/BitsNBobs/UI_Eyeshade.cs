@@ -13,7 +13,7 @@ public class UI_Eyeshade : MonoBehaviour
     {
 	    if (GameStateManager.Instance != null)
         {
-            if (GameStateManager.Instance.popupHasFocus != image.enabled) image.enabled = GameStateManager.Instance.popupHasFocus;
+            if (GameStateManager.Instance.somethingHasFocus != image.enabled) image.enabled = GameStateManager.Instance.somethingHasFocus;
         }
 	}
 }

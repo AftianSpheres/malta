@@ -120,6 +120,9 @@ public class CutscenePlayer : MonoBehaviour
     {
         bgImgPos = backgroundImage.transform.position;
         fgImgPos = foregroundImage.transform.position;
+        textbox.text = "";
+        foregroundImage.sprite = null;
+        backgroundImage.sprite = null;
     }
 
     // Update is called once per frame
@@ -134,7 +137,6 @@ public class CutscenePlayer : MonoBehaviour
     private bool CheckIfCurrentOpDone()
     {
         CutsceneOp op = cutsceneOps[opIndex];
-        KeyValuePair<CutsceneOp, float> opRuntime = new KeyValuePair<CutsceneOp, float>(default(CutsceneOp), 0);
         bool result = false;
         if (!op.isFX || op.isDone) result = true; // never _not_ done if it's not an FX op
         return result;
@@ -151,6 +153,7 @@ public class CutscenePlayer : MonoBehaviour
     public void StartCutscene(string cutsceneName)
     {
         gameObject.SetActive(true);
+        GameStateManager.Instance.GiveFocusToCutscene();
         lastBGM = bgmSource.clip;
         opIndex = 0;
         script = Resources.Load<TextAsset>(cutscenesActionsPath + cutsceneName);
@@ -242,6 +245,10 @@ public class CutscenePlayer : MonoBehaviour
             case "EVT_End":
                 EVTCall = cutsceneEVT_End;
                 break;
+            case "EVT_LoadLevel":
+                EVTCall = cutsceneEVT_LoadLevel;
+                arg0 = TermToSceneID(arg0Ref);
+                break;
             case "FX_Wait":
                 FXCall = cutsceneFX_Wait;
                 arg0 = float.Parse(arg0Ref);
@@ -264,6 +271,9 @@ public class CutscenePlayer : MonoBehaviour
                 FXCall = cutsceneFX_FadeOutForeground;
                 arg0 = float.Parse(arg0Ref);
                 break;
+            case "FX_WaitForClick":
+                FXCall = cutsceneFX_WaitForClick;
+                break;
             default:
                 throw new Exception("Bad op: " + opRef);
         }
@@ -271,6 +281,29 @@ public class CutscenePlayer : MonoBehaviour
         else if (FXCall != null) op = new CutsceneOp(FXCall, arg0, arg1);
         else throw new Exception("Tried to parse invalid cutscene op: " + opRef);
         return op;
+    }
+
+    private SceneIDType TermToSceneID(string term)
+    {
+        SceneIDType scene;
+        switch (term)
+        {
+            case "Title":
+                scene = SceneIDType.TitleScene;
+                break;
+            case "Town":
+                scene = SceneIDType.TownScene;
+                break;
+            case "Overworld":
+                scene = SceneIDType.OverworldScene;
+                break;
+            case "Fight":
+                scene = SceneIDType.FightScene;
+                break;
+            default:
+                throw new Exception(term + " is not a valid scene ID.");
+        }
+        return scene;
     }
 
     private Direction TermToDirection(string term)
@@ -348,10 +381,17 @@ public class CutscenePlayer : MonoBehaviour
 
     void cutsceneEVT_End(object notUsed0, object notUsed1)
     {
+        GameStateManager.Instance.CutsceneHasCededFocus();
         bgmSource.clip = lastBGM;
         bgmSource.Play();
         bgmSource.loop = true;
         gameObject.SetActive(false);
+    }
+
+    void cutsceneEVT_LoadLevel(object scene, object notUsed1)
+    {
+        GameStateManager.Instance.CutsceneHasCededFocus();
+        LevelLoadManager.Instance.EnterLevel((SceneIDType)scene);
     }
 
     IEnumerator<float> cutsceneFX_Wait(object length, object notUsed1)
@@ -469,5 +509,10 @@ public class CutscenePlayer : MonoBehaviour
             foregroundImage.color = Color.Lerp(baseColor, Color.clear, timer / l);
             yield return 0f;
         }
+    }
+
+    IEnumerator<float> cutsceneFX_WaitForClick(object notUsed0, object notUsed1)
+    {
+        while (!Input.GetMouseButtonDown(0)) yield return 0f;
     }
 }

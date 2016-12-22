@@ -21,7 +21,7 @@ public class ScreenChanger : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!GameStateManager.Instance.popupHasFocus && allowClickActivate) Activate();
+        if (!GameStateManager.Instance.somethingHasFocus && allowClickActivate) Activate();
     }
 
     public void Activate ()

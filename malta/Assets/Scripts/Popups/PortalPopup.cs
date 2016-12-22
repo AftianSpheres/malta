@@ -3,10 +3,12 @@ using UnityEngine.UI;
 
 public class PortalPopup : MonoBehaviour
 {
+    public PopupMenu shell;
     public Button winButton;
     public PortalStatusPanel portalStatus;
     public TextAsset stringsResource;
     public Text portalText;
+    public CutscenePlayer cutscenePlayer;
     private string[] strings;
 
 	// Use this for initialization
@@ -25,4 +27,10 @@ public class PortalPopup : MonoBehaviour
         }
         else if (portalText.text != strings[21]) portalText.text = strings[21];
 	}
+
+    public void Win ()
+    {
+        cutscenePlayer.StartCutscene("demoEnding");
+        shell.Close();
+    }
 }

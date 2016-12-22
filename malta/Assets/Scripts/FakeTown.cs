@@ -22,7 +22,7 @@ public class FakeTown : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!GameStateManager.Instance.popupHasFocus)
+        if (!GameStateManager.Instance.somethingHasFocus)
         {
             fakeTownPopup.Open(fakeTownsIndex);
         }

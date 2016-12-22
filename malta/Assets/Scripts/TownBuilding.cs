@@ -68,7 +68,7 @@ public class TownBuilding : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (associatedPopups[buildingStateIndex] != null && !GameStateManager.Instance.popupHasFocus && spriteRenderer.enabled)
+        if (associatedPopups[buildingStateIndex] != null && !GameStateManager.Instance.somethingHasFocus && spriteRenderer.enabled)
         {
             OpenPopupOnBuilding();
         }
