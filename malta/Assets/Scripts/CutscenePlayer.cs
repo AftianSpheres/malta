@@ -94,19 +94,21 @@ internal class CutsceneOp
 
 public class CutscenePlayer : MonoBehaviour
 {
+    public GameObject cutsceneDisplay;
     public AudioSource bgmSource;
     public AudioSource sfxSource;
     public Image backgroundImage;
     public Image foregroundImage;
     public Text textbox;
-    private TextAsset stringsResource;
-    private TextAsset script;
+    public string[] cutsceneNames;
     public string myTag = "cutscenePlayer";
     private AudioClip lastBGM;
     private Vector3 bgImgPos;
     private Vector3 fgImgPos;
     private CutsceneOp[] cutsceneOps;
+    private CutsceneOp[][] cutsceneOpSets;
     private string[] strings;
+    private string[][] cutsceneStringArrays;
     private bool running;
     private int opIndex;
     private const string gfxPath = "CutsceneGFX/";
@@ -123,6 +125,9 @@ public class CutscenePlayer : MonoBehaviour
         textbox.text = "";
         foregroundImage.sprite = null;
         backgroundImage.sprite = null;
+        cutsceneOpSets = new CutsceneOp[cutsceneNames.Length][];
+        cutsceneStringArrays = new string[cutsceneNames.Length][];
+        for (int i = 0; i < cutsceneNames.Length; i++) LoadCutscene(i);
     }
 
     // Update is called once per frame
@@ -150,19 +155,26 @@ public class CutscenePlayer : MonoBehaviour
         op.Run(myTag + opIndex.ToString());
     }
 
-    public void StartCutscene(string cutsceneName)
+    public void StartCutscene(int index)
     {
-        gameObject.SetActive(true);
+        cutsceneDisplay.SetActive(true);
         GameStateManager.Instance.GiveFocusToCutscene();
         lastBGM = bgmSource.clip;
         opIndex = 0;
-        script = Resources.Load<TextAsset>(cutscenesActionsPath + cutsceneName);
-        stringsResource = Resources.Load<TextAsset>(cutscenesTextPath + cutsceneName);
-        strings = stringsResource.text.Split('\n');
-        cutsceneOps = ParseCutsceneScript(script);
+        strings = cutsceneStringArrays[index];
+        cutsceneOps = cutsceneOpSets[index];
         cutsceneOps[0].Run(myTag + 0);
-        Debug.Log("Started playing cutscene " + cutsceneName);
         running = true;
+    }
+
+    private void LoadCutscene(int index)
+    {
+        string cutsceneName = cutsceneNames[index];
+        TextAsset script = Resources.Load<TextAsset>(cutscenesActionsPath + cutsceneName);
+        TextAsset stringsResource = Resources.Load<TextAsset>(cutscenesTextPath + cutsceneName);
+        cutsceneStringArrays[index] = stringsResource.text.Split('\n');
+        strings = cutsceneStringArrays[index];
+        cutsceneOpSets[index] = ParseCutsceneScript(script);
     }
 
     private CutsceneOp[] ParseCutsceneScript(TextAsset _script)
@@ -385,7 +397,8 @@ public class CutscenePlayer : MonoBehaviour
         bgmSource.clip = lastBGM;
         bgmSource.Play();
         bgmSource.loop = true;
-        gameObject.SetActive(false);
+        running = false;
+        cutsceneDisplay.SetActive(false);
     }
 
     void cutsceneEVT_LoadLevel(object scene, object notUsed1)

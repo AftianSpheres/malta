@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using System.Collections.Generic;
+using MovementEffects;
 
 public class PopupMenu : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PopupMenu : MonoBehaviour
         get { if (contents != null) return contents.activeInHierarchy; else return false; } // ugly hack, keeps loading popup from breaking shit
     }
     public GameObject contents;
+    public Image dark;
     public PopupMenu[] focusSharers;
     public Button[] buttons;
     public Scrollbar[] scrollbars;
@@ -16,12 +18,6 @@ public class PopupMenu : MonoBehaviour
     private Scrollbar[] activeScrollbars;
     public bool[] closeFocusSharersWhenClosingSelf;
     private bool surrenderedFocus;
-
-    // Use this for initialization
-    void Start ()
-    {
-
-	}
 	
 	// Update is called once per frame
 	void Update ()
@@ -81,6 +77,17 @@ public class PopupMenu : MonoBehaviour
         surrenderedFocus = true;
     }
 
+    public void EraseSave ()
+    {
+        GameDataManager.Instance.EraseSave();
+        Close();
+    }
+
+    public void EndGame ()
+    {
+        Timing.RunCoroutine(_in_EndGame());
+    }
+
     public static string GetTimerReadout(float timer, float level)
     {
         string timerReadout;
@@ -92,5 +99,27 @@ public class PopupMenu : MonoBehaviour
         else secString = "0" + seconds.ToString();
         timerReadout = minutes.ToString() + ":" + secString;
         return timerReadout;
+    }
+
+    IEnumerator<float> _in_EndGame ()
+    {
+        GameStateManager.Instance.GiveFocusToCutscene(); // it's not a real cutscene, but close enough
+        GameDataManager.Instance.Save();
+        Close();
+        yield return Timing.WaitUntilDone(Timing.RunCoroutine(FadeScreenToBlack(5)));
+        GameStateManager.Instance.CutsceneHasCededFocus();
+        LevelLoadManager.Instance.EnterLevel(SceneIDType.TitleScene);
+    }
+
+    IEnumerator<float> FadeScreenToBlack (float time)
+    {
+        dark.gameObject.SetActive(true);
+        float t = 0;
+        while (t < time)
+        {
+            t += Time.deltaTime;
+            dark.color = Color.Lerp(Color.clear, Color.black, t / time);
+            yield return 0f;
+        }
     }
 }

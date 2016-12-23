@@ -10,6 +10,7 @@ public class PortalPopup : MonoBehaviour
     public Text portalText;
     public CutscenePlayer cutscenePlayer;
     private string[] strings;
+    private const int overworldCutscenePlayerEndingIndex = 0;
 
 	// Use this for initialization
 	void Awake ()
@@ -30,7 +31,7 @@ public class PortalPopup : MonoBehaviour
 
     public void Win ()
     {
-        cutscenePlayer.StartCutscene("demoEnding");
+        cutscenePlayer.StartCutscene(overworldCutscenePlayerEndingIndex);
         shell.Close();
     }
 }

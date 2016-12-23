@@ -38,7 +38,7 @@ public class TownBuilding : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        if (GameDataManager.Instance.dataStore != null) // only matters in editor, but prevents silly timing-related crashes
+        if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
         {  
             if (buildingType == BuildingType.House || buildingType == BuildingType.Forge)
             {
@@ -54,7 +54,7 @@ public class TownBuilding : MonoBehaviour
                 }
                 if (!associatedAdventurer.initialized && _adventurerUnlocked)
                 {
-                    associatedAdventurer.Reroll(GameDataManager.Instance.dataStore.warriorClassUnlock, AdventurerSpecies.Human, hasOutbuilding && (buildingType == BuildingType.House), new int[] { 0, 0, 0, 0 });
+                    associatedAdventurer.Reroll(GameDataManager.Instance.dataStore.warriorClassUnlock, AdventurerSpecies.Human, hasOutbuilding && (buildingType == BuildingType.House), Adventurer.GetRandomStatPoint());
                 }
             }
             else if (buildingType == BuildingType.Tower)
@@ -97,7 +97,7 @@ public class TownBuilding : MonoBehaviour
                 if (koboldIfForge) GameDataManager.Instance.dataStore.unlock_Taskmaster = true;
                 else
                 {
-                    associatedAdventurer.Reroll(GameDataManager.Instance.dataStore.warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
+                    associatedAdventurer.Reroll(GameDataManager.Instance.dataStore.warriorClassUnlock, AdventurerSpecies.Human, false, Adventurer.GetRandomStatPoint());
                 }
                 buildingAlteredSinceLastUpdate = true;
                 GameDataManager.Instance.dataStore.unlock_forgeOutbuilding = true;

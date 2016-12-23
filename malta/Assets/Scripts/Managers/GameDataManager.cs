@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 [System.Serializable]
 public class GameDataManager_DataStore
 {
+    public SceneIDType lastScene;
     public Adventurer sovereignAdventurer;
     public Adventurer forgeAdventurer;
     public Adventurer[] houseAdventurers;
@@ -74,6 +75,7 @@ public class GameDataManager_DataStore
 
     public GameDataManager_DataStore ()
     {
+        lastScene = SceneIDType.OverworldScene;
         yourTownName = "Citysburg";
         fakeTownNames = new string[] { "Town A", "Town No. 2", "Tertiary Town" };
         pendingUpgrade_ClayPit = false;
@@ -150,10 +152,7 @@ public class GameDataManager_DataStore
         FileStream f = File.Create(path);
         formatter.Serialize(f, this);
         f.Close();
-        if (Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-            Application.ExternalCall("sync");
-        }
+        if (Application.platform == RuntimePlatform.WebGLPlayer) Application.ExternalCall("sync");
     }
 }
 
@@ -166,6 +165,7 @@ public class GameDataManager_DataStore
 public class GameDataManager : Manager<GameDataManager>
 {
     public GameDataManager_DataStore dataStore;
+    public bool saveExisted { get; private set; }
     private float lastSecondTimestamp;
     private int resourceGainTimer = 0;
     private const int resourceGainThreshold = 59;
@@ -176,27 +176,11 @@ public class GameDataManager : Manager<GameDataManager>
     void Start ()
     {
         lastSecondTimestamp = Time.time;
-
-        if (File.Exists(Application.persistentDataPath + saveName))
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream f = File.OpenRead(Application.persistentDataPath + saveName);
-            try
-            {
-                dataStore = formatter.Deserialize(f) as GameDataManager_DataStore;
-            }
-            catch (System.Exception)
-            {
-                dataStore = default(GameDataManager_DataStore); // if we throw an exception trying to open the save it doesn't really matter what that is - no recovering from it, so just pretend the save wasn't even there
-            }
-        }
-        if (dataStore == null) RegenerateDataStore();
-
+        saveExisted = LoadFromSave();
     }
 
     void Update ()
     {
-        if (Input.GetKeyDown(KeyCode.F12)) dataStore.SaveToFile(Application.persistentDataPath + saveName);     
         if (Input.GetKey(KeyCode.Pause))
         {
             Time.timeScale = 100.0f; // speed things up for testing
@@ -224,8 +208,8 @@ public class GameDataManager : Manager<GameDataManager>
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Smith, ref dataStore.buildingLv_Smith, ref dataStore.pendingUpgrade_Smith, ref dataStore.resMetal_maxUpgrades);
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Woodlands, ref dataStore.harvestLv_Woodlands, ref dataStore.pendingUpgrade_Woodlands, ref dataStore.resLumber_maxUpgrades);
         }
-        for (int i = 0; i < dataStore.housesBuilt.Length; i++) if (dataStore.housesBuilt[i] && !dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housesOutbuildingsBuilt[i], new int[] { 0, 0, 0, 0 });
-        if (dataStore.unlock_forgeOutbuilding && !dataStore.unlock_Taskmaster && !dataStore.forgeAdventurer.initialized) dataStore.forgeAdventurer.Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
+        for (int i = 0; i < dataStore.housesBuilt.Length; i++) if (dataStore.housesBuilt[i] && !dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housesOutbuildingsBuilt[i], Adventurer.GetRandomStatPoint());
+        if (dataStore.unlock_forgeOutbuilding && !dataStore.unlock_Taskmaster && !dataStore.forgeAdventurer.initialized) dataStore.forgeAdventurer.Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, false, Adventurer.GetRandomStatPoint());
         if (dataStore.adventureLevel > 1 && (!dataStore.unlock_raceFae || !dataStore.unlock_raceOrc))
         {
             dataStore.unlock_raceFae = true;
@@ -233,6 +217,41 @@ public class GameDataManager : Manager<GameDataManager>
         }
         if (dataStore.adventureLevel > 2 && !dataStore.unlock_WizardsTower) dataStore.unlock_WizardsTower = true;
 
+    }
+
+    public bool LoadFromSave ()
+    {
+        bool r = false;
+        if (File.Exists(Application.persistentDataPath + saveName))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream f = File.OpenRead(Application.persistentDataPath + saveName);
+            try
+            {
+                dataStore = formatter.Deserialize(f) as GameDataManager_DataStore;
+                r = true;
+            }
+            catch (System.Exception)
+            {
+                EraseSave();
+                r = false;
+            }
+        }
+        if (dataStore == null) RegenerateDataStore();
+        return r;
+    }
+
+    public void Save ()
+    {
+        dataStore.SaveToFile(Application.persistentDataPath + saveName);
+        saveExisted = true;
+    }
+
+    public void EraseSave ()
+    {
+        RegenerateDataStore();
+        if (File.Exists(Application.persistentDataPath + saveName)) File.Delete(Application.persistentDataPath + saveName);
+        if (Application.platform == RuntimePlatform.WebGLPlayer) Application.ExternalCall("sync");
     }
 
     public void RegenerateDataStore()
@@ -243,11 +262,12 @@ public class GameDataManager : Manager<GameDataManager>
         {
             if (dataStore.housesBuilt[i])
             {
-                dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housesOutbuildingsBuilt[i], new int[] { 0, 0, 0, 0 });
+                dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housesOutbuildingsBuilt[i], Adventurer.GetRandomStatPoint());
             }
         }
         dataStore.sovereignMugshot = (AdventurerMugshot)Random.Range((int)AdventurerMugshot.Sovereign0, (int)AdventurerMugshot.Sovereign7 + 1);
         dataStore.sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
+        saveExisted = false;
     }
 
     void HandlePendingUpgrade (ref int pendingUpgradeTimer, ref int buildingLv, ref bool pendingUpgrade, ref int capUpgrades)

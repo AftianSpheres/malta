@@ -204,6 +204,16 @@ public class Adventurer
         special = GetClassSpecial(advClass);
     }
 
+    public static int[] GetRandomStatPoint ()
+    {
+        int[] r;
+        int randomInt = Random.Range(0, 3);
+        if (randomInt == 0) r = new int[] { 0, 1, 0, 0 };
+        else if (randomInt == 1) r = new int[] { 0, 0, 1, 0 };
+        else r = new int[] { 0, 0, 0, 1 };
+        return r;
+    }
+
     public static Sprite GetMugshot (AdventurerMugshot mugshot)
     {
         Sprite mugSprite = Resources.Load<Sprite>(mugshotsResourcePath + mugshot.ToString());

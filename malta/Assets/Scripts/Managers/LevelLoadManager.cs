@@ -74,5 +74,6 @@ public class LevelLoadManager : Manager<LevelLoadManager>
                     break;
             }
         }
+        if ((SceneIDType)sceneIndex == SceneIDType.OverworldScene || (SceneIDType)sceneIndex == SceneIDType.TownScene) GameDataManager.Instance.dataStore.lastScene = (SceneIDType)sceneIndex;
     }
 }

@@ -38,19 +38,19 @@ public class EvictPopup : MonoBehaviour
 
     public void RerollAsHuman () // yes there have to be three of these - ugly af but Unity can't invoke functions with args from UI buttons
     {
-        associatedAdventurer.Reroll(associatedAdventurer.advClass, AdventurerSpecies.Human, associatedAdventurer.isElite, new int[]{ 0, 0, 0, 0 });
+        associatedAdventurer.Reroll(associatedAdventurer.advClass, AdventurerSpecies.Human, associatedAdventurer.isElite, Adventurer.GetRandomStatPoint());
         shell.Close();
     }
 
     public void RerollAsFae ()
     {
-        associatedAdventurer.Reroll(associatedAdventurer.advClass, AdventurerSpecies.Fae, associatedAdventurer.isElite, new int[] { 0, 0, 0, 0 });
+        associatedAdventurer.Reroll(associatedAdventurer.advClass, AdventurerSpecies.Fae, associatedAdventurer.isElite, Adventurer.GetRandomStatPoint());
         shell.Close();
     }
 
     public void RerollAsOrc ()
     {
-        associatedAdventurer.Reroll(associatedAdventurer.advClass, AdventurerSpecies.Orc, associatedAdventurer.isElite, new int[] { 0, 0, 0, 0 });
+        associatedAdventurer.Reroll(associatedAdventurer.advClass, AdventurerSpecies.Orc, associatedAdventurer.isElite, Adventurer.GetRandomStatPoint());
         shell.Close();
     }
 }

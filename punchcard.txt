@@ -241,3 +241,15 @@ Dec.21 2016-136
 2:30 AM - off
 2:35 AM - on
 2:52 AM - off
+
+Dec.23 2016-092
+1:09 AM - start
+1:41 AM - off
+1:48 AM - on
+2:16 AM - off
+2:37 AM - on
+2:48 AM - off
+3:23 AM - on
+3:40 AM - off
+3:47 AM - on
+3:51 AM - off
