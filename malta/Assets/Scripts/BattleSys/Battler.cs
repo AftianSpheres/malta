@@ -63,7 +63,8 @@ public class Battler : MonoBehaviour
     public float moveSpeed;
     public int currentHP;
     public int lastDamage;
-    public bool isValidTarget { get { return (!dead && activeBattler); } }
+    public bool existsInBattle { get { return (!dead && activeBattler); } }
+    public bool isValidTarget { get { return (existsInBattle && !pulledOutOfBattle); } }
     private bool getBehindMeProc;
     private int barrierTurns;
     private int burstOfSpeedCooldown;
@@ -73,13 +74,15 @@ public class Battler : MonoBehaviour
     private int shieldBlockTurns;
     private int shieldWallTurns;
     private int silentTurns;
-    private bool activeBattler = true;
+    public bool activeBattler { get; private set; }
+    private bool pulledOutOfBattle;
     bool _readiedActionNeedsTarget;
     int _damageDealt = 0;
     int _drainRounds = 0;
     int _damage;
     bool _hitAll;
     bool _isMagic;
+    public bool _wantsToReenterBattle { get; private set; }
     public Battler _target { get; private set; }
     Battler _secondaryTarget;
     BattlerAction _action;
@@ -88,12 +91,36 @@ public class Battler : MonoBehaviour
     void Start ()
     {
         InitializeDisposables();
+        activeBattler = true;
         _effectMessages = new Queue<BattleMessageType>();
 	}
 
     public void Upkeep ()
     {
         TickCooldownsAndShit();
+        if (pulledOutOfBattle)
+        {
+            currentHP += adventurer.HP / 4;
+            if (currentHP > adventurer.HP) currentHP = adventurer.HP;
+            if (currentHP == adventurer.HP) _wantsToReenterBattle = true;
+        }
+    }
+
+    public void PullOutOfBattle ()
+    {
+        pulledOutOfBattle = true;
+        overseer.outOfBattleBattler = this;
+        puppet.PullOutAnim();
+        overseer.messageBox.Step(BattleMessageType.PulledOutOfBattle, this);
+    }
+
+    public void ReenterBattle ()
+    {
+        pulledOutOfBattle = false;
+        overseer.outOfBattleBattler = null;
+        puppet.ReenterBattleAnim();
+        puppet.Respond();
+        overseer.messageBox.Step(BattleMessageType.ReenteredBattle, this);
     }
 
     private Battler AcquireTarget (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action, int baseDamage, bool isMagic)
@@ -422,22 +449,25 @@ public class Battler : MonoBehaviour
     public BattlerAction GetAction (int turn, List<Battler> allies, List<Battler> opponents)
     {
         BattlerAction action = BattlerAction.None;
-        bool spellcasterInEnemyParty = false;
-        for (int i = 0; i < opponents.Count; i++)
+        if (!pulledOutOfBattle)
         {
-            if (opponents[i].adventurer.advClass == AdventurerClass.Mystic || opponents[i].adventurer.advClass == AdventurerClass.Sage || opponents[i].adventurer.advClass == AdventurerClass.Wizard)
+            bool spellcasterInEnemyParty = false;
+            for (int i = 0; i < opponents.Count; i++)
             {
-                spellcasterInEnemyParty = true;
-                break;
+                if (opponents[i].adventurer.advClass == AdventurerClass.Mystic || opponents[i].adventurer.advClass == AdventurerClass.Sage || opponents[i].adventurer.advClass == AdventurerClass.Wizard)
+                {
+                    spellcasterInEnemyParty = true;
+                    break;
+                }
             }
+            if (adventurer.special == AdventurerSpecial.SilencingShot && turn == 0 && spellcasterInEnemyParty) action = BattlerAction.SilencingShot;
+            else if (HasAttack(AdventurerAttack.RainOfArrows) && opponents.Count > 2) action = BattlerAction.RainOfArrows;
+            else if (HasAttack(AdventurerAttack.ShieldBlock) && shieldBlockTurns < 1) action = BattlerAction.ShieldBlock;
+            else if (HasAttack(AdventurerAttack.Haste) && hasteCooldown < 1) action = BattlerAction.Haste;
+            else if (HasAttack(AdventurerAttack.BurstOfSpeed) && burstOfSpeedCooldown < 1 && turn > 0) action = BattlerAction.BurstOfSpeed;
+            else if (HasAttack(AdventurerAttack.Inferno) && opponents.Count > 1) action = BattlerAction.Inferno;
+            else action = defaultAction;
         }
-        if (adventurer.special == AdventurerSpecial.SilencingShot && turn == 0 && spellcasterInEnemyParty) action = BattlerAction.SilencingShot;
-        else if (HasAttack(AdventurerAttack.RainOfArrows) && opponents.Count > 2) action = BattlerAction.RainOfArrows;
-        else if (HasAttack(AdventurerAttack.ShieldBlock) && shieldBlockTurns < 1) action = BattlerAction.ShieldBlock;
-        else if (HasAttack(AdventurerAttack.Haste) && hasteCooldown < 1) action = BattlerAction.Haste;
-        else if (HasAttack(AdventurerAttack.BurstOfSpeed) && burstOfSpeedCooldown < 1 && turn > 0) action = BattlerAction.BurstOfSpeed;
-        else if (HasAttack(AdventurerAttack.Inferno) && opponents.Count > 1) action = BattlerAction.Inferno;
-        else action = defaultAction;
         _action = action;
         return action;
     }
@@ -609,6 +639,7 @@ public class Battler : MonoBehaviour
         bodyguard = default(Battler);
         incomingHit = false;
         _damageDealt = 0;
+        _wantsToReenterBattle = false;
         _readiedActionNeedsTarget = false;
         _drainRounds = 0;
         _damage = 0;

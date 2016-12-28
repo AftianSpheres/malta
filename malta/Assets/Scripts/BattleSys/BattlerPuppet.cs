@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using MovementEffects;
 
 public class BattlerPuppet : MonoBehaviour
 {
     public Battler battler;
+    public Button pullOutButton;
     public Image panel;
     public Image mugshot;
     public Text conditionText;
@@ -19,16 +22,39 @@ public class BattlerPuppet : MonoBehaviour
     private int cachedHP;
     private bool killedPuppet;
     private string[] conditionStrings;
+    private Vector3 originalPos;
+    const float pullOutAnimLength = 1.0f;
+    const float pullOutAnimDist = 360.0f;
 
     void Start ()
     {
         conditionStrings = conditionStringsResource.text.Split('\n');
+        originalPos = transform.position;
     }
 
     void Update ()
     {
         if (killedPuppet && !damageAnimGadget.triggeredGadget) KillDisplay(); // let hit anims play before vanishing 
-	}
+        if (pullOutButton != null)
+        {
+            if (!battler.activeBattler)
+            {
+                if (pullOutButton.gameObject.activeSelf) pullOutButton.gameObject.SetActive(false);
+            }
+            else if (battler.overseer.currentlyInFight)
+            {
+                if (pullOutButton.interactable && pullOutButton.gameObject.activeSelf) pullOutButton.gameObject.SetActive(false);
+            }
+            else
+            {
+                if (battler.overseer.outOfBattleBattler != null && pullOutButton.interactable == true)
+                {
+                    if (pullOutButton.gameObject.activeSelf) pullOutButton.gameObject.SetActive(false);
+                }
+                else if (!pullOutButton.gameObject.activeSelf && battler.currentHP < battler.adventurer.HP) pullOutButton.gameObject.SetActive(true);
+            }
+        }
+    }
 
     public void Respond ()
     {
@@ -100,5 +126,29 @@ public class BattlerPuppet : MonoBehaviour
     {
         hpText.text = battler.currentHP.ToString() + " / " + battler.adventurer.HP.ToString();
         cachedHP = battler.currentHP;
+    }
+
+    public void ReenterBattleAnim ()
+    {
+        transform.position = originalPos;
+    }
+
+    public void PullOutAnim ()
+    {
+        Timing.RunCoroutine(_PullOutAnim());
+    }
+
+    IEnumerator<float> _PullOutAnim ()
+    {
+        pullOutButton.interactable = false;
+        float timer = 0;
+        while (timer < pullOutAnimLength)
+        {
+            timer += Time.deltaTime;
+            transform.position = originalPos + (Vector3.left * pullOutAnimDist * (timer / pullOutAnimLength));
+            yield return 0f;
+        }
+        pullOutButton.interactable = true;
+        yield break;
     }
 }

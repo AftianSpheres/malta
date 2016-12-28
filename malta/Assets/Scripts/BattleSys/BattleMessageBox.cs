@@ -23,7 +23,9 @@ public enum BattleMessageType
     Win,
     Loss,
     Retreat,
-    FailedCast
+    FailedCast,
+    PulledOutOfBattle,
+    ReenteredBattle
 }
 
 public class BattleMessageBox : MonoBehaviour
@@ -180,6 +182,12 @@ public class BattleMessageBox : MonoBehaviour
             case BattleMessageType.FailedCast:
                 if (overseer.currentActingBattler.isEnemy) nextLine = actor.adventurer.title + mainStrings[19];
                 else nextLine = actor.adventurer.fullName + mainStrings[19];
+                break;
+            case BattleMessageType.PulledOutOfBattle:
+                nextLine = actor.adventurer.fullName + mainStrings[20];
+                break;
+            case BattleMessageType.ReenteredBattle:
+                nextLine = actor.adventurer.fullName + mainStrings[21];
                 break;
         }
         if (drawToLine1) line1 = nextLine;

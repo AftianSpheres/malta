@@ -11,6 +11,7 @@ public class BattleOverseer : MonoBehaviour
     public Battler currentActingBattler;
     public Battler currentTurnTarget;
     public Battler standardPriorityActingBattler;
+    public Battler outOfBattleBattler;
     public BattlerAction nextAction;
     public PopupMenu battleEndPopup;
     public SortedList<float, Battler> turnOrderList;
@@ -19,6 +20,7 @@ public class BattleOverseer : MonoBehaviour
     public GameObject retreatButton;
     public bool standardActionPriorityBracket;
     public bool retreatingAtStartOfNextTurn { get; private set; }
+    public bool currentlyInFight { get; private set; }
     [System.NonSerialized] public AdventureSubstage[] adventure;
     [System.NonSerialized] public int battleNo = 0;
     private bool currentBattleResolved;
@@ -32,6 +34,7 @@ public class BattleOverseer : MonoBehaviour
     private List<Battler> validPlayerTargets;
     const string _owned = "_BattleOverseerCoroutine";
     private int[] baseEndlessAdventurePayout;
+    private bool _forceAllBattlersRegen = false;
 
     // Use this for initialization
     void Start ()
@@ -202,6 +205,7 @@ public class BattleOverseer : MonoBehaviour
 
     public void EndBattle ()
     {
+        currentlyInFight = false;
         if (validEnemyTargets.Count == 0)
         {
             battleNo++;
@@ -395,6 +399,7 @@ public class BattleOverseer : MonoBehaviour
 
     private void RebuildAllBattlersArray ()
     {
+        _forceAllBattlersRegen = false;
         Battler[] longAllBattlers = new Battler[playerParty.Length + enemyParty.Length];
         int i2 = 0;
         for (int i = 0; i < playerParty.Length; i++) if (playerParty[i].isValidTarget)
@@ -413,6 +418,7 @@ public class BattleOverseer : MonoBehaviour
 
     private void StartNextBattle ()
     {
+        currentlyInFight = true;
         currentBattleResolved = false;
         turn = 0;
         PopulateEnemyParty();
@@ -423,13 +429,26 @@ public class BattleOverseer : MonoBehaviour
 
     private void StartTurn ()
     {
-        for (int i = 0; i < allBattlers.Length; i++) if (!allBattlers[i].isValidTarget) RebuildAllBattlersArray();
-        for (int i = 0; i < allBattlers.Length; i++) allBattlers[i].Upkeep(); // yes you have to repeat the loop - can't assume allBattlers[i] refers to the same object after rebuilding the array.
+        for (int i = 0; i < allBattlers.Length; i++)
+        {
+            if (!allBattlers[i].isValidTarget || _forceAllBattlersRegen)
+            {
+                RebuildAllBattlersArray();
+                break;
+            }
+        }
+        for (int i = 0; i < playerParty.Length; i++) if (playerParty[i].existsInBattle) playerParty[i].Upkeep();
+        for (int i = 0; i < enemyParty.Length; i++) if (enemyParty[i].existsInBattle) enemyParty[i].Upkeep();
         BuildLists();
     }
 
     private void EndTurn ()
     {
+        if (outOfBattleBattler != null && outOfBattleBattler._wantsToReenterBattle)
+        {
+            outOfBattleBattler.ReenterBattle();
+            _forceAllBattlersRegen = true;
+        }
         turn++;
         encoreWaitingForEnemies = false;
         encoreWaitingForPlayer = false;

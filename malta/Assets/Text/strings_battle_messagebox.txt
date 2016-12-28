@@ -18,3 +18,5 @@ You won!
 You lost...
 You withdrew from battle!
  tried to cast a spell, but the words wouldn't come out!
+ pulled out of the fray to recuperate!
+ leapt back into the fight!
