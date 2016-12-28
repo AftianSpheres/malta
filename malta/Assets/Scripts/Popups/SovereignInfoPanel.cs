@@ -34,7 +34,7 @@ public class SovereignInfoPanel : MonoBehaviour
         if (cachedSovereignMugshot != GameDataManager.Instance.dataStore.sovereignMugshot)
         {
             cachedSovereignMugshot = GameDataManager.Instance.dataStore.sovereignMugshot;
-            sovereignMugshot.sprite = Adventurer.GetMugshot(cachedSovereignMugshot);
+            sovereignMugshot.sprite = GameDataManager.Instance.dataStore.sovereignAdventurer.GetMugshotGraphic();
         }
         if (cachedSovereignTactic != GameDataManager.Instance.dataStore.sovereignTactic)
         {

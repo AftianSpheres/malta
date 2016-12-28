@@ -230,9 +230,11 @@ public class GameDataManager : Manager<GameDataManager>
             {
                 dataStore = formatter.Deserialize(f) as GameDataManager_DataStore;
                 r = true;
+                f.Close();
             }
             catch (System.Exception)
             {
+                f.Close();
                 EraseSave();
                 r = false;
             }

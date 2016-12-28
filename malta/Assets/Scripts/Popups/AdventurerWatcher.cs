@@ -45,7 +45,7 @@ public class AdventurerWatcher : MonoBehaviour
             if (cachedAdventurerMugshot != adventurer.mugshot)
             {
                 cachedAdventurerMugshot = adventurer.mugshot;
-                mugshot.sprite = Adventurer.GetMugshot(cachedAdventurerMugshot);
+                mugshot.sprite = adventurer.GetMugshotGraphic();
             }
             if (cachedAdventurerStats[0] != adventurer.HP || cachedAdventurerStats[1] != adventurer.Martial || cachedAdventurerStats[2] != adventurer.Magic || cachedAdventurerStats[3] != adventurer.Speed)
             {

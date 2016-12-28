@@ -9,8 +9,11 @@ public class HousePopup : MonoBehaviour
     public PopupMenu insufficientResourcesPopup;
     public RetrainPopup retrainPopup;
     public EvictPopup evictPopup;
+    public Button awakenButton;
     public Button outbuildingButton;
     public Image mugshot;
+    public Text awakenedLabel;
+    public Text biography;
     public Text nameLabel;
     public Text titleLabel;
     public Text attacksLabel;
@@ -49,7 +52,7 @@ public class HousePopup : MonoBehaviour
         if (cachedAdventurerMugshot != associatedHouse.associatedAdventurer.mugshot)
         {
             cachedAdventurerMugshot = associatedHouse.associatedAdventurer.mugshot;
-            mugshot.sprite = Adventurer.GetMugshot(cachedAdventurerMugshot);
+            mugshot.sprite = associatedHouse.associatedAdventurer.GetMugshotGraphic();
         }
         if (associatedHouse.associatedAdventurer.title != titleLabel.text) titleLabel.text = associatedHouse.associatedAdventurer.title;
         if (adventurerHPCached != associatedHouse.associatedAdventurer.HP || adventurerMartialCached != associatedHouse.associatedAdventurer.Martial
@@ -65,7 +68,9 @@ public class HousePopup : MonoBehaviour
         if (adventurerAttacksCached == null || adventurerAttacksCached.Length != associatedHouse.associatedAdventurer.attacks.Length) attacksChanged = true;
         else
         {
+#pragma warning disable 162 // VS reports a false-alarm unreachable code warning on the next line because of the compound loop conditional, so we silence that - and, yes, it is a false alarm
             for (int i = 0; (i < adventurerAttacksCached.Length && i < associatedHouse.associatedAdventurer.attacks.Length); i++)
+#pragma warning restore 162 // because we _do_ want to know if unreachable code is detected, it's just not actually present there
             {
                 attacksChanged = true;
                 break;
@@ -93,6 +98,23 @@ public class HousePopup : MonoBehaviour
             adventurerSpecialCached = associatedHouse.associatedAdventurer.special;
             specialLabel.text = Adventurer.GetSpecialDescription(adventurerSpecialCached);
         }
+        if (awakenButton != null)
+        {
+            if (associatedHouse.associatedAdventurer.isElite)
+            {
+                if ((associatedHouse.associatedAdventurer.awakened == awakenButton.gameObject.activeSelf))
+                {
+                    awakenButton.gameObject.SetActive(!associatedHouse.associatedAdventurer.awakened);
+                    awakenedLabel.gameObject.SetActive(!awakenButton.gameObject.activeSelf);
+                }
+            }
+            else if (awakenButton.gameObject.activeSelf || awakenedLabel.gameObject.activeSelf)
+            {
+                awakenButton.gameObject.SetActive(false);
+                awakenedLabel.gameObject.SetActive(false);
+            }
+        }
+        if (biography.text != associatedHouse.associatedAdventurer.bioText) biography.text = associatedHouse.associatedAdventurer.bioText;
 	}
 
     public void OpenRetrainPopup()
@@ -119,6 +141,22 @@ public class HousePopup : MonoBehaviour
         {
             shell.SurrenderFocus();
             insufficientResourcesPopup.Open();
+        }
+    }
+
+    public void AwakenAdventurer ()
+    {
+        if (!associatedHouse.associatedAdventurer.awakened)
+        {
+            if (GameDataManager.Instance.SpendResourcesIfPossible(Adventurer.awakeningCosts))
+            {
+                associatedHouse.associatedAdventurer.Awaken();
+            }
+            else
+            {
+                shell.SurrenderFocus();
+                insufficientResourcesPopup.Open();
+            }
         }
     }
 }

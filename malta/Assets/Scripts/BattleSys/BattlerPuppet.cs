@@ -57,7 +57,11 @@ public class BattlerPuppet : MonoBehaviour
     {
         if (nameText != null) nameText.text = battler.adventurer.fullName;
         if (titleText != null) titleText.text = battler.adventurer.title;
-        if (mugshot != null && !battler.isEnemy) mugshot.sprite = Adventurer.GetMugshot(battler.adventurer.mugshot);
+        if (mugshot != null)
+        {
+            if (battler.isEnemy) mugshot.sprite = battler.adventurer.GetEnemyGraphic();
+            else mugshot.sprite = battler.adventurer.GetMugshotGraphic();
+        }
         RefreshHPText();
         killedPuppet = false;
     }

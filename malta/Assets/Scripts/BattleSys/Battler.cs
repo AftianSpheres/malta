@@ -170,6 +170,7 @@ public class Battler : MonoBehaviour
             }
         }
         if (overseer.standardPriorityActingBattler == this) overseer.currentTurnTarget = target;
+        if (target != null && !target.isValidTarget) target = null;
         return target;
     }
 
@@ -322,6 +323,11 @@ public class Battler : MonoBehaviour
                     }
                 }
                 else throw new System.Exception("Battler " + gameObject.name + " tried to use a damage-dealing action, but with no target.");
+            }
+            if (_secondaryTarget != null && !_secondaryTarget.isValidTarget)
+            {
+                _secondaryTarget = null;
+                _drainRounds = 0;
             }
             if (_drainRounds > 1) _effectMessages.Enqueue(BattleMessageType.MultiHeal);
             else if (_drainRounds > 1) _effectMessages.Enqueue(BattleMessageType.Heal);

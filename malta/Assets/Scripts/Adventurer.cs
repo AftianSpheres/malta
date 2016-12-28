@@ -47,6 +47,7 @@ public class Adventurer
     public string fullName;
     public string title;
     public string fullTitle;
+    public string bioText { get; private set; }
     public AdventurerAttack[] attacks;
     public AdventurerClass advClass { get; private set; }
     public AdventurerSpecial special;
@@ -60,6 +61,7 @@ public class Adventurer
     public int individualMagic { get; private set; }
     public int Speed { get; private set; }
     public int individualSpeed { get; private set; }
+    public bool awakened { get; private set; }
     public bool isElite { get; private set; }
     public bool initialized { get; private set; }
     private static string[] attackNames;
@@ -73,9 +75,73 @@ public class Adventurer
     private static string[] orcLastNames;
     private static string[] aeonFirstNames = { "Dwayne" };
     private static string[] aeonLastNames = { "Johnson" };
+    private static string[] bioAdjectives;
+    private static string[] bioAnecdotes;
+    private static string[] bioHints;
+    private static string[] bioLikes;
+    private static string[] bioSpecies;
+    private const string bioAdjectivesResourcePath = "bio/0_adjective";
+    private const string bioAnecdotesResourcePath = "bio/1_anecdote";
+    private const string bioHintsResourcePath = "bio/0_hint";
+    private const string bioLikesResourcePath = "bio/2_like";
+    private const string bioSpeciesResourcePath = "bio/0_species";
     private const string attackDescsResourcePath = "attack_descs/";
     private const string specialDescsResourcePath = "special_descs/";
     private const string mugshotsResourcePath = "mugshots/";
+    private const string enemyGfxResourcePath = "mugshots/enemy/";
+    public static int[] awakeningCosts = { 0, 0, 0, 50, 50, 50 };
+
+    public void Awaken ()
+    {
+        if (awakened) throw new System.Exception(fullTitle + " is already awakened!");
+        int[] a = GetRandomStatPoint();
+        individualHP += a[0];
+        individualMartial += a[1];
+        individualMagic += a[2];
+        individualSpeed += a[3];
+        CalcStats();
+        awakened = true;
+    }
+
+    void GenerateBioText ()
+    {
+        if (bioAdjectives == null) LoadBioTextStrings();
+        string line0 = "";
+        string line1 = "";
+        string line2 = "";
+        int index;
+        int lastIndex;
+        index = Random.Range(0, bioAdjectives.Length);
+        line0 += bioAdjectives[index];
+        index = (int)species - 1;
+        line0 += bioSpecies[index];
+        index = Random.Range(0, 3);
+        if (individualMagic > 0) index += 3;
+        else if (individualSpeed > 0) index += 6;
+        line0 += bioHints[index];
+        line0 += System.Environment.NewLine;
+        index = Random.Range(0, bioAnecdotes.Length);
+        lastIndex = index;
+        line1 += bioAnecdotes[index] + ' ';
+        while (index == lastIndex) index = Random.Range(0, bioAnecdotes.Length);
+        line1 += bioAnecdotes[index];
+        line1 += System.Environment.NewLine;
+        index = Random.Range(0, bioLikes.Length - 2);
+        lastIndex = index;
+        line2 += bioLikes[0] + bioLikes[index + 2] + ' ';
+        while (index == lastIndex) index = Random.Range(0, bioLikes.Length - 2);
+        line2 += bioLikes[1] + bioLikes[index + 2];
+        bioText = line0 + line1 + line2;
+    }
+
+    void LoadBioTextStrings ()
+    {
+        bioAdjectives = Resources.Load<TextAsset>(bioAdjectivesResourcePath).text.Split('\n');
+        bioAnecdotes = Resources.Load<TextAsset>(bioAnecdotesResourcePath).text.Split('\n');
+        bioHints = Resources.Load<TextAsset>(bioHintsResourcePath).text.Split('\n');
+        bioLikes = Resources.Load<TextAsset>(bioLikesResourcePath).text.Split('\n');
+        bioSpecies = Resources.Load<TextAsset>(bioSpeciesResourcePath).text.Split('\n');
+    }
 
     void CalcStats ()
     {
@@ -194,7 +260,9 @@ public class Adventurer
         RerollFullTitle();
         RecalcStatsAndReloadMoves();
         RerollMugshot();
+        GenerateBioText();
         initialized = true;
+        awakened = false;
     }
 
     public void RecalcStatsAndReloadMoves ()
@@ -212,12 +280,6 @@ public class Adventurer
         else if (randomInt == 1) r = new int[] { 0, 0, 1, 0 };
         else r = new int[] { 0, 0, 0, 1 };
         return r;
-    }
-
-    public static Sprite GetMugshot (AdventurerMugshot mugshot)
-    {
-        Sprite mugSprite = Resources.Load<Sprite>(mugshotsResourcePath + mugshot.ToString());
-        return mugSprite;
     }
 
     public static string GetAttackName (AdventurerAttack attack)
@@ -409,5 +471,21 @@ public class Adventurer
     public void Permadeath ()
     {
         initialized = false;
+    }
+
+    public Sprite GetEnemyGraphic ()
+    {
+        Sprite s = default(Sprite);
+        string p = enemyGfxResourcePath + species.ToString() + advClass.ToString();
+        s = Resources.Load<Sprite>(p);
+        if (s == null) throw new System.Exception("No enemy graphic for " + p);
+        return s;
+    }
+
+    public Sprite GetMugshotGraphic()
+    {
+        Sprite mugSprite = Resources.Load<Sprite>(mugshotsResourcePath + mugshot.ToString());
+        if (mugSprite == null) throw new System.Exception("No mugshot for " + mugshotsResourcePath + mugshot.ToString());
+        return mugSprite;
     }
 }
