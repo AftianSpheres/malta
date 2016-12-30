@@ -1,45 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public enum BattlerAction
-{
-    None,
-    MaceSwing,
-    Siphon,
-    Haste,
-    SilencingShot,
-    RainOfArrows,
-    Bowshot,
-    ShieldWall,
-    ShieldBlock,
-    SpearThrust,
-    Barrier,
-    VampiricWinds,
-    BurstOfSpeed,
-    Feedback,
-    Inferno,
-    Lightning,
-    Protect,
-    HammerBlow,
-    GetBehindMe,
-    Flanking,
-    Rend,
-    _CantMove_Silenced = 10000
-}
-
-public enum BattlerActionInterruptType
-{
-    None,
-    BattleStart,
-    OnAllyDeathblow,
-    OnAllyHit,
-    OnHit
-}
-
 public class Battler : MonoBehaviour
 {
-    private static int[] actionBaseDamages = { 0, 6, 5, 0, 2, 3, 6, 0, 0, 4, 0, 8, 0, 10, 10, 5, 4, 10, 0, 6, 99 };
-    private static bool[] actionMagicStatus = { false, false, true, false, false, false, false, false, false, false, false, true, false, true, true, true, false, false, false, false, true };
     public BattleOverseer overseer;
     public BattlerPuppet puppet;
     public Adventurer adventurer;
@@ -76,16 +39,12 @@ public class Battler : MonoBehaviour
     private int silentTurns;
     public bool activeBattler { get; private set; }
     private bool pulledOutOfBattle;
-    bool _readiedActionNeedsTarget;
+    public BattlerAction readiedAction;
     int _damageDealt = 0;
     int _drainRounds = 0;
-    int _damage;
-    bool _hitAll;
-    bool _isMagic;
     public bool _wantsToReenterBattle { get; private set; }
     public Battler _target { get; private set; }
-    Battler _secondaryTarget;
-    BattlerAction _action;
+    Battler _secondaryTarget; // TO-DO: kill this and use the subtargetCount field to do it in a smart way
     Queue<BattleMessageType> _effectMessages;
 
     void Start ()
@@ -123,34 +82,24 @@ public class Battler : MonoBehaviour
         overseer.messageBox.Step(BattleMessageType.ReenteredBattle, this);
     }
 
-    private Battler AcquireTarget (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action, int baseDamage, bool isMagic)
+    private Battler AcquireTarget (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action)
     {
+        BattlerActionData dat = BattlerActionData.get(action);
         int damage;
         int offense;
         int defense;
-        if (isMagic) offense = adventurer.Magic;
+        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) offense = adventurer.Magic;
         else offense = adventurer.Martial;
-        Battler target = default(Battler); // if it's left null we're doing something that doesn't have a "target" per se
-        switch (action)
+        Battler target = null; // if it's left null we're doing something that doesn't have a "target" per se
+        switch (dat.target)
         {
-            case BattlerAction.MaceSwing:
-            case BattlerAction.SilencingShot:
-            case BattlerAction.Bowshot:
-            case BattlerAction.SpearThrust:
-            case BattlerAction.Siphon:
-            case BattlerAction.VampiricWinds:
-            case BattlerAction.Lightning:
-            case BattlerAction.HammerBlow:
-            case BattlerAction.Rend:
+            case BattlerActionTarget.TargetWeakestEnemy:
                 int mostDamageDealt = 0;
-                _readiedActionNeedsTarget = true;
                 for (int i = 0; i < validEnemyTargets.Count; i++)
                 {
-                    if (action == BattlerAction.SilencingShot && validEnemyTargets[i].adventurer.advClass != AdventurerClass.Mystic &&
-                        validEnemyTargets[i].adventurer.advClass != AdventurerClass.Sage && validEnemyTargets[i].adventurer.advClass != AdventurerClass.Wizard) continue; // has to be a magic-user
-                    if (isMagic) defense = validEnemyTargets[i].adventurer.Magic;
+                    if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
                     else defense = validEnemyTargets[i].adventurer.Martial;
-                    damage = CalcDamage(baseDamage, offense, defense);
+                    damage = CalcDamage(dat.baseDamage, offense, defense);
                     if (damage >= validEnemyTargets[i].currentHP) // take kills if you can
                     {
                         target = validEnemyTargets[i];
@@ -165,36 +114,43 @@ public class Battler : MonoBehaviour
                     else if (damage > mostDamageDealt || (damage == mostDamageDealt && Random.Range(0, 2) == 0)) target = validEnemyTargets[i];
                 }
                 break;
-            case BattlerAction.Feedback:
-                _readiedActionNeedsTarget = true;
+            case BattlerActionTarget.RandomTarget:
                 target = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
                 break;
-            case BattlerAction.GetBehindMe: // If using this action, target needs to be the ally we're covering!!!
-                _readiedActionNeedsTarget = true;
+            case BattlerActionTarget.RandomTarget_ButOnlyCasters:
+                List<Battler> nuVet = new List<Battler>(validEnemyTargets.Count); // since we're just copying out of validEnemyTargets this is the largest capacity this list will ever need
+                for (int i = 0; i < validEnemyTargets.Count; i++)
+                {
+                    if (validEnemyTargets[i].adventurer.advClass == AdventurerClass.Mystic || validEnemyTargets[i].adventurer.advClass == AdventurerClass.Wizard || validEnemyTargets[i].adventurer.advClass == AdventurerClass.Sage)
+                    {
+                        nuVet.Add(validEnemyTargets[i]);
+                    }
+                }
+                if (nuVet.Count > 0) target = nuVet[Random.Range(0, nuVet.Count)];
+                else target = null;
+                break;
+            case BattlerActionTarget.TargetOwnSide:
+                target = null;
+                break;
+            case BattlerActionTarget.HitAll:
+                target = null;
+                for (int i = 0; i < validEnemyTargets.Count; i++)
+                {
+                    if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
+                    else defense = validEnemyTargets[i].adventurer.Martial;
+                    damage = CalcDamage(dat.baseDamage, offense, defense);
+                    if (damage >= validEnemyTargets[i].currentHP) deathblowList.Add(validEnemyTargets[i]);
+                }
+                break;
+            case BattlerActionTarget.TargetSelf:
+                target = this;
+                break;
+            case BattlerActionTarget.TargetEndangeredAlly:
                 target = overseer.currentTurnTarget;
                 break;
-            case BattlerAction.Flanking:
-                _readiedActionNeedsTarget = true;
+            case BattlerActionTarget.TargetActingBattler:
                 target = overseer.standardPriorityActingBattler;
                 break;
-            case BattlerAction.RainOfArrows:
-            case BattlerAction.Inferno:
-                _hitAll = true;
-                break;
-            case BattlerAction.Protect:
-                _readiedActionNeedsTarget = true;
-                target = overseer.standardPriorityActingBattler;
-                break;
-        }
-        if (_hitAll)
-        {
-            for (int i = 0; i < validEnemyTargets.Count; i++)
-            {
-                if (isMagic) defense = validEnemyTargets[i].adventurer.Magic;
-                else defense = validEnemyTargets[i].adventurer.Martial;
-                damage = CalcDamage(baseDamage, offense, defense);
-                if (damage >= validEnemyTargets[i].currentHP) deathblowList.Add(validEnemyTargets[i]);
-            }
         }
         if (overseer.standardPriorityActingBattler == this) overseer.currentTurnTarget = target;
         if (target != null && !target.isValidTarget) target = null;
@@ -233,9 +189,8 @@ public class Battler : MonoBehaviour
 
     public void ReadyAttack (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action)
     {
-        _damage = GetActionBaseDamage(action);
-        _isMagic = GetActionMagicStatus(action);
-        _target = AcquireTarget(validEnemyTargets, friends, action, _damage, _isMagic);
+        BattlerActionData dat = BattlerActionData.get(action);
+        _target = AcquireTarget(validEnemyTargets, friends, action);
         _secondaryTarget = default(Battler);
         switch (action)
         {
@@ -254,75 +209,91 @@ public class Battler : MonoBehaviour
                 _drainRounds = 2;
                 break;
         }
-        _action = action;
+        readiedAction = action;
         if (_target != null)
         {
             _target.incomingHit = _target.puppet.incomingHit = true;
             if (_secondaryTarget != null) _secondaryTarget.incomingHit = _secondaryTarget.puppet.incomingHit = true;
         }
-        else if (_hitAll)
+        else if (dat.target == BattlerActionTarget.HitAll)
         {
             for (int i = 0; i < validEnemyTargets.Count; i++) validEnemyTargets[i].incomingHit = validEnemyTargets[i].puppet.incomingHit = true;
         }
     }
 
+    private void EnqueueEffectMessagesBasedOnFlags (BattlerActionEffectFlags flags)
+    {
+        if ((flags & BattlerActionEffectFlags.Barrier) == BattlerActionEffectFlags.Barrier) _effectMessages.Enqueue(BattleMessageType.Barrier);
+        if ((flags & BattlerActionEffectFlags.Haste) == BattlerActionEffectFlags.Haste) _effectMessages.Enqueue(BattleMessageType.Haste);
+        if ((flags & BattlerActionEffectFlags.ShieldBlock) == BattlerActionEffectFlags.ShieldBlock) _effectMessages.Enqueue(BattleMessageType.ShieldBlock);
+        if ((flags & BattlerActionEffectFlags.ShieldWall) == BattlerActionEffectFlags.ShieldWall) _effectMessages.Enqueue(BattleMessageType.ShieldWall);
+        if ((flags & BattlerActionEffectFlags.Silence) == BattlerActionEffectFlags.Silence) _effectMessages.Enqueue(BattleMessageType.Silence);
+    }
+
+    public void ApplyEffectsBasedOnFlags (BattlerActionEffectFlags flags)
+    {
+        if ((flags & BattlerActionEffectFlags.Barrier) == BattlerActionEffectFlags.Barrier) ApplyBarrier();
+        if ((flags & BattlerActionEffectFlags.Haste) == BattlerActionEffectFlags.Haste) ApplyHaste();
+        if ((flags & BattlerActionEffectFlags.ShieldBlock) == BattlerActionEffectFlags.ShieldBlock) ApplyShieldBlock();
+        if ((flags & BattlerActionEffectFlags.ShieldWall) == BattlerActionEffectFlags.ShieldWall) ApplyShieldWall();
+        if ((flags & BattlerActionEffectFlags.Silence) == BattlerActionEffectFlags.Silence) Silence();
+    }
+
+    private void UpdateSelfStateBasedOnFlags (BattlerActionEffectFlags flags)
+    {
+        if ((flags & BattlerActionEffectFlags.Haste) == BattlerActionEffectFlags.Haste) hasteCooldown = 1;
+        if ((flags & BattlerActionEffectFlags.Encore) == BattlerActionEffectFlags.Encore)
+        {
+            burstOfSpeedCooldown = 3;
+            overseer.GiveEncore(isEnemy);
+        }
+        if ((flags & BattlerActionEffectFlags.Bodyguard) == BattlerActionEffectFlags.Bodyguard)
+        {
+            _target.Cover(this);
+            getBehindMeProc = true;
+        }
+    }
+
     public void ExecuteAttack (List<Battler> validEnemyTargets, List<Battler> friends)
     {
+        BattlerActionData dat = BattlerActionData.get(readiedAction);
         if (silentTurns > 0)
         {
             silentTurns--;
-            if (_isMagic) _action = BattlerAction._CantMove_Silenced;
+            if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) readiedAction = BattlerAction._CantMove_Silenced;
         }
-        if (_readiedActionNeedsTarget && (_target == null || !_target.isValidTarget))
+        if (dat.HasEffectFlag(BattlerActionEffectFlags.NeedsTarget) && (_target == null || !_target.isValidTarget))
         {
-            AcquireTarget(validEnemyTargets, friends, _action, GetActionBaseDamage(_action), _isMagic);
-            if (_target == null) _action = BattlerAction.None; // can't reacquire target - can't do anything
+            AcquireTarget(validEnemyTargets, friends, readiedAction);
+            if (_target == null) readiedAction = BattlerAction.None; // can't reacquire target - can't do anything
         }
-        if (_action == BattlerAction._CantMove_Silenced)
+        if (readiedAction == BattlerAction._CantMove_Silenced)
         {
             overseer.messageBox.Step(BattleMessageType.FailedCast, this);
         }
-        else if (_action != BattlerAction.None)
+        else if (readiedAction != BattlerAction.None)
         {
+            int _damage = dat.baseDamage;
             int offense;
-            if (_isMagic) offense = adventurer.Magic;
-            else offense = adventurer.Martial;
             int defense;
-            switch (_action)
+            if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) offense = adventurer.Magic;
+            else offense = adventurer.Martial;
+            if (_target == null)
             {
-                case BattlerAction.SilencingShot:
-                    _target.Silence();
-                    break;
-                case BattlerAction.ShieldWall:
-                    ApplyShieldWall(1);
-                    _effectMessages.Enqueue(BattleMessageType.ShieldWall);
-                    break;
-                case BattlerAction.ShieldBlock:
-                    ApplyShieldBlock(1);
-                    _effectMessages.Enqueue(BattleMessageType.ShieldBlock);
-                    break;
-                case BattlerAction.Haste:
-                    hasteCooldown = 1;
-                    for (int i = 0; i < friends.Count; i++) friends[i].ApplyHaste();
-                    _effectMessages.Enqueue(BattleMessageType.Haste);
-                    break;
-                case BattlerAction.Barrier:
-                    for (int i = 0; i < friends.Count; i++) friends[i].ApplyBarrier();
-                    _effectMessages.Enqueue(BattleMessageType.Barrier);
-                    break;
-                case BattlerAction.BurstOfSpeed:
-                    burstOfSpeedCooldown = 3;
-                    overseer.GiveEncore(isEnemy);
-                    _effectMessages.Enqueue(BattleMessageType.Encore);
-                    break;
-                case BattlerAction.Feedback:
-                    feedbackCooldown = 3;
-                    _effectMessages.Enqueue(BattleMessageType.Feedback);
-                    break;
-                case BattlerAction.GetBehindMe: // If using this action, target needs to be the ally we're covering!!!
-                    _target.Cover(this);
-                    getBehindMeProc = true;
-                    break;
+                if (dat.target == BattlerActionTarget.TargetOwnSide) for (int i = 0; i < friends.Count; i++) friends[i].ApplyEffectsBasedOnFlags(dat.flags);
+                else if (dat.target == BattlerActionTarget.HitAll) for (int i = 0; i < validEnemyTargets.Count; i++) validEnemyTargets[i].ApplyEffectsBasedOnFlags(dat.flags);
+            }
+            else
+            {
+                _target.ApplyEffectsBasedOnFlags(dat.flags);
+                if (_secondaryTarget != null) _secondaryTarget.ApplyEffectsBasedOnFlags(dat.flags);
+            }
+            EnqueueEffectMessagesBasedOnFlags(dat.flags);
+            UpdateSelfStateBasedOnFlags(dat.flags);
+            if (readiedAction == BattlerAction.Feedback)
+            {
+                feedbackCooldown = 3;
+                _effectMessages.Enqueue(BattleMessageType.Feedback);
             }
             if (_damage > 0)
             {
@@ -331,20 +302,20 @@ public class Battler : MonoBehaviour
                     _damage *= 2;
                     _effectMessages.Enqueue(BattleMessageType.Critical);
                 }
-                if (_hitAll) for (int i = 0; i < validEnemyTargets.Count; i++)
+                if (dat.target == BattlerActionTarget.HitAll) for (int i = 0; i < validEnemyTargets.Count; i++)
                     {
-                        if (_isMagic) defense = validEnemyTargets[i].adventurer.Magic;
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
                         else defense = validEnemyTargets[i].adventurer.Martial;
                         _damageDealt += validEnemyTargets[i].DealDamage(CalcDamage(_damage, offense, defense));
                     }
                 else if (_target != null)
                 {
-                    if (_isMagic) defense = _target.adventurer.Magic;
+                    if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _target.adventurer.Magic;
                     else defense = _target.adventurer.Martial;
                     _damageDealt += _target.DealDamage(CalcDamage(_damage, offense, defense));
                     if (_secondaryTarget != null)
                     {
-                        if (_isMagic) defense = _secondaryTarget.adventurer.Magic;
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _secondaryTarget.adventurer.Magic;
                         else defense = _secondaryTarget.adventurer.Martial;
                         _damageDealt += _secondaryTarget.DealDamage(CalcDamage(_damage, offense, defense));
                     }
@@ -376,7 +347,7 @@ public class Battler : MonoBehaviour
                 weakestAlly.puppet.incomingBuff = true;
                 _drainRounds--; // this loop caused the battle to hang for an embarrassingly long time because I forgot the decrement, lol
             }
-            overseer.messageBox.Step(BattleMessageType.StandardTurnMessage, this, _action);
+            overseer.messageBox.Step(BattleMessageType.StandardTurnMessage, this, readiedAction);
             while (_effectMessages.Count > 0) overseer.messageBox.Step(_effectMessages.Dequeue());
         }
 
@@ -468,7 +439,7 @@ public class Battler : MonoBehaviour
             else if (HasAttack(AdventurerAttack.Inferno) && opponents.Count > 1) action = BattlerAction.Inferno;
             else action = defaultAction;
         }
-        _action = action;
+        readiedAction = action;
         return action;
     }
 
@@ -503,22 +474,6 @@ public class Battler : MonoBehaviour
         }
         
         return action;
-    }
-
-    public static int GetActionBaseDamage (BattlerAction action)
-    {
-        int v;
-        if (action == BattlerAction._CantMove_Silenced) v = 0;
-        else v = actionBaseDamages[(int)action];
-        return v;
-    }
-
-    public static bool GetActionMagicStatus (BattlerAction action)
-    {
-        bool v;
-        if (action == BattlerAction._CantMove_Silenced) v = false;
-        else v = actionMagicStatus[(int)action];
-        return v;
     }
 
     public void GenerateBattleData (Adventurer _adventurer)
@@ -636,18 +591,14 @@ public class Battler : MonoBehaviour
 
     private void InitializeDisposables ()
     {
-        bodyguard = default(Battler);
+        bodyguard = null;
         incomingHit = false;
         _damageDealt = 0;
         _wantsToReenterBattle = false;
-        _readiedActionNeedsTarget = false;
         _drainRounds = 0;
-        _damage = 0;
-        _hitAll = false;
-        _isMagic = false;
-        _target = default(Battler);
-        _secondaryTarget = default(Battler);
-        _action = BattlerAction.None;
+        _target = null;
+        _secondaryTarget = null;
+        readiedAction = BattlerAction.None;
         if (deathblowList.Count > 0) deathblowList = new List<Battler>(); // This is gross, but it's controlled grossness, because either it happens rarely or you're throwing these away every turn and the adventure is just gonna be 12 turns anyway.
     }
 }

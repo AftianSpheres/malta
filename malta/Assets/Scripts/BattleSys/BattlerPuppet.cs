@@ -23,6 +23,8 @@ public class BattlerPuppet : MonoBehaviour
     private bool killedPuppet;
     private string[] conditionStrings;
     private Vector3 originalPos;
+    private Vector3 originalScale;
+    const float deathAnimLength = 1.0f;
     const float pullOutAnimLength = 1.0f;
     const float pullOutAnimDist = 360.0f;
 
@@ -30,11 +32,12 @@ public class BattlerPuppet : MonoBehaviour
     {
         conditionStrings = conditionStringsResource.text.Split('\n');
         originalPos = transform.position;
+        originalScale = transform.localScale;
     }
 
     void Update ()
     {
-        if (killedPuppet && !damageAnimGadget.triggeredGadget) KillDisplay(); // let hit anims play before vanishing 
+        if (killedPuppet && !damageAnimGadget.triggeredGadget && transform.localScale == originalScale) DeathAnim(); // let hit anims play before vanishing 
         if (pullOutButton != null)
         {
             if (!battler.activeBattler)
@@ -89,6 +92,8 @@ public class BattlerPuppet : MonoBehaviour
             else mugshot.sprite = battler.adventurer.GetMugshotGraphic();
         }
         RefreshHPText();
+        transform.position = originalPos;
+        transform.localScale = originalScale;
         killedPuppet = false;
     }
 
@@ -131,6 +136,24 @@ public class BattlerPuppet : MonoBehaviour
     public void ReenterBattleAnim ()
     {
         transform.position = originalPos;
+    }
+
+    public void DeathAnim ()
+    {
+        Timing.RunCoroutine(_DeathAnim());
+    }
+
+    IEnumerator<float> _DeathAnim ()
+    {
+        float timer = 0;
+        while (timer < deathAnimLength)
+        {
+            timer += Time.deltaTime;
+            transform.localScale = Vector3.Lerp(originalScale, Vector3.zero, (timer / deathAnimLength));
+            yield return 0f;
+        }
+        KillDisplay();
+        yield break;
     }
 
     public void PullOutAnim ()
