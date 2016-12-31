@@ -270,10 +270,20 @@ Dec.29 2016-137
 3:28 AM - on
 3:38 AM - off
 
-Dec.30 2016-169
+Dec.30 2016-249
 4:05 AM - start
 5:05 AM - off
 6:51 AM - on
 8:35 AM - off
 8:43 AM - on
 8:48 AM - off
+11:07 AM - on
+11:28 AM - off
+12:20 PM - on
+1:19 PM - off
+
+Dec.31 2016-
+1:32 PM - start
+2:36 PM - off
+4:13 PM - on
+5:17 PM - off

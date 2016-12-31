@@ -1,12 +1,12 @@
-EVT_SetBGM typing -
-EVT_RefreshTextboxWith 0 -
-EVT_SetBackground bgTest - // you can have comments in these scripts
-EVT_SetForeground fgDickButt - ???actually it doesn't even need to be a "comment"
-FX_FadeOutForeground 6 -
-endFX waitUntilDone False ('endFX' is a magic string, every FX statement needs to be followed by an 'endFX' or the parser will throw a fit.)
-EVT_SetBGM dreamchaser -
-EVT_RefreshTextboxWith 1 -
-skip (also you can skip lines.) anyway, endFX conditions are "whenFinished" or "waitSeconds." term 2 needs to be a number we can parse as a float if you give it "waitSeconds." negative values will be interpreted as postive + set kill-FX-when-moving-on flag true.
-FX_WaitForClick - -
+EVT_SetBGM typing
+EVT_RefreshTextboxWith 0
+EVT_SetBackground bgTest
+EVT_SetForeground fgDickButt
+FX_FadeOutForeground 6
 endFX waitUntilDone False
-EVT_LoadLevel Title -
+EVT_SetBGM dreamchaser
+EVT_RefreshTextboxWith 1
+skip (Inline comments aren't feasible any more, but you can still use skip lines for them, at least.)
+FX_WaitForClick
+endFX waitUntilDone False
+EVT_LoadLevel Title

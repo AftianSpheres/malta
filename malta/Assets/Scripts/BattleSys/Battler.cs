@@ -44,15 +44,21 @@ public class Battler : MonoBehaviour
     int _drainRounds = 0;
     public bool _wantsToReenterBattle { get; private set; }
     public Battler _target { get; private set; }
-    Battler _secondaryTarget; // TO-DO: kill this and use the subtargetCount field to do it in a smart way
+    List<Battler> _subtargets;
     Queue<BattleMessageType> _effectMessages;
+
+    void Awake()
+    {
+        _effectMessages = new Queue<BattleMessageType>();
+        deathblowList = new List<Battler>(overseer.playerParty.Length);
+        _subtargets = new List<Battler>(overseer.playerParty.Length);
+    } 
 
     void Start ()
     {
         InitializeDisposables();
         activeBattler = true;
-        _effectMessages = new Queue<BattleMessageType>();
-	}
+    }
 
     public void Upkeep ()
     {
@@ -191,29 +197,30 @@ public class Battler : MonoBehaviour
     {
         BattlerActionData dat = BattlerActionData.get(action);
         _target = AcquireTarget(validEnemyTargets, friends, action);
-        _secondaryTarget = default(Battler);
-        switch (action)
+        _subtargets.Clear();
+        if (dat.numberOfSubtargets > 0 && validEnemyTargets.Count > 1)
         {
-            case BattlerAction.Siphon:
-                _drainRounds = 1;
-                break;
-            case BattlerAction.VampiricWinds:
-                if (validEnemyTargets.Count > 1)
+            int mvec = validEnemyTargets.Count;
+            while (mvec > 1)
+            {
+                for (int i = 0; i < dat.numberOfSubtargets; i++)
                 {
                     while (true)
                     {
-                        _secondaryTarget = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
-                        if (_secondaryTarget != _target) break;
+                        _subtargets[i] = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
+                        if (_subtargets[i] != _target) break;
                     }
+                    mvec--;
                 }
-                _drainRounds = 2;
-                break;
+            }
+            if (mvec > 999) throw new System.Exception("Crashing to escape subtarget acquisition loop. This is bad!");
         }
+        if (dat.HasEffectFlag(BattlerActionEffectFlags.Drain)) _drainRounds = 1 + _subtargets.Count;
         readiedAction = action;
         if (_target != null)
         {
             _target.incomingHit = _target.puppet.incomingHit = true;
-            if (_secondaryTarget != null) _secondaryTarget.incomingHit = _secondaryTarget.puppet.incomingHit = true;
+            for (int i = 0; i < _subtargets.Count; i++) _subtargets[i].incomingHit = _subtargets[i].puppet.incomingHit = true;
         }
         else if (dat.target == BattlerActionTarget.HitAll)
         {
@@ -270,6 +277,7 @@ public class Battler : MonoBehaviour
         if (readiedAction == BattlerAction._CantMove_Silenced)
         {
             overseer.messageBox.Step(BattleMessageType.FailedCast, this);
+            overseer.lastActionAnim = BattlerActionAnim.None;
         }
         else if (readiedAction != BattlerAction.None)
         {
@@ -286,7 +294,7 @@ public class Battler : MonoBehaviour
             else
             {
                 _target.ApplyEffectsBasedOnFlags(dat.flags);
-                if (_secondaryTarget != null) _secondaryTarget.ApplyEffectsBasedOnFlags(dat.flags);
+                for (int i = 0; i < _subtargets.Count; i++) _subtargets[i].ApplyEffectsBasedOnFlags(dat.flags);
             }
             EnqueueEffectMessagesBasedOnFlags(dat.flags);
             UpdateSelfStateBasedOnFlags(dat.flags);
@@ -313,19 +321,22 @@ public class Battler : MonoBehaviour
                     if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _target.adventurer.Magic;
                     else defense = _target.adventurer.Martial;
                     _damageDealt += _target.DealDamage(CalcDamage(_damage, offense, defense));
-                    if (_secondaryTarget != null)
+                    for (int i = 0; i < _subtargets.Count; i++)
                     {
-                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _secondaryTarget.adventurer.Magic;
-                        else defense = _secondaryTarget.adventurer.Martial;
-                        _damageDealt += _secondaryTarget.DealDamage(CalcDamage(_damage, offense, defense));
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _subtargets[i].adventurer.Magic;
+                        else defense = _subtargets[i].adventurer.Martial;
+                        _damageDealt += _subtargets[i].DealDamage(CalcDamage(_damage, offense, defense));
                     }
                 }
                 else throw new System.Exception("Battler " + gameObject.name + " tried to use a damage-dealing action, but with no target.");
             }
-            if (_secondaryTarget != null && !_secondaryTarget.isValidTarget)
+            for (int i = 0; i < _subtargets.Count; i++)
             {
-                _secondaryTarget = null;
-                _drainRounds = 0;
+                if (!_subtargets[i].isValidTarget)
+                {
+                    _subtargets.RemoveAt(i);
+                    _drainRounds--;
+                }
             }
             if (_drainRounds > 1) _effectMessages.Enqueue(BattleMessageType.MultiHeal);
             else if (_drainRounds > 1) _effectMessages.Enqueue(BattleMessageType.Heal);
@@ -349,7 +360,9 @@ public class Battler : MonoBehaviour
             }
             overseer.messageBox.Step(BattleMessageType.StandardTurnMessage, this, readiedAction);
             while (_effectMessages.Count > 0) overseer.messageBox.Step(_effectMessages.Dequeue());
+            overseer.lastActionAnim = dat.anim;
         }
+        else overseer.lastActionAnim = BattlerActionAnim.None;
 
     }
 
@@ -481,10 +494,10 @@ public class Battler : MonoBehaviour
         SetBattlerActive();
         dead = false;
         defaultAction = BattlerAction.None;
-        battleStartInterruptActions = new List<BattlerAction>();
-        onAllyHitInterruptActions = new List<BattlerAction>();
-        onAllyDeathblowInterruptActions = new List<BattlerAction>();
-        onHitInterruptActions = new List<BattlerAction>();
+        if (battleStartInterruptActions == null) battleStartInterruptActions = new List<BattlerAction>(); else battleStartInterruptActions.Clear();
+        if (onAllyHitInterruptActions == null) onAllyHitInterruptActions = new List<BattlerAction>(); else onAllyHitInterruptActions.Clear();
+        if (onAllyDeathblowInterruptActions == null) onAllyDeathblowInterruptActions = new List<BattlerAction>(); else onAllyDeathblowInterruptActions.Clear();
+        if (onHitInterruptActions == null) onHitInterruptActions = new List<BattlerAction>(); else onHitInterruptActions.Clear();
         adventurer = _adventurer;
         currentHP = adventurer.HP;
         RefreshCooldownsAndShit();
@@ -597,8 +610,8 @@ public class Battler : MonoBehaviour
         _wantsToReenterBattle = false;
         _drainRounds = 0;
         _target = null;
-        _secondaryTarget = null;
+        _subtargets.Clear();
         readiedAction = BattlerAction.None;
-        if (deathblowList.Count > 0) deathblowList = new List<Battler>(); // This is gross, but it's controlled grossness, because either it happens rarely or you're throwing these away every turn and the adventure is just gonna be 12 turns anyway.
+        if (deathblowList.Count > 0) deathblowList.Clear();
     }
 }

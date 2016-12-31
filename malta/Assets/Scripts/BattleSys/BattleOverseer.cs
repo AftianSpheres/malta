@@ -18,6 +18,7 @@ public class BattleOverseer : MonoBehaviour
     public Battler[] allBattlers { get; private set; }
     public ScreenChanger screenChanger;
     public GameObject retreatButton;
+    public BattlerActionAnim lastActionAnim;
     public bool standardActionPriorityBracket;
     public bool retreatingAtStartOfNextTurn { get; private set; }
     public bool currentlyInFight { get; private set; }
@@ -39,6 +40,9 @@ public class BattleOverseer : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        turnOrderList = new SortedList<float, Battler>(enemyParty.Length + playerParty.Length);
+        validEnemyTargets = new List<Battler>(enemyParty.Length);
+        validPlayerTargets = new List<Battler>(playerParty.Length);
         retreatButton.SetActive(false);
         Timing.RunCoroutine(Bootstrap(), _owned);
         baseEndlessAdventurePayout = new int[] { 0, 0, 0, GameDataManager.Instance.dataStore.nextRandomAdventureAnte, GameDataManager.Instance.dataStore.nextRandomAdventureAnte, GameDataManager.Instance.dataStore.nextRandomAdventureAnte };
@@ -325,9 +329,9 @@ public class BattleOverseer : MonoBehaviour
 
     private void BuildLists ()
     {
-        turnOrderList = new SortedList<float, Battler>(allBattlers.Length);
-        validEnemyTargets = new List<Battler>(enemyParty.Length);
-        validPlayerTargets = new List<Battler>(playerParty.Length);
+        turnOrderList.Clear();
+        validEnemyTargets.Clear();
+        validPlayerTargets.Clear();
         for (int i = 0; i < allBattlers.Length; i++)
         {
             if (allBattlers[i] != null && allBattlers[i].isValidTarget)

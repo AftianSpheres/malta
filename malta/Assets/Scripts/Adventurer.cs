@@ -484,8 +484,13 @@ public class Adventurer
 
     public Sprite GetMugshotGraphic()
     {
-        Sprite mugSprite = Resources.Load<Sprite>(mugshotsResourcePath + mugshot.ToString());
-        if (mugSprite == null) throw new System.Exception("No mugshot for " + mugshotsResourcePath + mugshot.ToString());
+        Sprite mugSprite;
+        if (mugshot == AdventurerMugshot.None) mugSprite = null;
+        else
+        {
+            mugSprite = Resources.Load<Sprite>(mugshotsResourcePath + mugshot.ToString());
+            if (mugSprite == null) throw new System.Exception("No mugshot for " + mugshotsResourcePath + mugshot.ToString());
+        }
         return mugSprite;
     }
 }

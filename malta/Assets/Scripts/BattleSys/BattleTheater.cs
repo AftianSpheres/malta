@@ -13,6 +13,7 @@ public class BattleTheater : MonoBehaviour
     public AudioSource sfxSource;
     public BattleOverseer overseer;
     public BattleMessageBox messageBox;
+    public CutscenePlayer animsPlayer;
     public GameObject enemyParty;
     public SpriteRenderer battleBG;
     public Sprite[] battleBG_bgs;
@@ -38,7 +39,7 @@ public class BattleTheater : MonoBehaviour
 
     public void ProcessAction ()
     {
-        for (int i = 0; i < overseer.allBattlers.Length; i++) if (overseer.allBattlers[i] != null) overseer.allBattlers[i].puppet.Respond();
+        Timing.RunCoroutine(_PlayAnim(overseer.lastActionAnim));
     }
 
     public void StartBattle ()
@@ -47,6 +48,15 @@ public class BattleTheater : MonoBehaviour
         else battleBG.sprite = battleBG_bgs[AdventureSubstageLoader.randomAdventureBaseLevel];
         source.clip = overseer.adventure[overseer.battleNo].battleBGM;
         source.Play();
+    }
+
+    IEnumerator<float> _PlayAnim (BattlerActionAnim anim)
+    {
+        _processing = true;
+        animsPlayer.StartCutscene((int)anim);
+        while (animsPlayer.running) yield return 0f;
+        _processing = false;
+        for (int i = 0; i < overseer.allBattlers.Length; i++) if (overseer.allBattlers[i] != null) overseer.allBattlers[i].puppet.Respond();
     }
 
     IEnumerator<float> _PlayFanfare (AudioClip ff)

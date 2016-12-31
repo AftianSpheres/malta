@@ -93,6 +93,7 @@ public struct BattlerActionData
     readonly public BattlerActionTarget target;
     readonly public int baseDamage;
     readonly public int numberOfSubtargets;
+    public const int numberOfAnims = 3;
 
     /// <summary>
     /// Calls into BattlerActionData, gets a BattlerActionData entry from the dataset if it exists, makes it first if it doesn't.
