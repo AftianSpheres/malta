@@ -50,6 +50,7 @@ public class CutsceneSlaveSprite : MonoBehaviour
 
     public void ChangeGraphic (Sprite s, Color c)
     {
+        
         image.sprite = s;
         image.color = c;
     }
@@ -80,8 +81,8 @@ public class CutsceneSlaveSprite : MonoBehaviour
         Vector3 modifiedMV = new Vector3(moveVector.x * speed.x, moveVector.y * speed.y, moveVector.z * speed.z);
         while (elapsedTime < time)
         {
-            transform.position += modifiedMV * Time.deltaTime;
             elapsedTime += Time.deltaTime;
+            transform.position += modifiedMV * Time.deltaTime;
             yield return 0f;
         }
     }
@@ -103,12 +104,19 @@ public class CutsceneSlaveSprite : MonoBehaviour
 
     IEnumerator<float> _ScaleOverTime(Vector3 scaleMod, float time)
     {
+        bool scaleDown = false;
+        if (time < 0)
+        {
+            scaleDown = true;
+            time = Mathf.Abs(time);
+        }
         float elapsedTime = 0;
         Vector3 lastScale = transform.localScale;
         while (elapsedTime < time)
         {
-            transform.localScale = new Vector3(lastScale.x * scaleMod.x * (time / elapsedTime), lastScale.y * scaleMod.y * (time / elapsedTime), lastScale.z * scaleMod.z * (time / elapsedTime));
             elapsedTime += Time.deltaTime;
+            if (scaleDown) transform.localScale = new Vector3((lastScale.x * scaleMod.x) * (time / elapsedTime), (lastScale.y * scaleMod.y) * (time / elapsedTime), (lastScale.z * scaleMod.z) * (time / elapsedTime));
+            else transform.localScale = new Vector3((lastScale.x * scaleMod.x) / (time / elapsedTime), (lastScale.y * scaleMod.y) / (time / elapsedTime), (lastScale.z * scaleMod.z) / (time / elapsedTime));
             yield return 0f;
         }
     }

@@ -57,6 +57,11 @@ internal class CutsceneOp
         args = _args;
     }
 
+    public void ResetStateVariables ()
+    {
+        isDone = false;
+    }
+
     /// <summary>
     /// Pass 0 if we move on immediately.
     /// Pass float.MinValue if we continue until done.
@@ -134,8 +139,8 @@ public class CutscenePlayer : MonoBehaviour
         fgImgPos = foregroundImage.transform.position;
         foregroundImage.sprite = null;
         backgroundImage.sprite = null;
-        backgroundImage.enabled = false;
-        foregroundImage.enabled = false;
+        backgroundImage.gameObject.SetActive(false);
+        foregroundImage.gameObject.SetActive(false);
         slaveSprites = new Queue<CutsceneSlaveSprite>(slaveCount);
         activeSlaves = new Dictionary<string, CutsceneSlaveSprite>(slaveCount);
         if (subtype == CutscenePlayerSubtype.Cutscene)
@@ -189,7 +194,12 @@ public class CutscenePlayer : MonoBehaviour
         op.Run(myTag + opIndex.ToString());
     }
 
-    public void StartCutscene(int index)
+    public IEnumerator<float> _cutsceneRunning()
+    {
+        while (running) yield return 0f;
+    }
+
+    public IEnumerator<float> StartCutscene(int index)
     {
         cutsceneDisplay.SetActive(true);
         opIndex = 0;
@@ -199,10 +209,11 @@ public class CutscenePlayer : MonoBehaviour
             lastBGM = bgmSource.clip;
             strings = cutsceneStringArrays[index];
         }
-        Debug.Log(index);
         cutsceneOps = cutsceneOpSets[index];
+        for (int i = 0; i < cutsceneOps.Length; i++) cutsceneOps[i].ResetStateVariables();
         cutsceneOps[0].Run(myTag + 0);
         running = true;
+        return Timing.RunCoroutine(_cutsceneRunning(), myTag);
     }
 
     private void LoadCutscene(int index)
@@ -452,7 +463,7 @@ public class CutscenePlayer : MonoBehaviour
     void cutsceneEVT_SetBackground(object[] args) // Sprite sprite, optionally Color color
     {
         backgroundImage.sprite = (Sprite)args[0];
-        backgroundImage.enabled = (backgroundImage.sprite != null);
+        backgroundImage.gameObject.SetActive(backgroundImage.sprite != null);
         if (args.Length > 1) backgroundImage.color = (Color)args[1];
         else backgroundImage.color = Color.white;
         backgroundImage.transform.position = bgImgPos;
@@ -461,7 +472,7 @@ public class CutscenePlayer : MonoBehaviour
     void cutsceneEVT_SetForeground(object[] args) // Sprite sprite, optionally Color color
     {
         foregroundImage.sprite = (Sprite)args[0];
-        foregroundImage.enabled = (foregroundImage.sprite != null);
+        foregroundImage.gameObject.SetActive(foregroundImage.sprite != null);
         if (args.Length > 1) foregroundImage.color = (Color)args[1];
         else foregroundImage.color = Color.white;
         foregroundImage.transform.position = fgImgPos;

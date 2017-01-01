@@ -1,5 +1,6 @@
-EVT_MakeSlave animWidget 0.66 sliceEffect 0 0 0
-EVT_MoveSlave animWidget -1 0 0 1 0 0 0.66
+EVT_MakeSlave animWidget 0.66 sliceEffect 600 338.5 0
+EVT_MoveSlave animWidget -1 0 0 70 0 0 0.66
+EVT_ScaleSlave animWidget 3 3 1 0.66
 FX_Wait 0.66
 EndFX waitUntilDone True
 End

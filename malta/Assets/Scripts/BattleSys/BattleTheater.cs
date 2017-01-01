@@ -53,8 +53,7 @@ public class BattleTheater : MonoBehaviour
     IEnumerator<float> _PlayAnim (BattlerActionAnim anim)
     {
         _processing = true;
-        animsPlayer.StartCutscene((int)anim);
-        while (animsPlayer.running) yield return 0f;
+        yield return Timing.WaitUntilDone(animsPlayer.StartCutscene((int)anim));
         _processing = false;
         for (int i = 0; i < overseer.allBattlers.Length; i++) if (overseer.allBattlers[i] != null) overseer.allBattlers[i].puppet.Respond();
     }
