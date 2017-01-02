@@ -207,7 +207,7 @@ public class Battler : MonoBehaviour
                 {
                     while (true)
                     {
-                        _subtargets[i] = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
+                        _subtargets.Add(validEnemyTargets[Random.Range(0, validEnemyTargets.Count)]);
                         if (_subtargets[i] != _target) break;
                     }
                     mvec--;
