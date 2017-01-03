@@ -301,3 +301,10 @@ Jan. 1 2016-54
 Jan. 2 2016-36
 9:22 AM - start
 9:48 AM - off
+
+Jan. 3 2016-
+1:45 PM - start
+2:38 PM - off
+2:53 PM - on
+3:12 PM - off
+3:16 PM - on

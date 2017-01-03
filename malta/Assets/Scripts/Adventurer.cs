@@ -90,6 +90,7 @@ public class Adventurer
     private const string mugshotsResourcePath = "mugshots/";
     private const string enemyGfxResourcePath = "mugshots/enemy/";
     public static int[] awakeningCosts = { 0, 0, 0, 50, 50, 50 };
+    private static AdventurerClass[] frontRowClasses = { AdventurerClass.Warrior, AdventurerClass.Footman, AdventurerClass.Sovereign };
 
     public void Awaken ()
     {
@@ -466,6 +467,20 @@ public class Adventurer
                 break;
         }
         return term;
+    }
+
+    public static bool ClassIsFrontRowClass (AdventurerClass advClass)
+    {
+        bool r = false;
+        for (int i = 0; i < frontRowClasses.Length; i++)
+        {
+            if (frontRowClasses[i] == advClass)
+            {
+                r = true;
+                break;
+            }
+        }
+        return r;
     }
 
     public void Permadeath ()

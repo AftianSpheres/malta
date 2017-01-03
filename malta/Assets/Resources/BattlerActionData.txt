@@ -1,5 +1,5 @@
 None,None,None,0,0
-None,Hit,TargetWeakestEnemy,6,0,NeedsTarget
+None,Hit,TargetWeakestEnemy,6,0,NeedsTarget,Melee
 None,Cast,TargetWeakestEnemy,5,0,IsMagic,Drain,NeedsTarget
 None,Cast,TargetOwnSide,0,0,IsMagic,Haste
 BattleStart,Hit,RandomTarget_ButOnlyCasters,2,0,Silence,NeedsTarget
@@ -7,7 +7,7 @@ None,Hit,HitAll,3,0,NeedsTarget
 None,Hit,TargetWeakestEnemy,6,0,NeedsTarget
 BattleStart,PhysBuff,TargetOwnSide,0,0,ShieldWall
 None,PhysBuff,TargetSelf,0,0,ShieldBlock
-None,Hit,TargetWeakestEnemy,4,0,NeedsTarget
+None,Hit,TargetWeakestEnemy,4,0,NeedsTarget,Melee
 BattleStart,Cast,TargetOwnSide,0,0,IsMagic,Barrier
 None,Cast,TargetWeakestEnemy,8,1,IsMagic,Drain,NeedsTarget
 None,Cast,TargetOwnSide,0,0,IsMagic,Encore
@@ -15,7 +15,7 @@ OnHit,Cast,RandomTarget,10,0,IsMagic,NeedsTarget
 None,Cast,TargetWeakestEnemy,10,0,IsMagic,NeedsTarget
 None,Cast,HitAll,5,0,IsMagic,NeedsTarget
 OnAllyHit,Hit,TargetActingBattler,4,0,NeedsTarget
-None,Hit,TargetWeakestEnemy,10,0,NeedsTarget
+None,Hit,TargetWeakestEnemy,10,0,NeedsTarget,Melee
 OnAllyDeathblow,PhysBuff,TargetEndangeredAlly,0,0,Bodyguard,NeedsTarget
 OnAllyDeathblow,Hit,TargetActingBattler,6,0,NeedsTarget
 None,Cast,TargetWeakestEnemy,99,0,IsMagic,NeedsTarget

@@ -26,7 +26,12 @@ public class BattlerPuppet : MonoBehaviour
     private Vector3 originalScale;
     const float deathAnimLength = 1.0f;
     const float pullOutAnimLength = 1.0f;
-    const float pullOutAnimDist = 360.0f;
+    const float pullOutAnimDist = 450.0f;
+    const float playerSideBackRowOffset = 90.0f;
+    const float enemySideBackRowOffset = 200.0f;
+    float backRowOffset { get { if (battler.isEnemy) return enemySideBackRowOffset; else return playerSideBackRowOffset; } }
+    float battlerRowOffset { get { if (battler.livesOnBackRow) return backRowOffset; else return 0; } }
+    Vector3 offsetDirection { get { if (battler.isEnemy) return Vector3.right; else return Vector3.left; } }
 
     void Start ()
     {
@@ -57,6 +62,12 @@ public class BattlerPuppet : MonoBehaviour
                 else if (!pullOutButton.gameObject.activeSelf && battler.currentHP < battler.adventurer.HP) pullOutButton.gameObject.SetActive(true);
             }
         }
+    }
+
+    void ResetTransform ()
+    {
+        transform.position = originalPos + (offsetDirection * battlerRowOffset);
+        transform.localScale = originalScale;
     }
 
     public void Respond ()
@@ -92,8 +103,7 @@ public class BattlerPuppet : MonoBehaviour
             else mugshot.sprite = battler.adventurer.GetMugshotGraphic();
         }
         RefreshHPText();
-        transform.position = originalPos;
-        transform.localScale = originalScale;
+        ResetTransform();
         killedPuppet = false;
     }
 
@@ -135,7 +145,7 @@ public class BattlerPuppet : MonoBehaviour
 
     public void ReenterBattleAnim ()
     {
-        transform.position = originalPos;
+        ResetTransform();
     }
 
     public void DeathAnim ()
@@ -168,7 +178,7 @@ public class BattlerPuppet : MonoBehaviour
         while (timer < pullOutAnimLength)
         {
             timer += Time.deltaTime;
-            transform.position = originalPos + (Vector3.left * pullOutAnimDist * (timer / pullOutAnimLength));
+            transform.position = originalPos + (battlerRowOffset * offsetDirection) + (Vector3.left * pullOutAnimDist * (timer / pullOutAnimLength));
             yield return 0f;
         }
         pullOutButton.interactable = true;

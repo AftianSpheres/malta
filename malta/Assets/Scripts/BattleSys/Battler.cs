@@ -39,6 +39,7 @@ public class Battler : MonoBehaviour
     private int silentTurns;
     public bool activeBattler { get; private set; }
     private bool pulledOutOfBattle;
+    public bool livesOnBackRow;
     public BattlerAction readiedAction;
     int _damageDealt = 0;
     int _drainRounds = 0;
@@ -94,72 +95,109 @@ public class Battler : MonoBehaviour
         int damage;
         int offense;
         int defense;
+        bool meleeAtk;
         if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) offense = adventurer.Magic;
         else offense = adventurer.Martial;
+        if (dat.HasEffectFlag(BattlerActionEffectFlags.Melee)) meleeAtk = true;
+        else meleeAtk = false;
         Battler target = null; // if it's left null we're doing something that doesn't have a "target" per se
-        switch (dat.target)
+        if (validEnemyTargets.Count > 0)
         {
-            case BattlerActionTarget.TargetWeakestEnemy:
-                int mostDamageDealt = 0;
-                for (int i = 0; i < validEnemyTargets.Count; i++)
-                {
-                    if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
-                    else defense = validEnemyTargets[i].adventurer.Martial;
-                    damage = CalcDamage(dat.baseDamage, offense, defense);
-                    if (damage >= validEnemyTargets[i].currentHP) // take kills if you can
+            switch (dat.target)
+            {
+                case BattlerActionTarget.TargetWeakestEnemy:
+                    int mostDamageDealt = 0;
+                    for (int i = 0; i < validEnemyTargets.Count; i++)
                     {
-                        target = validEnemyTargets[i];
-                        deathblowList.Add(target);
-                        break; // already found the target, don't bother with anything else
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
+                        else defense = validEnemyTargets[i].adventurer.Martial;
+                        if (validEnemyTargets[i].livesOnBackRow && meleeAtk) defense += 1;
+                        damage = CalcDamage(dat.baseDamage, offense, defense);
+                        if (damage >= validEnemyTargets[i].currentHP) // take kills if you can
+                        {
+                            target = validEnemyTargets[i];
+                            deathblowList.Add(target);
+                            break; // already found the target, don't bother with anything else
+                        }
+                        else if (validEnemyTargets[i].shieldWallTurns > 0)
+                        {
+                            target = validEnemyTargets[i]; // shield wall pulls aggro
+                            break;
+                        }
+                        else if (damage > mostDamageDealt || (damage == mostDamageDealt && Random.Range(0, 2) == 0))
+                        {
+                            if (!meleeAtk || target == null || !validEnemyTargets[i].livesOnBackRow || target.livesOnBackRow)
+                            {
+                                target = validEnemyTargets[i];
+                                mostDamageDealt = damage;
+                            }
+                        }
                     }
-                    else if (validEnemyTargets[i].shieldWallTurns > 0)
+                    break;
+                case BattlerActionTarget.RandomTarget:
+                    bool foundTarget = false;
+                    while (!foundTarget)
                     {
-                        target = validEnemyTargets[i]; // shield wall pulls aggro
-                        break;
+                        target = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
+                        if (target.livesOnBackRow && meleeAtk)
+                        {
+                            if (Random.Range(0, 4) == 0) foundTarget = true;
+                        }
+                        else foundTarget = true;
                     }
-                    else if (damage > mostDamageDealt || (damage == mostDamageDealt && Random.Range(0, 2) == 0)) target = validEnemyTargets[i];
-                }
-                break;
-            case BattlerActionTarget.RandomTarget:
-                target = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
-                break;
-            case BattlerActionTarget.RandomTarget_ButOnlyCasters:
-                List<Battler> nuVet = new List<Battler>(validEnemyTargets.Count); // since we're just copying out of validEnemyTargets this is the largest capacity this list will ever need
-                for (int i = 0; i < validEnemyTargets.Count; i++)
-                {
-                    if (validEnemyTargets[i].adventurer.advClass == AdventurerClass.Mystic || validEnemyTargets[i].adventurer.advClass == AdventurerClass.Wizard || validEnemyTargets[i].adventurer.advClass == AdventurerClass.Sage)
+                    break;
+                case BattlerActionTarget.RandomTarget_ButOnlyCasters:
+                    List<Battler> nuVet = new List<Battler>(validEnemyTargets.Count); // since we're just copying out of validEnemyTargets this is the largest capacity this list will ever need
+                    for (int i = 0; i < validEnemyTargets.Count; i++)
                     {
-                        nuVet.Add(validEnemyTargets[i]);
+                        if (validEnemyTargets[i].adventurer.advClass == AdventurerClass.Mystic || validEnemyTargets[i].adventurer.advClass == AdventurerClass.Wizard || validEnemyTargets[i].adventurer.advClass == AdventurerClass.Sage)
+                        {
+                            nuVet.Add(validEnemyTargets[i]);
+                        }
                     }
-                }
-                if (nuVet.Count > 0) target = nuVet[Random.Range(0, nuVet.Count)];
-                else target = null;
-                break;
-            case BattlerActionTarget.TargetOwnSide:
-                target = null;
-                break;
-            case BattlerActionTarget.HitAll:
-                target = null;
-                for (int i = 0; i < validEnemyTargets.Count; i++)
-                {
-                    if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
-                    else defense = validEnemyTargets[i].adventurer.Martial;
-                    damage = CalcDamage(dat.baseDamage, offense, defense);
-                    if (damage >= validEnemyTargets[i].currentHP) deathblowList.Add(validEnemyTargets[i]);
-                }
-                break;
-            case BattlerActionTarget.TargetSelf:
-                target = this;
-                break;
-            case BattlerActionTarget.TargetEndangeredAlly:
-                target = overseer.currentTurnTarget;
-                break;
-            case BattlerActionTarget.TargetActingBattler:
-                target = overseer.standardPriorityActingBattler;
-                break;
+                    if (nuVet.Count > 0)
+                    {
+                        foundTarget = false;
+                        while (!foundTarget)
+                        {
+
+                            target = nuVet[Random.Range(0, nuVet.Count)];
+                            if (target.livesOnBackRow && meleeAtk)
+                            {
+                                if (Random.Range(0, 4) == 0) foundTarget = true;
+                            }
+                            else foundTarget = true;
+                        }
+                    }
+                    else target = null;
+                    break;
+                case BattlerActionTarget.TargetOwnSide:
+                    target = null;
+                    break;
+                case BattlerActionTarget.HitAll:
+                    target = null;
+                    for (int i = 0; i < validEnemyTargets.Count; i++)
+                    {
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
+                        else defense = validEnemyTargets[i].adventurer.Martial;
+                        if (validEnemyTargets[i].livesOnBackRow && meleeAtk) defense += 1;
+                        damage = CalcDamage(dat.baseDamage, offense, defense);
+                        if (damage >= validEnemyTargets[i].currentHP) deathblowList.Add(validEnemyTargets[i]);
+                    }
+                    break;
+                case BattlerActionTarget.TargetSelf:
+                    target = this;
+                    break;
+                case BattlerActionTarget.TargetEndangeredAlly:
+                    target = overseer.currentTurnTarget;
+                    break;
+                case BattlerActionTarget.TargetActingBattler:
+                    target = overseer.standardPriorityActingBattler;
+                    break;
+            }
+            if (overseer.standardPriorityActingBattler == this) overseer.currentTurnTarget = target;
+            if (target != null && !target.isValidTarget) target = null;
         }
-        if (overseer.standardPriorityActingBattler == this) overseer.currentTurnTarget = target;
-        if (target != null && !target.isValidTarget) target = null;
         return target;
     }
 
@@ -207,13 +245,14 @@ public class Battler : MonoBehaviour
                 {
                     while (true)
                     {
-                        _subtargets.Add(validEnemyTargets[Random.Range(0, validEnemyTargets.Count)]);
+                        if (_subtargets.Count <= i) _subtargets.Add(validEnemyTargets[Random.Range(0, validEnemyTargets.Count)]);
+                        else _subtargets[i] = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
                         if (_subtargets[i] != _target) break;
                     }
                     mvec--;
                 }
             }
-            if (mvec > 999) throw new System.Exception("Crashing to escape subtarget acquisition loop. This is bad!");
+
         }
         if (dat.HasEffectFlag(BattlerActionEffectFlags.Drain)) _drainRounds = 1 + _subtargets.Count;
         readiedAction = action;
@@ -314,17 +353,20 @@ public class Battler : MonoBehaviour
                     {
                         if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
                         else defense = validEnemyTargets[i].adventurer.Martial;
+                        if (validEnemyTargets[i].livesOnBackRow && dat.HasEffectFlag(BattlerActionEffectFlags.Melee)) defense++;
                         _damageDealt += validEnemyTargets[i].DealDamage(CalcDamage(_damage, offense, defense));
                     }
                 else if (_target != null)
                 {
                     if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _target.adventurer.Magic;
                     else defense = _target.adventurer.Martial;
+                    if (_target.livesOnBackRow && dat.HasEffectFlag(BattlerActionEffectFlags.Melee)) defense++;
                     _damageDealt += _target.DealDamage(CalcDamage(_damage, offense, defense));
                     for (int i = 0; i < _subtargets.Count; i++)
                     {
                         if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _subtargets[i].adventurer.Magic;
                         else defense = _subtargets[i].adventurer.Martial;
+                        if (_subtargets[i].livesOnBackRow && dat.HasEffectFlag(BattlerActionEffectFlags.Melee)) defense++;
                         _damageDealt += _subtargets[i].DealDamage(CalcDamage(_damage, offense, defense));
                     }
                 }
@@ -538,6 +580,7 @@ public class Battler : MonoBehaviour
         else if (adventurer.special == AdventurerSpecial.Protect) onAllyHitInterruptActions.Add(BattlerAction.Protect);
         if (HasAttack(AdventurerAttack.GetBehindMe)) onAllyDeathblowInterruptActions.Add(BattlerAction.GetBehindMe);
         if (HasAttack(AdventurerAttack.Flanking)) onAllyDeathblowInterruptActions.Add(BattlerAction.Flanking);
+        livesOnBackRow = !Adventurer.ClassIsFrontRowClass(adventurer.advClass);
         puppet.Setup();
     }
 

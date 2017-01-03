@@ -58,6 +58,7 @@ public enum BattlerActionEffectFlags : ulong // these will never be serialized, 
     Haste = 1 << 7,
     Encore = 1 << 8,
     Bodyguard = 1 << 9,
+    Melee = 1 << 10,
     MaxValue = ulong.MaxValue
 }
 
@@ -208,6 +209,9 @@ public struct BattlerActionData
                     break;
                 case "Bodyguard":
                     flags |= BattlerActionEffectFlags.Bodyguard;
+                    break;
+                case "Melee":
+                    flags |= BattlerActionEffectFlags.Melee;
                     break;
                 default:
                     throw new System.NotSupportedException("BattlerActionData entry has a bad flag: " + flagsList[i]);
