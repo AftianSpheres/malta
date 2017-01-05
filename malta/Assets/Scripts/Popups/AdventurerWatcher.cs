@@ -4,9 +4,12 @@ using UnityEngine.UI;
 public class AdventurerWatcher : MonoBehaviour
 {
     public int houseAdventurerIndex;
+    public Color defaultColor;
+    public Color activeColor;
     public Button selfButton;
     public GameObject interior;
     public Image mugshot;
+    public Image panelBG;
     public Text adventurerName;
     public Text adventurerTitle;
     public Text adventurerStats;
@@ -36,6 +39,11 @@ public class AdventurerWatcher : MonoBehaviour
         }
         if (adventurer != null && adventurer.initialized)
         {
+            if (panelBG != null)
+            {
+                if (housePopup.inspectedAdventurer == adventurer) panelBG.color = activeColor;
+                else panelBG.color = defaultColor;
+            }
             if (selfButton != null)
             {
                 selfButton.interactable = (housePopup.inspectedAdventurer != adventurer);

@@ -15,6 +15,9 @@ public class GameDataManager_DataStore
     public AdventurerSpecial sovereignSkill;
     public AdventurerMugshot sovereignMugshot;
     public int housingLevel;
+    public int partyAdventurer0Index;
+    public int partyAdventurer1Index;
+    public int partyAdventurer2Index;
     public bool[] housingUnitUpgrades;
     public string sovereignFirstName;
     public string sovereignLastName;
@@ -102,6 +105,9 @@ public class GameDataManager_DataStore
         pendingUpgradeTimer_Sawmill = 0;
         pendingUpgradeTimer_Smith = 0;
         lastInspectedAdventurerIndex = 0;
+        partyAdventurer0Index = -1;
+        partyAdventurer1Index = -1;
+        partyAdventurer2Index = -1;
         sovereignFirstName = "Dude";
         sovereignLastName = "Huge";
         housingLevel = 0;
@@ -176,7 +182,7 @@ public class GameDataManager : Manager<GameDataManager>
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Sawmill, ref dataStore.buildingLv_Sawmill, ref dataStore.pendingUpgrade_Sawmill, ref dataStore.resPlanks_maxUpgrades);
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Smith, ref dataStore.buildingLv_Smith, ref dataStore.pendingUpgrade_Smith, ref dataStore.resMetal_maxUpgrades);
         }
-        for (int i = 0; i < dataStore.housingLevel; i++) if (!dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, false, Adventurer.GetRandomStatPoint());
+        for (int i = 0; i < dataStore.housingLevel; i++) if (!dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
         if (dataStore.adventureLevel > 1 && (!dataStore.unlock_raceFae || !dataStore.unlock_raceOrc))
         {
             dataStore.unlock_raceFae = true;
@@ -229,7 +235,7 @@ public class GameDataManager : Manager<GameDataManager>
         RecalculateResourceMaximums();
         for (int i = 0; i < dataStore.housingLevel; i++)
         {
-            dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, false, Adventurer.GetRandomStatPoint());
+            dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
         }
         dataStore.sovereignMugshot = (AdventurerMugshot)Random.Range((int)AdventurerMugshot.Sovereign0, (int)AdventurerMugshot.Sovereign7 + 1);
         dataStore.sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });

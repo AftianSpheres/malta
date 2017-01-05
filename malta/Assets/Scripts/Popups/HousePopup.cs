@@ -49,10 +49,8 @@ public class HousePopup : MonoBehaviour
         shell.buttons.CopyTo(sb, 0);
         for (int i = 0; i < GameDataManager.Instance.dataStore.houseAdventurers.Length; i++)
         {
-            GameObject go = Instantiate(advPanelPrototype);
+            GameObject go = (GameObject)Instantiate(advPanelPrototype, transform);
             go.name = "advPanel" + i;
-            go.transform.SetParent(advPanelsParent.transform);
-            go.transform.position = panelPos + Vector3.down * (i * advPanelHeight + advPanelsSpacing);
             houseAdvWatchers[i] = go.GetComponent<AdventurerWatcher>();
             houseAdvWatchers[i].houseAdventurerIndex = i;
             sb[shell.buttons.Length + i] = houseAdvWatchers[i].selfButton;
@@ -164,6 +162,7 @@ public class HousePopup : MonoBehaviour
         if (GameDataManager.Instance.SpendResourcesIfPossible(20, 20, 20))
         {
             housingUnitUpgraded = true;
+            inspectedAdventurer.Promote();
         }
         else
         {
@@ -190,8 +189,15 @@ public class HousePopup : MonoBehaviour
 
     void RecalcScrollRectSize ()
     {
+        for (int i = 0; i < houseAdvWatchers.Length; i++) houseAdvWatchers[i].transform.SetParent(transform, true);
         houseLvCached = GameDataManager.Instance.dataStore.housingLevel;
-        scrollAreaRect.sizeDelta = new Vector2(scrollAreaRect.sizeDelta.x, (GameDataManager.Instance.dataStore.houseAdventurers.Length * advPanelHeight) + (GameDataManager.Instance.dataStore.houseAdventurers.Length - 1 * advPanelsSpacing));
+        scrollAreaRect.sizeDelta = new Vector2(scrollAreaRect.sizeDelta.x, ((GameDataManager.Instance.dataStore.housingLevel) * advPanelHeight) + ((GameDataManager.Instance.dataStore.housingLevel - 1) * advPanelsSpacing));
         scrollAreaRect.anchoredPosition = Vector3.zero;
+        for (int i = 0; i < houseAdvWatchers.Length; i++)
+        {
+            RectTransform rt = houseAdvWatchers[i].transform as RectTransform;
+            rt.SetParent(advPanelsParent.transform, true);
+            rt.anchoredPosition = new Vector2(0, (Mathf.Abs(rt.sizeDelta.y) / 2) - (i * (advPanelHeight + advPanelsSpacing))); // I don't pretend to understand this. rects are a mystery. why can't you be nice and clunky low-level stuff, rects?
+        }
     }
 }
