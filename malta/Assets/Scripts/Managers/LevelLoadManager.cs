@@ -60,15 +60,6 @@ public class LevelLoadManager : Manager<LevelLoadManager>
                 case BuildingType.Mason:
                     topLevelMenuSystem.masonPopup.Open();
                     break;
-                case BuildingType.Mine:
-                    topLevelMenuSystem.minesPopup.Open();
-                    break;
-                case BuildingType.Woodlands:
-                    topLevelMenuSystem.woodlandsPopup.Open();
-                    break;
-                case BuildingType.ClayPit:
-                    topLevelMenuSystem.clayPitPopup.Open();
-                    break;
                 case BuildingType.Tower:
                     topLevelMenuSystem.towerPopup.Open();
                     break;

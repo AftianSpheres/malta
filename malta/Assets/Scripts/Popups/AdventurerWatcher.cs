@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 public class AdventurerWatcher : MonoBehaviour
 {
-    public bool isForgeAdventurer;
     public int houseAdventurerIndex;
+    public Button selfButton;
     public GameObject interior;
     public Image mugshot;
     public Text adventurerName;
@@ -14,6 +14,7 @@ public class AdventurerWatcher : MonoBehaviour
     public Text adventurerSpecial;
     private Adventurer adventurer;
     public TextAsset stringsResource;
+    public HousePopup housePopup;
     private int[] cachedAdventurerStats = { -1, -1, -1, -1 };
     private AdventurerAttack[] cachedAdventurerAttacks = { AdventurerAttack.None, AdventurerAttack.None };
     private AdventurerSpecial cachedAdventurerSpecial = AdventurerSpecial.LoseBattle;
@@ -30,16 +31,20 @@ public class AdventurerWatcher : MonoBehaviour
 	void Update ()
     {
         if (adventurer == null)
-        {
-            if (isForgeAdventurer)
-            {
-                if (GameDataManager.Instance.dataStore.forgeAdventurer != null && GameDataManager.Instance.dataStore.unlock_forgeOutbuilding && !GameDataManager.Instance.dataStore.unlock_Taskmaster) adventurer = GameDataManager.Instance.dataStore.forgeAdventurer;
-            }             
-            else if (GameDataManager.Instance.dataStore.houseAdventurers[houseAdventurerIndex] != null && GameDataManager.Instance.dataStore.housesBuilt[houseAdventurerIndex]) adventurer = GameDataManager.Instance.dataStore.houseAdventurers[houseAdventurerIndex];
+        {     
+            if (GameDataManager.Instance.dataStore.houseAdventurers[houseAdventurerIndex] != null && GameDataManager.Instance.dataStore.housingLevel > houseAdventurerIndex) adventurer = GameDataManager.Instance.dataStore.houseAdventurers[houseAdventurerIndex];
         }
         if (adventurer != null && adventurer.initialized)
         {
-            if (!interior.activeInHierarchy) interior.SetActive(true);
+            if (selfButton != null)
+            {
+                selfButton.interactable = (housePopup.inspectedAdventurer != adventurer);
+            }
+            if (interior != null)
+            {
+                if (!interior.activeInHierarchy) interior.SetActive(true);
+            }
+
             if (adventurerName.text != adventurer.fullName) adventurerName.text = adventurer.fullName;
             if (adventurerTitle.text != adventurer.title) adventurerTitle.text = adventurer.title;
             if (cachedAdventurerMugshot != adventurer.mugshot)
@@ -47,36 +52,51 @@ public class AdventurerWatcher : MonoBehaviour
                 cachedAdventurerMugshot = adventurer.mugshot;
                 mugshot.sprite = adventurer.GetMugshotGraphic();
             }
-            if (cachedAdventurerStats[0] != adventurer.HP || cachedAdventurerStats[1] != adventurer.Martial || cachedAdventurerStats[2] != adventurer.Magic || cachedAdventurerStats[3] != adventurer.Speed)
+            if (adventurerStats != null)
             {
-                cachedAdventurerStats = new int[] { adventurer.HP, adventurer.Martial, adventurer.Magic, adventurer.Speed };
-                adventurerStats.text =  strings[0] + cachedAdventurerStats[0].ToString() + strings[1] + cachedAdventurerStats[1].ToString() + strings[2] +
-                    cachedAdventurerStats[2].ToString() + strings[3] + cachedAdventurerStats[3].ToString();
-            }
-            if (cachedAdventurerSpecial != adventurer.special)
-            {
-                cachedAdventurerSpecial = adventurer.special;
-                adventurerSpecial.text = Adventurer.GetSpecialDescription(cachedAdventurerSpecial);
-            }
-            if (cachedAdventurerAttacks[0] != adventurer.attacks[0] || cachedAdventurerAttacks[1] != adventurer.attacks[1])
-            {
-                cachedAdventurerAttacks = adventurer.attacks.Clone() as AdventurerAttack[];
-                string[] attacksStrings = { "", "" };
-                for (int i = 0; i < cachedAdventurerAttacks.Length && i < 2; i++)
+                if (cachedAdventurerStats[0] != adventurer.HP || cachedAdventurerStats[1] != adventurer.Martial || cachedAdventurerStats[2] != adventurer.Magic || cachedAdventurerStats[3] != adventurer.Speed)
                 {
-                    if (cachedAdventurerAttacks[i] != AdventurerAttack.None)
-                    {
-                        attacksStrings[i] = Adventurer.GetAttackName(cachedAdventurerAttacks[i]);
-                    }
-                    else
-                    {
-                        attacksStrings[i] = "";
-                    }
+                    cachedAdventurerStats = new int[] { adventurer.HP, adventurer.Martial, adventurer.Magic, adventurer.Speed };
+                    adventurerStats.text = strings[0] + cachedAdventurerStats[0].ToString() + strings[1] + cachedAdventurerStats[1].ToString() + strings[2] +
+                        cachedAdventurerStats[2].ToString() + strings[3] + cachedAdventurerStats[3].ToString();
                 }
-                adventurerAttacks.text = attacksStrings[0] + System.Environment.NewLine + attacksStrings[1];
             }
-
+            if (adventurerSpecial != null)
+            {
+                if (cachedAdventurerSpecial != adventurer.special)
+                {
+                    cachedAdventurerSpecial = adventurer.special;
+                    adventurerSpecial.text = Adventurer.GetSpecialDescription(cachedAdventurerSpecial);
+                }
+            }
+            if (adventurerAttacks != null)
+            {
+                if (cachedAdventurerAttacks[0] != adventurer.attacks[0] || cachedAdventurerAttacks[1] != adventurer.attacks[1])
+                {
+                    cachedAdventurerAttacks = adventurer.attacks.Clone() as AdventurerAttack[];
+                    string[] attacksStrings = { "", "" };
+                    for (int i = 0; i < cachedAdventurerAttacks.Length && i < 2; i++)
+                    {
+                        if (cachedAdventurerAttacks[i] != AdventurerAttack.None)
+                        {
+                            attacksStrings[i] = Adventurer.GetAttackName(cachedAdventurerAttacks[i]);
+                        }
+                        else
+                        {
+                            attacksStrings[i] = "";
+                        }
+                    }
+                    adventurerAttacks.text = attacksStrings[0] + System.Environment.NewLine + attacksStrings[1];
+                }
+            }
         }
-        else if (interior.activeInHierarchy) interior.SetActive(false);
+        else if (interior != null && interior.activeInHierarchy) interior.SetActive(false);
 	}
+
+    public void TakeAdvFocus ()
+    {
+        housePopup.inspectedAdventurer = adventurer;
+        housePopup.advIndex = houseAdventurerIndex;
+        GameDataManager.Instance.dataStore.lastInspectedAdventurerIndex = houseAdventurerIndex;
+    }
 }

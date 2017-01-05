@@ -11,9 +11,6 @@ public enum BuildingType
     Sawmill,
     Palace,
     Mason,
-    Mine,
-    Woodlands,
-    ClayPit,
     Tower,
     Portal,
     Forest

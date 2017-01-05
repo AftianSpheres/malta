@@ -11,9 +11,9 @@ public class FakeTownPopup : MonoBehaviour
     public Text fakeTownName;
     public Text metalText;
     public Text planksText;
-    private int cachedLv_ClayPit = -1;
-    private int cachedLv_Mines = -1;
-    private int cachedLv_Woodlands = -1;
+    private int cachedLv_Mason = -1;
+    private int cachedLv_Smith = -1;
+    private int cachedLv_Sawmill = -1;
     private int currentFakeTownIndex = -1;
 
     /// <summary>
@@ -23,7 +23,7 @@ public class FakeTownPopup : MonoBehaviour
     {
         if (GameDataManager.Instance != null)
         {
-            if (cachedLv_ClayPit != GameDataManager.Instance.dataStore.harvestLv_ClayPit || cachedLv_Mines != GameDataManager.Instance.dataStore.harvestLv_Mine || cachedLv_Woodlands != GameDataManager.Instance.dataStore.harvestLv_Woodlands)
+            if (cachedLv_Mason != GameDataManager.Instance.dataStore.buildingLv_Mason || cachedLv_Smith != GameDataManager.Instance.dataStore.buildingLv_Smith || cachedLv_Sawmill != GameDataManager.Instance.dataStore.buildingLv_Sawmill)
             {
                 RefreshFakeNumbersFakelyForFakeTown();
             }
@@ -43,15 +43,15 @@ public class FakeTownPopup : MonoBehaviour
     /// </summary>
     private void RefreshFakeNumbersFakelyForFakeTown ()
     {
-        cachedLv_ClayPit = GameDataManager.Instance.dataStore.harvestLv_ClayPit;
-        cachedLv_Mines = GameDataManager.Instance.dataStore.harvestLv_Mine;
-        cachedLv_Woodlands = GameDataManager.Instance.dataStore.harvestLv_Woodlands;
+        cachedLv_Mason = GameDataManager.Instance.dataStore.buildingLv_Mason;
+        cachedLv_Smith = GameDataManager.Instance.dataStore.buildingLv_Smith;
+        cachedLv_Sawmill = GameDataManager.Instance.dataStore.buildingLv_Sawmill;
         int fakeNo;
-        fakeNo = GameDataManager.Instance.GetResourceGainRate(cachedLv_ClayPit - 1, 4);
+        fakeNo = GameDataManager.Instance.GetResourceGainRate(cachedLv_Mason - 1, 4);
         bricksText.text = fakeNo.ToString() + " / " + (fakeNo / 4).ToString();
-        fakeNo = GameDataManager.Instance.GetResourceGainRate(cachedLv_Mines - 1, 4);
+        fakeNo = GameDataManager.Instance.GetResourceGainRate(cachedLv_Smith - 1, 4);
         metalText.text = fakeNo.ToString() + " / " + (fakeNo / 4).ToString();
-        fakeNo = GameDataManager.Instance.GetResourceGainRate(cachedLv_Woodlands - 1, 4);
+        fakeNo = GameDataManager.Instance.GetResourceGainRate(cachedLv_Sawmill - 1, 4);
         planksText.text = fakeNo.ToString() + " / " + (fakeNo / 4).ToString();
     }
 }

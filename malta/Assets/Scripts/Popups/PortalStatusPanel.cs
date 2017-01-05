@@ -5,16 +5,16 @@ enum PortalNextSteps
 {
     None,
     NoTower,
-    TowerPreLv7_NotEnoughAny,
+    TowerPreLv7_NotEnoughMana,
     TowerPreLv7_ReadyForUpgrade,
-    TowerPreLv7_NotEnoughBrick,
-    TowerPreLv7_NotEnoughMetal,
-    TowerPreLv7_NotEnoughPlanks,
-    TowerLv7_NotEnoughAny,
+    r0,
+    r1,
+    r2,
+    TowerLv7_NotEnoughMana,
     TowerLv7_ReadyForUpgrade,
-    TowerLv7_NotEnoughBrick,
-    TowerLv7_NotEnoughMetal,
-    TowerLv7_NotEnoughPlanks,
+    r3,
+    r4,
+    r5,
     TowerDone
 }
 
@@ -32,12 +32,7 @@ enum PortalStatus
 public class PortalStatusPanel : MonoBehaviour
 {
     public GameObject matsNeededSection;
-    public Text matsNeededBrick;
-    public Text matsNeededClay;
-    public Text matsNeededMetal;
-    public Text matsNeededOre;
-    public Text matsNeededPlanks;
-    public Text matsNeededWood;
+    public Text manaNeeded;
     public Text portalStatusArea;
     public Text portalNextStepsArea;
     public string[] strings;
@@ -128,9 +123,9 @@ public class PortalStatusPanel : MonoBehaviour
 
     private void _in_UpdateProcessing_PortalArea_preLv7()
     {
-        int[] recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
+        int recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
         _in_UpdateProcessing_PortalArea_reqs(ref recs);
-        if (GameDataManager.Instance.CheckMaterialAvailability(recs))
+        if (GameDataManager.Instance.CheckManaAvailability(recs))
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_ReadyForUpgrade)
             {
@@ -138,44 +133,18 @@ public class PortalStatusPanel : MonoBehaviour
                 cachedPortalNextSteps = PortalNextSteps.TowerPreLv7_ReadyForUpgrade;
             }
         }
-        else if (GameDataManager.Instance.dataStore.resBricks >= recs[3] && GameDataManager.Instance.dataStore.resPlanks >= recs[4])
-        {
-            if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_NotEnoughMetal)
-            {
-                portalNextStepsArea.text = strings[13] + " " + strings[18];
-                cachedPortalNextSteps = PortalNextSteps.TowerPreLv7_NotEnoughMetal;
-            }
-
-        }
-        else if (GameDataManager.Instance.dataStore.resMetal >= recs[5] && GameDataManager.Instance.dataStore.resPlanks >= recs[4])
-        {
-            if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_NotEnoughBrick)
-            {
-                portalNextStepsArea.text = strings[13] + " " + strings[17];
-                cachedPortalNextSteps = PortalNextSteps.TowerPreLv7_NotEnoughBrick;
-            }
-        }
-        else if (GameDataManager.Instance.dataStore.resMetal >= recs[5] && GameDataManager.Instance.dataStore.resBricks >= recs[3])
-        {
-            if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_NotEnoughPlanks)
-            {
-                portalNextStepsArea.text = strings[13] + " " + strings[19];
-                cachedPortalNextSteps = PortalNextSteps.TowerPreLv7_NotEnoughPlanks;
-            }
-
-        }
-        else if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_NotEnoughAny)
+        else if (cachedPortalNextSteps != PortalNextSteps.TowerPreLv7_NotEnoughMana)
         {
             portalNextStepsArea.text = strings[13] + " " + strings[16];
-            cachedPortalNextSteps = PortalNextSteps.TowerPreLv7_NotEnoughAny;
+            cachedPortalNextSteps = PortalNextSteps.TowerPreLv7_NotEnoughMana;
         }
     }
 
     private void _in_UpdateProcessing_PortalArea_postLv7()
     {
-        int[] recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
+        int recs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
         _in_UpdateProcessing_PortalArea_reqs(ref recs);
-        if (GameDataManager.Instance.CheckMaterialAvailability(recs))
+        if (GameDataManager.Instance.CheckManaAvailability(recs))
         {
             if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_ReadyForUpgrade)
             {
@@ -183,46 +152,15 @@ public class PortalStatusPanel : MonoBehaviour
                 cachedPortalNextSteps = PortalNextSteps.TowerLv7_ReadyForUpgrade;
             }
         }
-        else if (GameDataManager.Instance.dataStore.resBricks >= recs[3] && GameDataManager.Instance.dataStore.resPlanks >= recs[4])
-        {
-            if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_NotEnoughMetal)
-            {
-                portalNextStepsArea.text = strings[14] + " " + strings[18];
-                cachedPortalNextSteps = PortalNextSteps.TowerLv7_NotEnoughMetal;
-            }
-
-        }
-        else if (GameDataManager.Instance.dataStore.resMetal >= recs[5] && GameDataManager.Instance.dataStore.resPlanks >= recs[4])
-        {
-            if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_NotEnoughBrick)
-            {
-                portalNextStepsArea.text = strings[14] + " " + strings[17];
-                cachedPortalNextSteps = PortalNextSteps.TowerLv7_NotEnoughBrick;
-            }
-        }
-        else if (GameDataManager.Instance.dataStore.resMetal >= recs[5] && GameDataManager.Instance.dataStore.resBricks >= recs[3])
-        {
-            if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_NotEnoughPlanks)
-            {
-                portalNextStepsArea.text = strings[14] + " " + strings[19];
-                cachedPortalNextSteps = PortalNextSteps.TowerLv7_NotEnoughPlanks;
-            }
-
-        }
-        else if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_NotEnoughAny)
+        else if (cachedPortalNextSteps != PortalNextSteps.TowerLv7_NotEnoughMana)
         {
             portalNextStepsArea.text = strings[14] + " " + strings[16];
-            cachedPortalNextSteps = PortalNextSteps.TowerLv7_NotEnoughAny;
+            cachedPortalNextSteps = PortalNextSteps.TowerLv7_NotEnoughMana;
         }
     }
 
-    private void _in_UpdateProcessing_PortalArea_reqs(ref int[] reqs)
+    private void _in_UpdateProcessing_PortalArea_reqs(ref int m)
     {
-        matsNeededClay.text = reqs[0].ToString();
-        matsNeededWood.text = reqs[1].ToString();
-        matsNeededOre.text = reqs[2].ToString();
-        matsNeededBrick.text = reqs[3].ToString();
-        matsNeededMetal.text = reqs[4].ToString();
-        matsNeededPlanks.text = reqs[5].ToString();
+        manaNeeded.text = m.ToString();
     }
 }

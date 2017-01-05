@@ -67,7 +67,7 @@ public class SovereignSpecialPopup : MonoBehaviour
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.CalledShots);
             shell.Close();
         }
-        else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5, 5, 5, 5))
+        else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5))
         {
             GameDataManager.Instance.dataStore.unlock_sovSpe_CalledShots = true;
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.CalledShots);
@@ -87,7 +87,7 @@ public class SovereignSpecialPopup : MonoBehaviour
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.HammerSmash);
             shell.Close();
         }
-        else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5, 5, 5, 5))
+        else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5))
         {
             GameDataManager.Instance.dataStore.unlock_sovSpe_HammerSmash = true;
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.HammerSmash);
@@ -107,7 +107,7 @@ public class SovereignSpecialPopup : MonoBehaviour
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.Protect);
             shell.Close();
         }
-        else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5, 5, 5, 5))
+        else if (GameDataManager.Instance.SpendResourcesIfPossible(5, 5, 5))
         {
             GameDataManager.Instance.dataStore.unlock_sovSpe_Protect = true;
             GameDataManager.Instance.SetSovereignSpecial(AdventurerSpecial.Protect);

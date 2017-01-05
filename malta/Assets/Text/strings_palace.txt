@@ -13,11 +13,11 @@ The portal is still, like the surface of a placid lake. You can see into another
 It's not clear what you'd need to do to activate the portal. Maybe a wizard might have the means to do so, though...?
 The Wizard's Tower seems like it's connected to the portal somehow...
 The portal seems like it's nearly ready for use. Just a little more!
-You have the resources to upgrade the Wizard's Tower.
-You'll need to wait for some more resources, though.
-You're short on bricks. Try upgrading the Mason.
-You're short on metal. Try upgrading the Blacksmith.
-You're short on planks. Try upgrading the Sawmill.
+You have the mana to upgrade the Wizard's Tower.
+You'll need more mana to upgrade the Wizard's Tower.
+
+
+
 The portal is ready. All that remains is to activate it.
 It's said that this portal is a gate to another world... but it doesn't seem to be usable right now.
 The portal has opened. All you need do now is step through.

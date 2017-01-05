@@ -7,15 +7,12 @@ enum ForgeStatus
     NoUpgrades,
     AtLeastOneUpgrade,
     ReadyForOutbuilding,
-    Outbuilding_Adventurer,
     Outbuilding_Taskmaster
 }
 
 public class ForgePopup : MonoBehaviour
 {
     public PopupMenu shell;
-    public GameObject adventurerArea;
-    public GameObject adventurerButton;
     public GameObject bowmanButton;
     public GameObject explainArea;
     public GameObject footmanButton;
@@ -24,7 +21,6 @@ public class ForgePopup : MonoBehaviour
     public GameObject taskmasterButton;
     public GameObject wizardButton;
     public PopupMenu insufficientResourcesPopup;
-    public Text[] adventurerButtonReqsLabels;
     public Text[] bowmanButtonReqsLabels;
     public Text[] footmanButtonReqsLabels;
     public Text[] sageButtonReqsLabels;
@@ -73,19 +69,11 @@ public class ForgePopup : MonoBehaviour
                     break;
                 case ForgeStatus.ReadyForOutbuilding:
                     ConformClassUpgradeButtonsToGameState();
-                    if (!adventurerButton.activeInHierarchy) adventurerButton.SetActive(true);
                     if (!taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(true);
                     _in_FuckingAwfulSwitchStatement(0);
                     break;
-                case ForgeStatus.Outbuilding_Adventurer:
-                    ConformClassUpgradeButtonsToGameState();
-                    if (adventurerButton.activeInHierarchy) adventurerButton.SetActive(false);
-                    if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
-                    if (!adventurerArea.activeInHierarchy) adventurerArea.SetActive(true);
-                    break;
                 case ForgeStatus.Outbuilding_Taskmaster:
                     ConformClassUpgradeButtonsToGameState();
-                    if (adventurerButton.activeInHierarchy) adventurerButton.SetActive(false);
                     if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
                     if (!taskmasterArea.activeInHierarchy) taskmasterArea.SetActive(true);
                     break;
@@ -102,7 +90,6 @@ public class ForgePopup : MonoBehaviour
         if (GameDataManager.Instance.dataStore.unlock_forgeOutbuilding)
         {
             if (GameDataManager.Instance.dataStore.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
-            else status = ForgeStatus.Outbuilding_Adventurer;
             RefreshReqsLabels();
         }
         else if (GameDataManager.Instance.dataStore.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.dataStore.mysticClassUnlock != AdventurerClass.Mystic && steps > 0)
@@ -147,22 +134,7 @@ public class ForgePopup : MonoBehaviour
         int[] costs = TownBuilding.GetUpgradeCost_Forge();
         for (int i = 0; i < costs.Length; i++)
         {
-            adventurerButtonReqsLabels[i].text = bowmanButtonReqsLabels[i].text = footmanButtonReqsLabels[i].text = 
-                sageButtonReqsLabels[i].text = taskmasterButtonReqsLabels[i].text = wizardButtonReqsLabels[i].text = costs[i].ToString();
-        }
-    }
-
-    public void BuildAdventurerQuartersButtonInteraction ()
-    {
-        int[] costs = TownBuilding.GetUpgradeCost_Forge();
-        if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
-        {
-            townBuilding.BuildOutbuilding();
-        }
-        else
-        {
-            shell.SurrenderFocus();
-            insufficientResourcesPopup.Open();
+            bowmanButtonReqsLabels[i].text = footmanButtonReqsLabels[i].text = sageButtonReqsLabels[i].text = taskmasterButtonReqsLabels[i].text = wizardButtonReqsLabels[i].text = costs[i].ToString();
         }
     }
     
@@ -171,7 +143,7 @@ public class ForgePopup : MonoBehaviour
         int[] costs = TownBuilding.GetUpgradeCost_Forge();
         if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
         {
-            townBuilding.BuildOutbuilding(true);
+            townBuilding.BuildOutbuilding();
         }
         else
         {

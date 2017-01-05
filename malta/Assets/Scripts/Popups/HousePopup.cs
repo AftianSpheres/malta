@@ -4,7 +4,14 @@ using System.Collections;
 
 public class HousePopup : MonoBehaviour
 {
-    public TownBuilding associatedHouse;
+    public RectTransform scrollAreaRect;
+    public GameObject advPanelPrototype;
+    public GameObject advPanelsParent;
+    public AdventurerWatcher[] houseAdvWatchers;
+    public Adventurer inspectedAdventurer;
+    public int advIndex;
+    const float advPanelHeight = 60.6f;
+    const float advPanelsSpacing = 4;
     public PopupMenu shell;
     public PopupMenu insufficientResourcesPopup;
     public RetrainPopup retrainPopup;
@@ -24,52 +31,73 @@ public class HousePopup : MonoBehaviour
     private int adventurerMartialCached;
     private int adventurerMagicCached;
     private int adventurerSpeedCached;
+    private int houseLvCached;
     private AdventurerAttack[] adventurerAttacksCached;
     private AdventurerSpecial adventurerSpecialCached = AdventurerSpecial.UninitializedValue;
     private AdventurerMugshot cachedAdventurerMugshot;
     private string cachedName;
     private string[] strings;
+    private bool housingUnitUpgraded { get { return GameDataManager.Instance.dataStore.housingUnitUpgrades[advIndex]; } set { GameDataManager.Instance.dataStore.housingUnitUpgrades[advIndex] = value; } }
 
 	// Use this for initialization
 	void Start ()
     {
-        strings = stringsResource.text.Split('\n');
+        strings = stringsResource.text.Split('\n');    
+        houseAdvWatchers = new AdventurerWatcher[GameDataManager.Instance.dataStore.houseAdventurers.Length];
+        Vector3 panelPos = advPanelPrototype.transform.position;
+        Button[] sb = new Button[shell.buttons.Length + houseAdvWatchers.Length];
+        shell.buttons.CopyTo(sb, 0);
+        for (int i = 0; i < GameDataManager.Instance.dataStore.houseAdventurers.Length; i++)
+        {
+            GameObject go = Instantiate(advPanelPrototype);
+            go.name = "advPanel" + i;
+            go.transform.SetParent(advPanelsParent.transform);
+            go.transform.position = panelPos + Vector3.down * (i * advPanelHeight + advPanelsSpacing);
+            houseAdvWatchers[i] = go.GetComponent<AdventurerWatcher>();
+            houseAdvWatchers[i].houseAdventurerIndex = i;
+            sb[shell.buttons.Length + i] = houseAdvWatchers[i].selfButton;
+        }
+        shell.buttons = sb;
+        advPanelPrototype.SetActive(false);
+        RecalcScrollRectSize();
+        inspectedAdventurer = GameDataManager.Instance.dataStore.houseAdventurers[GameDataManager.Instance.dataStore.lastInspectedAdventurerIndex];
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
+        if (GameDataManager.Instance.dataStore.housingLevel != houseLvCached) RecalcScrollRectSize();
         if (outbuildingButton != null)
         {
-            if (associatedHouse.hasOutbuilding && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
-            else if (!associatedHouse.hasOutbuilding && !outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(true);
+            if (housingUnitUpgraded && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
+            else if (!housingUnitUpgraded && !outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(true);
         }
-        if (associatedHouse.associatedAdventurer.fullName != cachedName)
+        if (inspectedAdventurer.fullName != cachedName)
         {
-            cachedName = associatedHouse.associatedAdventurer.fullName;
-            nameLabel.text = strings[4] + associatedHouse.associatedAdventurer.fullName;
+            cachedName = inspectedAdventurer.fullName;
+            nameLabel.text = strings[4] + inspectedAdventurer.fullName;
         }
-        if (cachedAdventurerMugshot != associatedHouse.associatedAdventurer.mugshot)
+        if (cachedAdventurerMugshot != inspectedAdventurer.mugshot)
         {
-            cachedAdventurerMugshot = associatedHouse.associatedAdventurer.mugshot;
-            mugshot.sprite = associatedHouse.associatedAdventurer.GetMugshotGraphic();
+            cachedAdventurerMugshot = inspectedAdventurer.mugshot;
+            mugshot.sprite = inspectedAdventurer.GetMugshotGraphic();
         }
-        if (associatedHouse.associatedAdventurer.title != titleLabel.text) titleLabel.text = associatedHouse.associatedAdventurer.title;
-        if (adventurerHPCached != associatedHouse.associatedAdventurer.HP || adventurerMartialCached != associatedHouse.associatedAdventurer.Martial
-        || adventurerMagicCached != associatedHouse.associatedAdventurer.Magic || adventurerSpeedCached != associatedHouse.associatedAdventurer.Speed)
+        if (inspectedAdventurer.title != titleLabel.text) titleLabel.text = inspectedAdventurer.title;
+        if (adventurerHPCached != inspectedAdventurer.HP || adventurerMartialCached != inspectedAdventurer.Martial
+        || adventurerMagicCached != inspectedAdventurer.Magic || adventurerSpeedCached != inspectedAdventurer.Speed)
         {
-            adventurerHPCached = associatedHouse.associatedAdventurer.HP;
-            adventurerMartialCached = associatedHouse.associatedAdventurer.Martial;
-            adventurerMagicCached = associatedHouse.associatedAdventurer.Magic;
-            adventurerSpeedCached = associatedHouse.associatedAdventurer.Speed;
+            adventurerHPCached = inspectedAdventurer.HP;
+            adventurerMartialCached = inspectedAdventurer.Martial;
+            adventurerMagicCached = inspectedAdventurer.Magic;
+            adventurerSpeedCached = inspectedAdventurer.Speed;
             statsLabel.text = strings[0] + adventurerHPCached.ToString() + strings[1] + adventurerMartialCached.ToString() + strings[2] + adventurerMagicCached.ToString() + strings[3] + adventurerSpeedCached.ToString(); 
         }
         bool attacksChanged = false;
-        if (adventurerAttacksCached == null || adventurerAttacksCached.Length != associatedHouse.associatedAdventurer.attacks.Length) attacksChanged = true;
+        if (adventurerAttacksCached == null || adventurerAttacksCached.Length != inspectedAdventurer.attacks.Length) attacksChanged = true;
         else
         {
 #pragma warning disable 162 // VS reports a false-alarm unreachable code warning on the next line because of the compound loop conditional, so we silence that - and, yes, it is a false alarm
-            for (int i = 0; (i < adventurerAttacksCached.Length && i < associatedHouse.associatedAdventurer.attacks.Length); i++)
+            for (int i = 0; (i < adventurerAttacksCached.Length && i < inspectedAdventurer.attacks.Length); i++)
 #pragma warning restore 162 // because we _do_ want to know if unreachable code is detected, it's just not actually present there
             {
                 attacksChanged = true;
@@ -79,12 +107,12 @@ public class HousePopup : MonoBehaviour
         if (attacksChanged)
         {
             string[] attacksStrings = { "", "", "" };
-            adventurerAttacksCached = associatedHouse.associatedAdventurer.attacks;
+            adventurerAttacksCached = inspectedAdventurer.attacks;
             for (int i = 0; i < adventurerAttacksCached.Length && i < 3; i++)
             {
-                if (associatedHouse.associatedAdventurer.attacks[i] != AdventurerAttack.None)
+                if (inspectedAdventurer.attacks[i] != AdventurerAttack.None)
                 {
-                    attacksStrings[i] = Adventurer.GetAttackName(associatedHouse.associatedAdventurer.attacks[i]);
+                    attacksStrings[i] = Adventurer.GetAttackName(inspectedAdventurer.attacks[i]);
                 }
                 else
                 {
@@ -93,18 +121,18 @@ public class HousePopup : MonoBehaviour
             }
             attacksLabel.text = attacksStrings[0] + '\n' + attacksStrings[1] + '\n' + attacksStrings[2];
         }
-        if (adventurerSpecialCached != associatedHouse.associatedAdventurer.special)
+        if (adventurerSpecialCached != inspectedAdventurer.special)
         {
-            adventurerSpecialCached = associatedHouse.associatedAdventurer.special;
+            adventurerSpecialCached = inspectedAdventurer.special;
             specialLabel.text = Adventurer.GetSpecialDescription(adventurerSpecialCached);
         }
         if (awakenButton != null)
         {
-            if (associatedHouse.associatedAdventurer.isElite)
+            if (inspectedAdventurer.isElite)
             {
-                if ((associatedHouse.associatedAdventurer.awakened == awakenButton.gameObject.activeSelf))
+                if ((inspectedAdventurer.awakened == awakenButton.gameObject.activeSelf))
                 {
-                    awakenButton.gameObject.SetActive(!associatedHouse.associatedAdventurer.awakened);
+                    awakenButton.gameObject.SetActive(!inspectedAdventurer.awakened);
                     awakenedLabel.gameObject.SetActive(!awakenButton.gameObject.activeSelf);
                 }
             }
@@ -114,28 +142,28 @@ public class HousePopup : MonoBehaviour
                 awakenedLabel.gameObject.SetActive(false);
             }
         }
-        if (biography.text != associatedHouse.associatedAdventurer.bioText) biography.text = associatedHouse.associatedAdventurer.bioText;
+        if (biography.text != inspectedAdventurer.bioText) biography.text = inspectedAdventurer.bioText;
 	}
 
     public void OpenRetrainPopup()
     {
         retrainPopup.shell.Open();
-        retrainPopup.associatedAdventurer = associatedHouse.associatedAdventurer;
+        retrainPopup.associatedAdventurer = inspectedAdventurer;
         shell.SurrenderFocus();
     }
 
     public void OpenEvictPopup()
     {
         evictPopup.shell.Open();
-        evictPopup.associatedAdventurer = associatedHouse.associatedAdventurer;
+        evictPopup.associatedAdventurer = inspectedAdventurer;
         shell.SurrenderFocus();
     }
 
     public void AddOutbuilding()
     {
-        if (GameDataManager.Instance.SpendResourcesIfPossible(0, 0, 0, 20, 20, 20))
+        if (GameDataManager.Instance.SpendResourcesIfPossible(20, 20, 20))
         {
-            associatedHouse.BuildOutbuilding();
+            housingUnitUpgraded = true;
         }
         else
         {
@@ -146,11 +174,11 @@ public class HousePopup : MonoBehaviour
 
     public void AwakenAdventurer ()
     {
-        if (!associatedHouse.associatedAdventurer.awakened)
+        if (!inspectedAdventurer.awakened)
         {
             if (GameDataManager.Instance.SpendResourcesIfPossible(Adventurer.awakeningCosts))
             {
-                associatedHouse.associatedAdventurer.Awaken();
+                inspectedAdventurer.Awaken();
             }
             else
             {
@@ -158,5 +186,12 @@ public class HousePopup : MonoBehaviour
                 insufficientResourcesPopup.Open();
             }
         }
+    }
+
+    void RecalcScrollRectSize ()
+    {
+        houseLvCached = GameDataManager.Instance.dataStore.housingLevel;
+        scrollAreaRect.sizeDelta = new Vector2(scrollAreaRect.sizeDelta.x, (GameDataManager.Instance.dataStore.houseAdventurers.Length * advPanelHeight) + (GameDataManager.Instance.dataStore.houseAdventurers.Length - 1 * advPanelsSpacing));
+        scrollAreaRect.anchoredPosition = Vector3.zero;
     }
 }

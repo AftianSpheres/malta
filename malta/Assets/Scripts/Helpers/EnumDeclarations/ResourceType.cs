@@ -2,9 +2,7 @@
 {
     None,
     Bricks,
-    Clay,
     Metal,
-    Ore,
     Planks,
-    Lumber
+    Mana
 }

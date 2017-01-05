@@ -7,9 +7,7 @@ public class TowerPopup : MonoBehaviour
     public PopupMenu insufficientResourcesPopup;
     public Text headerLabel;
     public Text infoLabel;
-    public Text resBrickNo;
-    public Text resMetalNo;
-    public Text resPlankNo;
+    public Text resManaNo;
     public TextAsset stringsResource;
     public GameObject upgradeButton;
     private int cachedWizardsTowerLv = -1;
@@ -36,18 +34,15 @@ public class TowerPopup : MonoBehaviour
                 cachedWizardsTowerLv = GameDataManager.Instance.dataStore.buildingLv_WizardsTower;
                 headerLabel.text = strings[0] + cachedWizardsTowerLv.ToString();
                 infoLabel.text = strings[baseResGainStringIndex + cachedWizardsTowerLv]; 
-                int[] costs = TownBuilding.GetUpgradeCost_WizardsTower(cachedWizardsTowerLv);
-                resBrickNo.text = costs[3].ToString();
-                resPlankNo.text = costs[4].ToString();
-                resMetalNo.text = costs[5].ToString();
+                resManaNo.text = TownBuilding.GetUpgradeCost_WizardsTower(cachedWizardsTowerLv).ToString();
             }
         }
 	}
 
     public void UpgradeButtonInteraction ()
     {
-        int[] costs = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
-        if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
+        int cost = TownBuilding.GetUpgradeCost_WizardsTower(GameDataManager.Instance.dataStore.buildingLv_WizardsTower);
+        if (GameDataManager.Instance.SpendManaIfPossible(cost))
         {
             if (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]) GameDataManager.Instance.dataStore.buildingLv_WizardsTower++;
         }

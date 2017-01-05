@@ -9,11 +9,8 @@ public class DocksPopup : MonoBehaviour
     public Text infoArea;
     public Text timerArea;
     public Text bricksCount;
-    public Text clayCount;
     public Text metalCount;
-    public Text oreCount;
     public Text planksCount;
-    public Text woodCount;
     public PopupMenu insufficientResourcesPopup;
     public TextAsset stringsResource;
     private string[] strings;
@@ -92,12 +89,9 @@ public class DocksPopup : MonoBehaviour
                 {
                     if (!upgradeButton.activeInHierarchy) upgradeButton.SetActive(true);
                     int[] costs = TownBuilding.GetUpgradeCost_Docks(GameDataManager.Instance.dataStore.buildingLv_Docks);
-                    clayCount.text = costs[0].ToString();
-                    woodCount.text = costs[1].ToString();
-                    oreCount.text = costs[2].ToString();
-                    bricksCount.text = costs[3].ToString();
-                    planksCount.text = costs[4].ToString();
-                    metalCount.text = costs[5].ToString();
+                    bricksCount.text = costs[0].ToString();
+                    planksCount.text = costs[1].ToString();
+                    metalCount.text = costs[2].ToString();
                 }
                 else if (upgradeButton.activeInHierarchy) upgradeButton.SetActive(false);
             }

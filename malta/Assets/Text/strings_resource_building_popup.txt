@@ -1,9 +1,9 @@
 Mason, 
 Smith, 
 Sawmill, 
-Clay Pit, 
-Mines, 
-Woodlands, 
+
+
+
 Level 
 No upgrade in progress
 Building is at max level
@@ -16,16 +16,16 @@ Storage capacity:
 Upgrade Mason
 Upgrade Smith
 Upgrade Sawmill
-Upgrade Clay Pit
-Upgrade Mines
-Upgrade Woodlands
+
+
+
 [
- clay]
- ore]
- wood]
- clay, 
- ore, 
- wood, 
+
+
+
+
+
+
  bricks]
  metal]
  planks]

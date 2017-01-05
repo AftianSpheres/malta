@@ -25,12 +25,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return GameDataManager.Instance.dataStore.pendingUpgrade_Smith;
                 case BuildingType.Sawmill:
                     return GameDataManager.Instance.dataStore.pendingUpgrade_Sawmill;
-                case BuildingType.ClayPit:
-                    return GameDataManager.Instance.dataStore.pendingUpgrade_ClayPit;
-                case BuildingType.Mine:
-                    return GameDataManager.Instance.dataStore.pendingUpgrade_Mine;
-                case BuildingType.Woodlands:
-                    return GameDataManager.Instance.dataStore.pendingUpgrade_Woodlands;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -46,12 +40,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return GameDataManager.Instance.dataStore.buildingLv_Smith;
                 case BuildingType.Sawmill:
                     return GameDataManager.Instance.dataStore.buildingLv_Sawmill;
-                case BuildingType.ClayPit:
-                    return GameDataManager.Instance.dataStore.harvestLv_ClayPit;
-                case BuildingType.Mine:
-                    return GameDataManager.Instance.dataStore.harvestLv_Mine;
-                case BuildingType.Woodlands:
-                    return GameDataManager.Instance.dataStore.harvestLv_Woodlands;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -69,12 +57,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return 1;
                 case BuildingType.Sawmill:
                     return 2;
-                case BuildingType.ClayPit:
-                    return 3;
-                case BuildingType.Mine:
-                    return 4;
-                case BuildingType.Woodlands:
-                    return 5;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -92,12 +74,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return 16;
                 case BuildingType.Sawmill:
                     return 17;
-                case BuildingType.ClayPit:
-                    return 18;
-                case BuildingType.Mine:
-                    return 19;
-                case BuildingType.Woodlands:
-                    return 20;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -115,12 +91,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return GameDataManager.Instance.dataStore.resMetal_maxUpgrades;
                 case BuildingType.Sawmill:
                     return GameDataManager.Instance.dataStore.resPlanks_maxUpgrades;
-                case BuildingType.ClayPit:
-                    return GameDataManager.Instance.dataStore.resClay_maxUpgrades;
-                case BuildingType.Mine:
-                    return GameDataManager.Instance.dataStore.resOre_maxUpgrades;
-                case BuildingType.Woodlands:
-                    return GameDataManager.Instance.dataStore.resLumber_maxUpgrades;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -138,12 +108,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return GameDataManager.Instance.dataStore.pendingUpgradeTimer_Smith;
                 case BuildingType.Sawmill:
                     return GameDataManager.Instance.dataStore.pendingUpgradeTimer_Sawmill;
-                case BuildingType.ClayPit:
-                    return GameDataManager.Instance.dataStore.pendingUpgradeTimer_ClayPit;
-                case BuildingType.Mine:
-                    return GameDataManager.Instance.dataStore.pendingUpgradeTimer_Mine;
-                case BuildingType.Woodlands:
-                    return GameDataManager.Instance.dataStore.pendingUpgradeTimer_Woodlands;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -161,12 +125,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return GameDataManager.Instance.dataStore.resMetal_max;
                 case BuildingType.Sawmill:
                     return GameDataManager.Instance.dataStore.resPlanks_max;
-                case BuildingType.ClayPit:
-                    return GameDataManager.Instance.dataStore.resClay_max;
-                case BuildingType.Mine:
-                    return GameDataManager.Instance.dataStore.resOre_max;
-                case BuildingType.Woodlands:
-                    return GameDataManager.Instance.dataStore.resLumber_max;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -184,12 +142,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return GameDataManager.Instance.dataStore.resMetal;
                 case BuildingType.Sawmill:
                     return GameDataManager.Instance.dataStore.resPlanks;
-                case BuildingType.ClayPit:
-                    return GameDataManager.Instance.dataStore.resClay;
-                case BuildingType.Mine:
-                    return GameDataManager.Instance.dataStore.resOre;
-                case BuildingType.Woodlands:
-                    return GameDataManager.Instance.dataStore.resLumber;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -207,12 +159,6 @@ public class ResourceBuildingPopup : MonoBehaviour
                     return ResourceType.Metal;
                 case BuildingType.Sawmill:
                     return ResourceType.Planks;
-                case BuildingType.ClayPit:
-                    return ResourceType.Clay;
-                case BuildingType.Mine:
-                    return ResourceType.Ore;
-                case BuildingType.Woodlands:
-                    return ResourceType.Lumber;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
             }
@@ -227,52 +173,16 @@ public class ResourceBuildingPopup : MonoBehaviour
             switch (buildingType)
             {
                 case BuildingType.Mason:
-                case BuildingType.ClayPit:
                     costs = TownBuilding.GetCapUpCost_MasonClaypit(buildingLv);
-                    if (costs[3] == 0) // no brick cost
-                    {
-                        line1 = strings[21] + costs[0].ToString() + strings[22];
-                    }
-                    else if (costs[0] == 0)
-                    {
-                        line1 = strings[21] + costs[3].ToString() + strings[28];
-                    }
-                    else
-                    {
-                        line1 = strings[21] + costs[0].ToString() + strings[25] + costs[3].ToString() + strings[28];
-                    }
+                    line1 = strings[21] + costs[0].ToString() + strings[28];
                     break;
                 case BuildingType.Smith:
-                case BuildingType.Mine:
                     costs = TownBuilding.GetCapUpCost_SmithMines(buildingLv);
-                    if (costs[5] == 0)
-                    {
-                        line1 = strings[21] + costs[2].ToString() + strings[23];
-                    }
-                    else if (costs[2] == 0)
-                    {
-                        line1 = strings[21] + costs[5].ToString() + strings[29];
-                    }
-                    else
-                    {
-                        line1 = strings[21] + costs[2].ToString() + strings[26] + costs[5].ToString() + strings[29];
-                    }
+                    line1 = strings[21] + costs[2].ToString() + strings[29];
                     break;
                 case BuildingType.Sawmill:
-                case BuildingType.Woodlands:
                     costs = TownBuilding.GetCapUpCost_SawmillWoodlands(buildingLv);
-                    if (costs[4] == 0)
-                    {
-                        line1 = strings[21] + costs[1].ToString() + strings[24];
-                    }
-                    else if (costs[1] == 0)
-                    {
-                        line1 = strings[21] + costs[4].ToString() + strings[30];
-                    }
-                    else
-                    {
-                        line1 = strings[21] + costs[1].ToString() + strings[27] + costs[4].ToString() + strings[30];
-                    }
+                    line1 = strings[21] + costs[1].ToString() + strings[30];
                     break;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
@@ -289,52 +199,16 @@ public class ResourceBuildingPopup : MonoBehaviour
             switch (buildingType)
             {
                 case BuildingType.Mason:
-                case BuildingType.ClayPit:
                     costs = TownBuilding.GetUpgradeCost_MasonClaypit(buildingLv);
-                    if (costs[3] == 0) // no brick cost
-                    {
-                        line1 = strings[21] + costs[0].ToString() + strings[22];
-                    }
-                    else if (costs[0] == 0)
-                    {
-                        line1 = strings[21] + costs[3].ToString() + strings[28];
-                    }
-                    else
-                    {
-                        line1 = strings[21] + costs[0].ToString() + strings[25] + costs[3].ToString() + strings[28];
-                    }
+                    line1 = strings[21] + costs[0].ToString() + strings[28];
                     break;
                 case BuildingType.Smith:
-                case BuildingType.Mine:
                     costs = TownBuilding.GetUpgradeCost_SmithMines(buildingLv);
-                    if (costs[5] == 0)
-                    {
-                        line1 = strings[21] + costs[2].ToString() + strings[23];
-                    }
-                    else if (costs[2] == 0)
-                    {
-                        line1 = strings[21] + costs[5].ToString() + strings[29];
-                    }
-                    else
-                    {
-                        line1 = strings[21] + costs[2].ToString() + strings[26] + costs[5].ToString() + strings[29];
-                    }
+                    line1 = strings[21] + costs[2].ToString() + strings[29];
                     break;
                 case BuildingType.Sawmill:
-                case BuildingType.Woodlands:
                     costs = TownBuilding.GetUpgradeCost_SawmillWoodlands(buildingLv);
-                    if (costs[4] == 0)
-                    {
-                        line1 = strings[21] + costs[1].ToString() + strings[24];
-                    }
-                    else if (costs[1] == 0)
-                    {
-                        line1 = strings[21] + costs[4].ToString() + strings[30];
-                    }
-                    else
-                    {
-                        line1 = strings[21] + costs[1].ToString() + strings[27] + costs[4].ToString() + strings[30];
-                    }
+                    line1 = strings[21] + costs[1].ToString() + strings[30];
                     break;
                 default:
                     throw new System.Exception("Opened resource building popup with bad buildingtype: " + buildingType.ToString());
@@ -402,15 +276,12 @@ public class ResourceBuildingPopup : MonoBehaviour
         switch (buildingType)
         {
             case BuildingType.Mason:
-            case BuildingType.ClayPit:
                 costs = TownBuilding.GetCapUpCost_MasonClaypit(buildingLv);
                 break;
             case BuildingType.Smith:
-            case BuildingType.Mine:
                 costs = TownBuilding.GetCapUpCost_SmithMines(buildingLv);
                 break;
             case BuildingType.Sawmill:
-            case BuildingType.Woodlands:
                 costs = TownBuilding.GetCapUpCost_SawmillWoodlands(buildingLv);
                 break;
             default:
@@ -435,15 +306,12 @@ public class ResourceBuildingPopup : MonoBehaviour
             switch (buildingType)
             {
                 case BuildingType.Mason:
-                case BuildingType.ClayPit:
                     costs = TownBuilding.GetUpgradeCost_MasonClaypit(buildingLv);
                     break;
                 case BuildingType.Smith:
-                case BuildingType.Mine:
                     costs = TownBuilding.GetUpgradeCost_SmithMines(buildingLv);
                     break;
                 case BuildingType.Sawmill:
-                case BuildingType.Woodlands:
                     costs = TownBuilding.GetUpgradeCost_SawmillWoodlands(buildingLv);
                     break;
                 default:

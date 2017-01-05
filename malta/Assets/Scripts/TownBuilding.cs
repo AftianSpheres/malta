@@ -21,9 +21,7 @@ public class TownBuilding : MonoBehaviour
     public int nonUniqueBuildingsIndex;
     public PopupMenu[] associatedPopups;
     public HousePopup housePopup;
-    public BuildHousePopup buildHousePopup;
     public BuildingType buildingType;
-    public Adventurer associatedAdventurer;
     new public BoxCollider2D collider;
     public SpriteRenderer spriteRenderer;
     public Sprite[] buildingSprites;
@@ -33,31 +31,13 @@ public class TownBuilding : MonoBehaviour
     public bool forgeOutbuildingIsKobold;
     private AdventurerClass _cachedAdvClass;
     private bool buildingAlteredSinceLastUpdate = true;
-    private bool _adventurerUnlocked { get { if (buildingType == BuildingType.House) return GameDataManager.Instance.dataStore.housesBuilt[nonUniqueBuildingsIndex]; else return GameDataManager.Instance.dataStore.unlock_forgeOutbuilding && !GameDataManager.Instance.dataStore.unlock_Taskmaster; } }
 
     // Update is called once per frame
     void Update ()
     {
         if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
         {  
-            if (buildingType == BuildingType.House || buildingType == BuildingType.Forge)
-            {
-                if (associatedAdventurer == null)
-                {
-                    if (buildingType == BuildingType.House) associatedAdventurer = GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex];
-                    else associatedAdventurer = GameDataManager.Instance.dataStore.forgeAdventurer;
-                }
-                else if (_cachedAdvClass != associatedAdventurer.advClass)
-                {
-                    _cachedAdvClass = associatedAdventurer.advClass;
-                    buildingAlteredSinceLastUpdate = true;
-                }
-                if (!associatedAdventurer.initialized && _adventurerUnlocked)
-                {
-                    associatedAdventurer.Reroll(GameDataManager.Instance.dataStore.warriorClassUnlock, AdventurerSpecies.Human, hasOutbuilding && (buildingType == BuildingType.House), Adventurer.GetRandomStatPoint());
-                }
-            }
-            else if (buildingType == BuildingType.Tower)
+           if (buildingType == BuildingType.Tower)
             {
                 if (GameDataManager.Instance.dataStore.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.dataStore.unlock_WizardsTower;
                 if (spriteRenderer.enabled) RefreshBuildingAssociations();
@@ -74,31 +54,13 @@ public class TownBuilding : MonoBehaviour
         }
     }
 
-    public void BuildFromFoundation()
-    {
-        if (!isUndeveloped) throw new System.Exception("Can't build from foundation because building " + gameObject.name + " is already developed!");
-        GameDataManager.Instance.dataStore.housesBuilt[nonUniqueBuildingsIndex] = true;
-        buildingStateIndex = 0;
-        isUndeveloped = false;
-        buildingAlteredSinceLastUpdate = true;
-    }
-
-    public void BuildOutbuilding (bool koboldIfForge = false)
+    public void BuildOutbuilding ()
     {
         if (hasOutbuilding) throw new System.Exception("Tried to add outbuilding to building, but it already had one: " + gameObject.name);
         switch (buildingType)
         {
-            case BuildingType.House:
-                GameDataManager.Instance.dataStore.housesOutbuildingsBuilt[nonUniqueBuildingsIndex] = true;
-                associatedAdventurer.Promote();
-                buildingAlteredSinceLastUpdate = true;
-                break;
             case BuildingType.Forge:
-                if (koboldIfForge) GameDataManager.Instance.dataStore.unlock_Taskmaster = true;
-                else
-                {
-                    associatedAdventurer.Reroll(GameDataManager.Instance.dataStore.warriorClassUnlock, AdventurerSpecies.Human, false, Adventurer.GetRandomStatPoint());
-                }
+                GameDataManager.Instance.dataStore.unlock_Taskmaster = true;
                 buildingAlteredSinceLastUpdate = true;
                 GameDataManager.Instance.dataStore.unlock_forgeOutbuilding = true;
                 break;
@@ -117,37 +79,37 @@ public class TownBuilding : MonoBehaviour
         switch (level)
         {
             case 0:
-                costs = new int[] { 2, 2, 2, 0, 0, 0 };
+                costs = new int[] { 2, 2, 2 };
                 break;
             case 1:
-                costs = new int[] { 4, 4, 4, 0, 0, 0 };
+                costs = new int[] { 4, 4, 4 };
                 break;
             case 2:
-                costs = new int[] { 4, 4, 4, 4, 4, 4 };
+                costs = new int[] { 8, 8, 8 };
                 break;
             case 3:
-                costs = new int[] { 8, 8, 8, 8, 8, 8 };
+                costs = new int[] { 16, 16, 16 };
                 break;
             case 4:
-                costs = new int[] { 16, 16, 16, 16, 16, 16 };
+                costs = new int[] { 32, 32, 32 };
                 break;
             case 5:
-                costs = new int[] { 32, 32, 32, 32, 32, 32 };
+                costs = new int[] { 64, 64, 64 };
                 break;
             case 6:
-                costs = new int[] { 64, 64, 64, 64, 64, 64 };
+                costs = new int[] { 128, 128, 128 };
                 break;
             case 7:
-                costs = new int[] { 128, 128, 128, 128, 128, 128 };
+                costs = new int[] { 256, 256, 256 };
                 break;
             case 8:
-                costs = new int[] { 205, 205, 205, 307, 307, 307 };
+                costs = new int[] { 512, 512, 512 };
                 break;
             case 9:
-                costs = new int[] { 410, 410, 410, 614, 614, 614 };
+                costs = new int[] { 1024, 1024, 1024};
                 break;
             default:
-                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                costs = new int[] { 0, 0, 0 };
                 break;
         }
         return costs;
@@ -161,15 +123,15 @@ public class TownBuilding : MonoBehaviour
         int[] costs;
         if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Warrior && GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Mystic)
         {
-            costs = new int[] { 5, 5, 5, 5, 5, 5 };
+            costs = new int[] { 10, 10, 10 };
         }
         else if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Mystic)
         {
-            costs = new int[] { 15, 15, 15, 15, 15, 15 };
+            costs = new int[] { 30, 30, 30 };
         }
         else
         {
-            costs = new int[] { 45, 45, 45, 45, 45, 45 };
+            costs = new int[] { 90, 90, 90 };
         }
         return costs;
     }
@@ -194,40 +156,40 @@ public class TownBuilding : MonoBehaviour
         switch (level)
         {
             case 0:
-                costs = new int[] { 2, 0, 0, 0, 0, 0 };
+                costs = new int[] { 2, 0, 0 };
                 break;
             case 1:
-                costs = new int[] { 4, 0, 0, 0, 0, 0 };
+                costs = new int[] { 4, 0, 0 };
                 break;
             case 2:
-                costs = new int[] { 4, 0, 0, 4, 0, 0 };
+                costs = new int[] { 8, 0, 0 };
                 break;
             case 3:
-                costs = new int[] { 8, 0, 0, 8, 0, 0 };
+                costs = new int[] { 16, 0, 0 };
                 break;
             case 4:
-                costs = new int[] { 16, 0, 0, 16, 0, 0 };
+                costs = new int[] { 32, 0, 0 };
                 break;
             case 5:
-                costs = new int[] { 32, 0, 0, 32, 0, 0 };
+                costs = new int[] { 64, 0, 0 };
                 break;
             case 6:
-                costs = new int[] { 64, 0, 0, 64, 0, 0 };
+                costs = new int[] { 128, 0, 0 };
                 break;
             case 7:
-                costs = new int[] { 128, 0, 0, 128, 0, 0 };
+                costs = new int[] { 256, 0, 0 };
                 break;
             case 8:
-                costs = new int[] { 154, 26, 26, 230, 38, 38 };
+                costs = new int[] { 512, 0, 0};
                 break;
             case 9:
-                costs = new int[] { 308, 52, 52, 460, 76, 76 };
+                costs = new int[] { 1024, 0, 0 };
                 break;
             case 10:
-                costs = new int[] { 616, 104, 104, 920, 152, 152 };
+                costs = new int[] { 2048, 0 , 0 };
                 break;
             default:
-                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                costs = new int[] { 0, 0, 0 };
                 break;
         }
         return costs;
@@ -253,40 +215,40 @@ public class TownBuilding : MonoBehaviour
         switch (level)
         {
             case 0:
-                costs = new int[] { 0, 2, 0, 0, 0, 0 };
+                costs = new int[] { 0, 2, 0 };
                 break;
             case 1:
-                costs = new int[] { 0, 4, 0, 0, 0, 0 };
+                costs = new int[] { 0, 4, 0 };
                 break;
             case 2:
-                costs = new int[] { 0, 4, 0, 0, 4, 0 };
+                costs = new int[] { 0, 8, 0 };
                 break;
             case 3:
-                costs = new int[] { 0, 8, 0, 0, 8, 0 };
+                costs = new int[] { 0, 16, 0 };
                 break;
             case 4:
-                costs = new int[] { 0, 16, 0, 0, 16, 0 };
+                costs = new int[] { 0, 32, 0 };
                 break;
             case 5:
-                costs = new int[] { 0, 32, 0, 0, 32, 0 };
+                costs = new int[] { 0, 64, 0 };
                 break;
             case 6:
-                costs = new int[] { 0, 64, 0, 0, 64, 0 };
+                costs = new int[] { 0, 128, 0 };
                 break;
             case 7:
-                costs = new int[] { 0, 128, 0, 0, 128, 0 };
+                costs = new int[] { 0, 256, 0 };
                 break;
             case 8:
-                costs = new int[] { 26, 154, 26, 38, 230, 38 };
+                costs = new int[] { 0, 512, 0 };
                 break;
             case 9:
-                costs = new int[] { 52, 308, 52, 76, 460, 76 };
+                costs = new int[] { 0, 1024, 0 };
                 break;
             case 10:
-                costs = new int[] { 104, 616, 104, 152, 920, 152 };
+                costs = new int[] { 0, 2048, 0 };
                 break;
             default:
-                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                costs = new int[] { 0, 0, 0 };
                 break;
         }
         return costs;
@@ -312,40 +274,40 @@ public class TownBuilding : MonoBehaviour
         switch (level)
         {
             case 0:
-                costs = new int[] { 0, 0, 2, 0, 0, 0 };
+                costs = new int[] { 0, 0, 2 };
                 break;
             case 1:
-                costs = new int[] { 0, 0, 4, 0, 0, 0 };
+                costs = new int[] { 0, 0, 4 };
                 break;
             case 2:
-                costs = new int[] { 0, 0, 4, 0, 0, 4 };
+                costs = new int[] { 0, 0, 8 };
                 break;
             case 3:
-                costs = new int[] { 0, 0, 8, 0, 0, 8 };
+                costs = new int[] { 0, 0, 16 };
                 break;
             case 4:
-                costs = new int[] { 0, 0, 16, 0, 0, 16 };
+                costs = new int[] { 0, 0, 32 };
                 break;
             case 5:
-                costs = new int[] { 0, 0, 32, 0, 0, 32 };
+                costs = new int[] { 0, 0, 64 };
                 break;
             case 6:
-                costs = new int[] { 0, 0, 64, 0, 0, 64 };
+                costs = new int[] { 0, 0, 128 };
                 break;
             case 7:
-                costs = new int[] { 0, 0, 128, 0, 0, 128 };
+                costs = new int[] { 0, 0, 256 };
                 break;
             case 8:
-                costs = new int[] { 26, 26, 154, 38, 38, 230 };
+                costs = new int[] { 0, 0, 512 };
                 break;
             case 9:
-                costs = new int[] { 52, 52, 308, 76, 76, 460 };
+                costs = new int[] { 0, 0, 1024 };
                 break;
             case 10:
-                costs = new int[] { 104, 104, 616, 152, 152, 920 };
+                costs = new int[] { 0, 0, 2048 };
                 break;
             default:
-                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                costs = new int[] { 0, 0, 0 };
                 break;
         }
         return costs;
@@ -356,43 +318,43 @@ public class TownBuilding : MonoBehaviour
     /// balancing tweaks with more precision than an actual algorithmic approach.
     /// also I think the economy seems kinda busted right now, lol - level^2 isn't near what the resource-gain buildings demand for upgrades
     /// </summary>
-    public static int[] GetUpgradeCost_WizardsTower(int level)
+    public static int GetUpgradeCost_WizardsTower(int level)
     {
-        int[] costs; // clay, wood, ore, brick, plank, metal
+        int costs;
         switch (level)
         {
             case 0:
-                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                costs = 10;
                 break;
             case 1:
-                costs = new int[] { 0, 0, 0, 1, 1, 1 };
+                costs = 20;
                 break;
             case 2:
-                costs = new int[] { 0, 0, 0, 4, 4, 4 };
+                costs = 30;
                 break;
             case 3:
-                costs = new int[] { 0, 0, 0, 9, 9, 9 };
+                costs = 40;
                 break;
             case 4:
-                costs = new int[] { 0, 0, 0, 16, 16, 16 };
+                costs = 50;
                 break;
             case 5:
-                costs = new int[] { 0, 0, 0, 25, 25, 25 };
+                costs = 60;
                 break;
             case 6:
-                costs = new int[] { 0, 0, 0, 36, 36, 36 };
+                costs = 70;
                 break;
             case 7:
-                costs = new int[] { 0, 0, 0, 49, 49, 49 };
+                costs = 80;
                 break;
             case 8:
-                costs = new int[] { 0, 0, 0, 64, 64, 64 };
+                costs = 90;
                 break;
             case 9:
-                costs = new int[] { 0, 0, 0, 81, 81, 81 };
+                costs = 100;
                 break;
             default:
-                costs = new int[] { 0, 0, 0, 0, 0, 0 };
+                costs = 0;
                 break;
         }
         return costs;
@@ -401,42 +363,12 @@ public class TownBuilding : MonoBehaviour
     public void OpenPopupOnBuilding ()
     {
         associatedPopups[buildingStateIndex].Open();
-        if (buildingType == BuildingType.House)
-        {
-            if (housePopup.gameObject.activeInHierarchy) housePopup.associatedHouse = this;
-            else if (buildHousePopup.gameObject.activeInHierarchy) buildHousePopup.associatedHouse = this;
-        }
     }
 
     void RefreshBuildingAssociations ()
     {
         switch (buildingType)
         {
-            case BuildingType.House:
-                if (GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex] != associatedAdventurer)
-                {
-                    if (GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex] == null) GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex] = associatedAdventurer;
-                    else associatedAdventurer = GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex];
-                }
-                if (GameDataManager.Instance.dataStore.housesBuilt[nonUniqueBuildingsIndex] == true && isUndeveloped)
-                {
-                    isUndeveloped = false;
-                    buildingStateIndex = 0;
-                }
-                if (hasOutbuilding == false && GameDataManager.Instance.dataStore.housesOutbuildingsBuilt[nonUniqueBuildingsIndex])
-                {
-                    hasOutbuilding = true;
-                    buildingStateIndex = 1;
-                }
-                if (buildingStateIndex == (int)BuildingStates_House.Foundation)
-                {
-                    buildingMessage.text = "";
-                }
-                else
-                {
-                    if (associatedAdventurer != null) buildingMessage.text = associatedAdventurer.fullTitle;
-                }
-                break;
             case BuildingType.Portal:
                 if (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < buildingTypeMaxLevels[(int)BuildingType.Tower]) buildingStateIndex = 0;
                 else buildingStateIndex = 1;

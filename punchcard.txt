@@ -302,9 +302,19 @@ Jan. 2 2016-36
 9:22 AM - start
 9:48 AM - off
 
-Jan. 3 2016-
+Jan. 3 2016-74
 1:45 PM - start
 2:38 PM - off
 2:53 PM - on
 3:12 PM - off
 3:16 PM - on
+3:18 PM - off
+
+Jan. 4 2016-64
+8:15 PM - start
+9:19 PM - off
+
+Jan. 5 2016-
+12:45 PM - start
+2:16 PM - off
+4:18 PM - on

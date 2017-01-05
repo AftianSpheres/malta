@@ -30,20 +30,14 @@ public class UI_ResourceWatcher : MonoBehaviour
             case ResourceType.Bricks:
                 _in_RefreshCachedValues(GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resBricks_max);
                 break;
-            case ResourceType.Clay:
-                _in_RefreshCachedValues(GameDataManager.Instance.dataStore.resClay, GameDataManager.Instance.dataStore.resClay_max);
+            case ResourceType.Mana:
+                _in_RefreshCachedValues(GameDataManager.Instance.dataStore.resMana, GameDataManager.Instance.dataStore.resMana_max);
                 break;
             case ResourceType.Metal:
                 _in_RefreshCachedValues(GameDataManager.Instance.dataStore.resMetal, GameDataManager.Instance.dataStore.resMetal_max);
                 break;
-            case ResourceType.Ore:
-                _in_RefreshCachedValues(GameDataManager.Instance.dataStore.resOre, GameDataManager.Instance.dataStore.resOre_max);
-                break;
             case ResourceType.Planks:
                 _in_RefreshCachedValues(GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resPlanks_max);
-                break;
-            case ResourceType.Lumber:
-                _in_RefreshCachedValues(GameDataManager.Instance.dataStore.resLumber, GameDataManager.Instance.dataStore.resLumber_max);
                 break;
         }
     }

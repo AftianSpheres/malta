@@ -6,17 +6,14 @@ using System.Collections;
 /// </summary>
 public class TopLevelMenuSystem : MonoBehaviour
 {
-    public PopupMenu clayPitPopup;
     public PopupMenu docksPopup;
     public PopupMenu forgePopup;
     public PopupMenu masonPopup;
-    public PopupMenu minesPopup;
     public PopupMenu loadingPopup;
     public PopupMenu palacePopup;
     public PopupMenu sawmillPopup;
     public PopupMenu smithPopup;
     public PopupMenu towerPopup;
-    public PopupMenu woodlandsPopup;
 
 	// Use this for initialization
 	void Update ()
