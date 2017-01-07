@@ -37,10 +37,16 @@ public class TownBuilding : MonoBehaviour
     {
         if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
         {  
-           if (buildingType == BuildingType.Tower)
+            switch (buildingType)
             {
-                if (GameDataManager.Instance.dataStore.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.dataStore.unlock_WizardsTower;
-                if (spriteRenderer.enabled) RefreshBuildingAssociations();
+                case BuildingType.Tower:
+                    if (GameDataManager.Instance.dataStore.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.dataStore.unlock_WizardsTower;
+                    if (spriteRenderer.enabled) RefreshBuildingAssociations();
+                    break;
+                case BuildingType.House:
+                    if ((GameDataManager.Instance.dataStore.housingLevel > 0) != spriteRenderer.enabled) spriteRenderer.enabled = (GameDataManager.Instance.dataStore.housingLevel > 0);
+                    if (spriteRenderer.enabled) RefreshBuildingAssociations();
+                    break;
             }
             if (buildingAlteredSinceLastUpdate) RefreshBuildingAssociations(); // doing it like this also lets you mark buildings as "dirty" based on timed events
         }

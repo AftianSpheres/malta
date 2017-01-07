@@ -44,7 +44,6 @@ public class HousePopup : MonoBehaviour
     {
         strings = stringsResource.text.Split('\n');    
         houseAdvWatchers = new AdventurerWatcher[GameDataManager.Instance.dataStore.houseAdventurers.Length];
-        Vector3 panelPos = advPanelPrototype.transform.position;
         Button[] sb = new Button[shell.buttons.Length + houseAdvWatchers.Length];
         shell.buttons.CopyTo(sb, 0);
         for (int i = 0; i < GameDataManager.Instance.dataStore.houseAdventurers.Length; i++)

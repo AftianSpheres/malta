@@ -105,9 +105,9 @@ public class GameDataManager_DataStore
         pendingUpgradeTimer_Sawmill = 0;
         pendingUpgradeTimer_Smith = 0;
         lastInspectedAdventurerIndex = 0;
-        partyAdventurer0Index = -1;
-        partyAdventurer1Index = -1;
-        partyAdventurer2Index = -1;
+        partyAdventurer0Index = 0;
+        partyAdventurer1Index = 1;
+        partyAdventurer2Index = 2;
         sovereignFirstName = "Dude";
         sovereignLastName = "Huge";
         housingLevel = 0;
@@ -214,6 +214,45 @@ public class GameDataManager : Manager<GameDataManager>
         }
         if (dataStore == null) RegenerateDataStore();
         return r;
+    }
+
+    public Adventurer GetPartyMember (int partySlot)
+    {
+        int advIndex = -1;
+        switch (partySlot)
+        {
+            case 0:
+                advIndex = dataStore.partyAdventurer0Index;
+                break;
+            case 1:
+                advIndex = dataStore.partyAdventurer1Index;
+                break;
+            case 2:
+                advIndex = dataStore.partyAdventurer2Index;
+                break;
+        }
+        Adventurer a;
+        if (advIndex < 0 || advIndex >= dataStore.housingLevel) a = null;
+        else a = dataStore.houseAdventurers[advIndex];
+        return a;
+    }
+
+    public void SetPartyMember (int partySlot, int advIndex)
+    {
+        switch (partySlot)
+        {
+            case 0:
+                dataStore.partyAdventurer0Index = advIndex;
+                break;
+            case 1:
+                dataStore.partyAdventurer1Index = advIndex;
+                break;
+            case 2:
+                dataStore.partyAdventurer2Index = advIndex;
+                break;
+            default:
+                throw new System.Exception("Called SetPartyMember with invalid party slot: " + partySlot);
+        }
     }
 
     public void Save ()

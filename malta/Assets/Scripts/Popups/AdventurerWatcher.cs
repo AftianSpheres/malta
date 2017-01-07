@@ -18,6 +18,7 @@ public class AdventurerWatcher : MonoBehaviour
     private Adventurer adventurer;
     public TextAsset stringsResource;
     public HousePopup housePopup;
+    public SwapAdventurerPopup swapPopup;
     private int[] cachedAdventurerStats = { -1, -1, -1, -1 };
     private AdventurerAttack[] cachedAdventurerAttacks = { AdventurerAttack.None, AdventurerAttack.None };
     private AdventurerSpecial cachedAdventurerSpecial = AdventurerSpecial.LoseBattle;
@@ -41,12 +42,32 @@ public class AdventurerWatcher : MonoBehaviour
         {
             if (panelBG != null)
             {
-                if (housePopup.inspectedAdventurer == adventurer) panelBG.color = activeColor;
-                else panelBG.color = defaultColor;
+                if (housePopup != null)
+                {
+                    if (housePopup.inspectedAdventurer == adventurer) panelBG.color = activeColor;
+                    else panelBG.color = defaultColor;
+                }
+                else if (swapPopup != null)
+                {
+                    if (swapPopup.partyMemberIndexInMainArray == houseAdventurerIndex) panelBG.color = activeColor;
+                    else if (houseAdventurerIndex == GameDataManager.Instance.dataStore.partyAdventurer0Index || houseAdventurerIndex == GameDataManager.Instance.dataStore.partyAdventurer1Index || houseAdventurerIndex == GameDataManager.Instance.dataStore.partyAdventurer2Index)
+                    {
+                        panelBG.color = Color.clear;
+                    }
+                    else panelBG.color = defaultColor;
+                }
+
             }
             if (selfButton != null)
             {
-                selfButton.interactable = (housePopup.inspectedAdventurer != adventurer);
+                if (housePopup != null)
+                {
+                    selfButton.interactable = (housePopup.inspectedAdventurer != adventurer);
+                }
+                else if (swapPopup != null)
+                {
+                    selfButton.interactable = swapPopup.partyMemberIndexInMainArray == houseAdventurerIndex || (houseAdventurerIndex != GameDataManager.Instance.dataStore.partyAdventurer0Index && houseAdventurerIndex != GameDataManager.Instance.dataStore.partyAdventurer1Index && houseAdventurerIndex != GameDataManager.Instance.dataStore.partyAdventurer2Index) ;
+                }
             }
             if (interior != null)
             {
@@ -106,5 +127,17 @@ public class AdventurerWatcher : MonoBehaviour
         housePopup.inspectedAdventurer = adventurer;
         housePopup.advIndex = houseAdventurerIndex;
         GameDataManager.Instance.dataStore.lastInspectedAdventurerIndex = houseAdventurerIndex;
+    }
+
+    public void SwapAdventurer ()
+    {
+        swapPopup.SwapFor(houseAdventurerIndex);
+        swapPopup.shell.Close();
+    }
+
+    public void ChangeDisplayedAdventurer (int _advIndex)
+    {
+        houseAdventurerIndex = _advIndex;
+        adventurer = GameDataManager.Instance.dataStore.houseAdventurers[houseAdventurerIndex];
     }
 }

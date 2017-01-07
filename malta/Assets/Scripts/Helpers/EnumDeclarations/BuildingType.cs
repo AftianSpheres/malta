@@ -13,5 +13,5 @@ public enum BuildingType
     Mason,
     Tower,
     Portal,
-    Forest
+    Forest,
 }

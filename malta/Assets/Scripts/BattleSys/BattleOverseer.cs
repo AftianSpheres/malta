@@ -383,8 +383,8 @@ public class BattleOverseer : MonoBehaviour
 
     private void PopulatePlayerParty ()
     {
-        Adventurer[] playerAdventurers = new Adventurer[] { GameDataManager.Instance.dataStore.sovereignAdventurer, GameDataManager.Instance.dataStore.houseAdventurers[0],
-                                                            GameDataManager.Instance.dataStore.houseAdventurers[1], GameDataManager.Instance.dataStore.houseAdventurers[0] };
+        Adventurer[] playerAdventurers = new Adventurer[] { GameDataManager.Instance.dataStore.sovereignAdventurer, GameDataManager.Instance.GetPartyMember(0),
+                                                            GameDataManager.Instance.GetPartyMember(1), GameDataManager.Instance.GetPartyMember(2) };
         int i2 = 0;
         for (int i = 0; i < playerAdventurers.Length && i2 < playerParty.Length; i++)
         {

@@ -4,7 +4,9 @@ using UnityEngine.UI;
 public class AdventureTimePopup : MonoBehaviour
 {
     public PopupMenu shell;
+    public AdventurerWatcher[] advWatchers;
     public SovereignInfoPanel sovereignInfo;
+    public SwapAdventurerPopup swapAdventurerPopup;
     public GameObject matsNeededSection;
     public PopupMenu insufficientResourcesPopup;
     public Text adventureDestination;
@@ -28,6 +30,9 @@ public class AdventureTimePopup : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
+            if (advWatchers[0].houseAdventurerIndex != GameDataManager.Instance.dataStore.partyAdventurer0Index) advWatchers[0].ChangeDisplayedAdventurer(GameDataManager.Instance.dataStore.partyAdventurer0Index);
+            if (advWatchers[1].houseAdventurerIndex != GameDataManager.Instance.dataStore.partyAdventurer1Index) advWatchers[1].ChangeDisplayedAdventurer(GameDataManager.Instance.dataStore.partyAdventurer1Index);
+            if (advWatchers[2].houseAdventurerIndex != GameDataManager.Instance.dataStore.partyAdventurer2Index) advWatchers[2].ChangeDisplayedAdventurer(GameDataManager.Instance.dataStore.partyAdventurer2Index);
             if (cachedAdventureLv != GameDataManager.Instance.dataStore.adventureLevel)
             {
                 cachedAdventureLv = GameDataManager.Instance.dataStore.adventureLevel;
@@ -77,5 +82,28 @@ public class AdventureTimePopup : MonoBehaviour
             shell.Close();
             screenChanger.Activate();
         }
+    }
+
+    public void SwapAdventurer (int partySlot)
+    {
+        int index;
+        switch (partySlot)
+        {
+            case 0:
+                index = GameDataManager.Instance.dataStore.partyAdventurer0Index;
+                break;
+            case 1:
+                index = GameDataManager.Instance.dataStore.partyAdventurer1Index;
+                break;
+            case 2:
+                index = GameDataManager.Instance.dataStore.partyAdventurer2Index;
+                break;
+            default:
+                throw new System.Exception("Tried to open adventurer swap popup w/ bad party slot: " + partySlot);
+        }
+        swapAdventurerPopup.partySlot = partySlot;
+        swapAdventurerPopup.partyMemberIndexInMainArray = index;
+        shell.SurrenderFocus();
+        swapAdventurerPopup.shell.Open();
     }
 }

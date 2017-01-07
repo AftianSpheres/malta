@@ -319,3 +319,9 @@ Jan. 5 2016-152
 2:16 PM - off
 4:18 PM - on
 5:19 PM - off
+
+Jan. 6 2016-73
+1:36 PM - start
+2:26 PM - off
+7:34 PM - on
+7:57 PM - off
