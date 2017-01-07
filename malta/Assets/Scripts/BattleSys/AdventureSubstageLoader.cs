@@ -6,6 +6,10 @@ using System.Collections;
 /// </summary>
 public class AdventureSubstageLoader : MonoBehaviour
 {
+    private static AdventureSubstage adventureTuto0_0;
+    public static AdventureSubstage[] adventureTuto0Substages;
+    private static AdventureSubstage adventureTuto1_0;
+    public static AdventureSubstage[] adventureTuto1Substages;
     private static AdventureSubstage adventure0_0;
     private static AdventureSubstage adventure0_1;
     private static AdventureSubstage adventure0_2;
@@ -31,6 +35,7 @@ public class AdventureSubstageLoader : MonoBehaviour
     {
         if (prebuiltAdventures == null)
         {
+            populateTutorialAdventuresStructs();
             populateAdventure0Structs();
             populateAdventure1Structs();
             populateAdventure2Structs();
@@ -42,6 +47,15 @@ public class AdventureSubstageLoader : MonoBehaviour
     {
         populateRandomAdventureStructs();
         return randomAdventureSubstages;
+    }
+
+    private static void populateTutorialAdventuresStructs ()
+    {
+        adventureTuto0_0 = new AdventureSubstage(new AdventurerClass[] { AdventurerClass.Warrior }, new AdventurerSpecies[] { AdventurerSpecies.Human }, new bool[] { false }, false, BattleBGMType.GARBO_dreamchaser);
+        adventureTuto0Substages = new AdventureSubstage[] { adventureTuto0_0 };
+        adventureTuto1_0 = new AdventureSubstage(new AdventurerClass[] { AdventurerClass.Warrior, AdventurerClass.Warrior }, new AdventurerSpecies[] { AdventurerSpecies.Human, AdventurerSpecies.Human }, new bool[] { false, false }, false, BattleBGMType.GARBO_dreamchaser);
+        adventureTuto1Substages = new AdventureSubstage[] { adventureTuto1_0 };
+
     }
 
     private static void populateAdventure0Structs ()

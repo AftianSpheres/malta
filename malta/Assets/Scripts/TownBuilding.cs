@@ -37,14 +37,15 @@ public class TownBuilding : MonoBehaviour
     {
         if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
         {  
+            if (buildingType != BuildingType.Forest)
+            {
+                if ((GameDataManager.Instance.dataStore.housingLevel > 0) != spriteRenderer.enabled) spriteRenderer.enabled = (GameDataManager.Instance.dataStore.housingLevel > 0);
+                if (spriteRenderer.enabled) RefreshBuildingAssociations();
+            }
             switch (buildingType)
             {
                 case BuildingType.Tower:
                     if (GameDataManager.Instance.dataStore.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.dataStore.unlock_WizardsTower;
-                    if (spriteRenderer.enabled) RefreshBuildingAssociations();
-                    break;
-                case BuildingType.House:
-                    if ((GameDataManager.Instance.dataStore.housingLevel > 0) != spriteRenderer.enabled) spriteRenderer.enabled = (GameDataManager.Instance.dataStore.housingLevel > 0);
                     if (spriteRenderer.enabled) RefreshBuildingAssociations();
                     break;
             }
@@ -54,7 +55,7 @@ public class TownBuilding : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (associatedPopups[buildingStateIndex] != null && !GameStateManager.Instance.somethingHasFocus && spriteRenderer.enabled)
+        if (associatedPopups.Length > 0 && associatedPopups[buildingStateIndex] != null && !GameStateManager.Instance.somethingHasFocus && spriteRenderer.enabled)
         {
             OpenPopupOnBuilding();
         }
@@ -440,6 +441,9 @@ public class TownBuilding : MonoBehaviour
                 else buildingStateIndex = 1;
                 break;
         }
-        spriteRenderer.sprite = buildingSprites[buildingStateIndex];
+        if (buildingSprites.Length > 0)
+        {
+            spriteRenderer.sprite = buildingSprites[buildingStateIndex];
+        }
     }
 }

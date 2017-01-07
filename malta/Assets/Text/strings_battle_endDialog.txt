@@ -17,3 +17,5 @@ You retreated from battle, but at the cost of
 You managed to retreat, but took heavy casualties.
 You managed to retreat... but was there even really a point...?
 The remaining party members were forced to retreat in order to protect their wounded sovereign...
+You managed to pull through the fight, and made contact with a member of your royal guard.
+You and the guard member you'd found managed to get clear of the forest. Town is within sight. You made contact with the other member of your guard, too.

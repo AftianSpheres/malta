@@ -54,7 +54,12 @@ public class BattleEndPopup : MonoBehaviour
             }
             else
             {
-                if (GameDataManager.Instance.dataStore.adventureLevel - 1 < AdventureSubstageLoader.randomAdventureBaseLevel) // adventureLevel is already incremented, we want to get the adventure we were on
+                if (battleOverseer.tutorial)
+                {
+                    if (GameDataManager.Instance.dataStore.housingLevel < 2) nextDestText.text = strings[19];
+                    else nextDestText.text = strings[20];
+                }
+                else if (GameDataManager.Instance.dataStore.adventureLevel - 1 < AdventureSubstageLoader.randomAdventureBaseLevel) // adventureLevel is already incremented, we want to get the adventure we were on
                 {
                     nextDestText.text = strings[GameDataManager.Instance.dataStore.adventureLevel - 1];
                 }

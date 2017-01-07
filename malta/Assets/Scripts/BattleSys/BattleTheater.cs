@@ -15,6 +15,7 @@ public class BattleTheater : MonoBehaviour
     public BattleMessageBox messageBox;
     public CutscenePlayer animsPlayer;
     public GameObject enemyParty;
+    public GameObject adventureInfoWindow;
     public SpriteRenderer battleBG;
     public Sprite[] battleBG_bgs;
     public TextAsset turnInfoStringsResource;
@@ -29,6 +30,11 @@ public class BattleTheater : MonoBehaviour
     void Awake ()
     {
         turnInfoStrings = turnInfoStringsResource.text.Split('\n');
+    }
+
+    void Update()
+    {
+        if (overseer.tutorial && adventureInfoWindow.activeInHierarchy) adventureInfoWindow.SetActive(false);
     }
 
     public void StartOfTurn ()

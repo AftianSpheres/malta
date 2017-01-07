@@ -36,6 +36,7 @@ public class BattleOverseer : MonoBehaviour
     const string _owned = "_BattleOverseerCoroutine";
     private int[] baseEndlessAdventurePayout;
     private bool _forceAllBattlersRegen = false;
+    public bool tutorial { get; private set; }
 
     // Use this for initialization
     void Start ()
@@ -172,14 +173,21 @@ public class BattleOverseer : MonoBehaviour
         yield return Timing.WaitForSeconds(battleStepLength * 3);
         theater.WinAdventure();
         while (theater.processing) yield return 0f;
-        if (GameDataManager.Instance.dataStore.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
+        if (tutorial)
         {
-            GameDataManager.Instance.dataStore.nextRandomAdventureAnte += Random.Range(1, 4);
-            GameDataManager.Instance.dataStore.resBricks += baseEndlessAdventurePayout[0];
-            GameDataManager.Instance.dataStore.resPlanks += baseEndlessAdventurePayout[1];
-            GameDataManager.Instance.dataStore.resMetal += baseEndlessAdventurePayout[2];
+            GameDataManager.Instance.dataStore.housingLevel++;
         }
-        GameDataManager.Instance.dataStore.adventureLevel++;
+        else
+        {
+            if (GameDataManager.Instance.dataStore.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
+            {
+                GameDataManager.Instance.dataStore.nextRandomAdventureAnte += Random.Range(1, 4);
+                GameDataManager.Instance.dataStore.resBricks += baseEndlessAdventurePayout[0];
+                GameDataManager.Instance.dataStore.resPlanks += baseEndlessAdventurePayout[1];
+                GameDataManager.Instance.dataStore.resMetal += baseEndlessAdventurePayout[2];
+            }
+            GameDataManager.Instance.dataStore.adventureLevel++;
+        }
         battleEndPopup.Open();
     }
 
@@ -321,8 +329,18 @@ public class BattleOverseer : MonoBehaviour
     IEnumerator<float> Bootstrap ()
     {
         while (GameDataManager.Instance.dataStore == null) yield return 0f;
-        if (GameDataManager.Instance.dataStore.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) adventure = AdventureSubstageLoader.prebuiltAdventures[GameDataManager.Instance.dataStore.adventureLevel];
-        else adventure = AdventureSubstageLoader.randomAdventure;
+        if (GameDataManager.Instance.dataStore.housingLevel < 2) tutorial = true;
+        if (tutorial)
+        {
+            if (GameDataManager.Instance.dataStore.housingLevel == 0) adventure = AdventureSubstageLoader.adventureTuto0Substages;
+            else adventure = AdventureSubstageLoader.adventureTuto1Substages;
+        }
+        else
+        {
+            if (GameDataManager.Instance.dataStore.adventureLevel < AdventureSubstageLoader.randomAdventureBaseLevel) adventure = AdventureSubstageLoader.prebuiltAdventures[GameDataManager.Instance.dataStore.adventureLevel];
+            else adventure = AdventureSubstageLoader.randomAdventure;
+        }
+
         PopulatePlayerParty();
         StartNextBattle();
     }
