@@ -63,7 +63,7 @@ public class GameDataManager_DataStore
     public int pendingUpgradeTimer_Smith;
     public int lastInspectedAdventurerIndex;
     const int manaCap = 100;
-    const int housingLevelCap = 20;
+    public const int housingLevelCap = 20;
 
     public GameDataManager_DataStore ()
     {

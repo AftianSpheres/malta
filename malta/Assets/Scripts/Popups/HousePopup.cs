@@ -7,6 +7,7 @@ public class HousePopup : MonoBehaviour
     public RectTransform scrollAreaRect;
     public GameObject advPanelPrototype;
     public GameObject advPanelsParent;
+    public GameObject lvButton;
     public AdventurerWatcher[] houseAdvWatchers;
     public Adventurer inspectedAdventurer;
     public int advIndex;
@@ -26,6 +27,9 @@ public class HousePopup : MonoBehaviour
     public Text attacksLabel;
     public Text specialLabel;
     public Text statsLabel;
+    public Text lvButton_Bricks;
+    public Text lvButton_Metal;
+    public Text lvButton_Planks;
     public TextAsset stringsResource;
     private int adventurerHPCached;
     private int adventurerMartialCached;
@@ -142,21 +146,21 @@ public class HousePopup : MonoBehaviour
         if (biography.text != inspectedAdventurer.bioText) biography.text = inspectedAdventurer.bioText;
 	}
 
-    public void OpenRetrainPopup()
+    public void OpenRetrainPopup ()
     {
         retrainPopup.shell.Open();
         retrainPopup.associatedAdventurer = inspectedAdventurer;
         shell.SurrenderFocus();
     }
 
-    public void OpenEvictPopup()
+    public void OpenEvictPopup ()
     {
         evictPopup.shell.Open();
         evictPopup.associatedAdventurer = inspectedAdventurer;
         shell.SurrenderFocus();
     }
 
-    public void AddOutbuilding()
+    public void AddOutbuilding ()
     {
         if (GameDataManager.Instance.SpendResourcesIfPossible(20, 20, 20))
         {
@@ -186,17 +190,47 @@ public class HousePopup : MonoBehaviour
         }
     }
 
+    public void LevelUpHousing ()
+    {
+        int[] costs = TownBuilding.GetUpgradeCost_House(GameDataManager.Instance.dataStore.housingLevel);
+        if (GameDataManager.Instance.SpendResourcesIfPossible(costs) && GameDataManager.Instance.dataStore.housingLevel < GameDataManager_DataStore.housingLevelCap) GameDataManager.Instance.dataStore.housingLevel++;
+        else
+        {
+            shell.SurrenderFocus();
+            insufficientResourcesPopup.Open();
+        }
+    }
+
     void RecalcScrollRectSize ()
     {
+        lvButton.transform.SetParent(transform, true);
+        bool canLevelHousing = GameDataManager.Instance.dataStore.housingLevel < GameDataManager_DataStore.housingLevelCap;
+        lvButton.gameObject.SetActive(canLevelHousing);
+        int modifier = 0;
+        if (canLevelHousing) modifier = 1;
         for (int i = 0; i < houseAdvWatchers.Length; i++) houseAdvWatchers[i].transform.SetParent(transform, true);
         houseLvCached = GameDataManager.Instance.dataStore.housingLevel;
-        scrollAreaRect.sizeDelta = new Vector2(scrollAreaRect.sizeDelta.x, ((GameDataManager.Instance.dataStore.housingLevel) * advPanelHeight) + ((GameDataManager.Instance.dataStore.housingLevel - 1) * advPanelsSpacing));
+        scrollAreaRect.sizeDelta = new Vector2(scrollAreaRect.sizeDelta.x, ((GameDataManager.Instance.dataStore.housingLevel + modifier) * advPanelHeight) + ((GameDataManager.Instance.dataStore.housingLevel - 1 + modifier) * advPanelsSpacing));
         scrollAreaRect.anchoredPosition = Vector3.zero;
         for (int i = 0; i < houseAdvWatchers.Length; i++)
         {
-            RectTransform rt = houseAdvWatchers[i].transform as RectTransform;
-            rt.SetParent(advPanelsParent.transform, true);
-            rt.anchoredPosition = new Vector2(0, (Mathf.Abs(rt.sizeDelta.y) / 2) - (i * (advPanelHeight + advPanelsSpacing))); // I don't pretend to understand this. rects are a mystery. why can't you be nice and clunky low-level stuff, rects?
+            _RSRS_parentAndPositionListEntry(i, houseAdvWatchers[i].transform as RectTransform);
         }
+        if (canLevelHousing)
+        {
+            RectTransform rt = lvButton.transform as RectTransform;
+            rt.SetParent(advPanelsParent.transform, true);
+            rt.anchoredPosition = (houseAdvWatchers[GameDataManager.Instance.dataStore.housingLevel].transform as RectTransform).anchoredPosition;
+            int[] costs = TownBuilding.GetUpgradeCost_House(GameDataManager.Instance.dataStore.housingLevel);
+            lvButton_Bricks.text = costs[0].ToString();
+            lvButton_Planks.text = costs[1].ToString();
+            lvButton_Metal.text = costs[2].ToString();
+        }
+    }
+
+    void _RSRS_parentAndPositionListEntry(int listIndex, RectTransform rt)
+    {
+        rt.SetParent(advPanelsParent.transform, true);
+        rt.anchoredPosition = new Vector2(0, (Mathf.Abs(rt.sizeDelta.y) / 2) - (listIndex * (advPanelHeight + advPanelsSpacing))); // I don't pretend to understand this. rects are a mystery. why can't you be nice and clunky low-level stuff, rects?
     }
 }

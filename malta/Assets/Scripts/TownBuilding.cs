@@ -142,6 +142,66 @@ public class TownBuilding : MonoBehaviour
         return costs;
     }
 
+    /// <summary>
+    /// This is a gross lookup table implemented in code because it lets us do
+    /// balancing tweaks with more precision than an actual algorithmic approach.
+    /// </summary>
+    public static int[] GetUpgradeCost_House(int level)
+    {
+        int[] costs; // clay, wood, ore
+        switch (level)
+        {
+            case 0:
+                costs = new int[] { 3, 3, 3 };
+                break;
+            case 1:
+                costs = new int[] { 6, 6, 6 };
+                break;
+            case 2:
+                costs = new int[] { 12, 12, 12 };
+                break;
+            case 3:
+                costs = new int[] { 24, 24, 24 };
+                break;
+            case 4:
+                costs = new int[] { 48, 48, 48 };
+                break;
+            case 5:
+                costs = new int[] { 96, 96, 96 };
+                break;
+            case 6:
+                costs = new int[] { 192, 192, 192 };
+                break;
+            case 7:
+                costs = new int[] { 384, 384, 384 };
+                break;
+            case 8:
+                costs = new int[] { 768, 768, 768 };
+                break;
+            case 9:
+                costs = new int[] { 1536, 1536, 1536 };
+                break;
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+                costs = new int[] { 3072, 3072, 3072 };
+                break;
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+                costs = new int[] { 6144, 6144, 6144 };
+                break;
+            default:
+                costs = new int[] { 0, 0, 0 };
+                break;
+        }
+        return costs;
+    }
+
     public static int[] GetCapUpCost_MasonClaypit(int level)
     {
         int[] costs = GetUpgradeCost_MasonClaypit(level);
