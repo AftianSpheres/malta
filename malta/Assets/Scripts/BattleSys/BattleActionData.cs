@@ -24,6 +24,33 @@ public enum BattlerAction
     GetBehindMe,
     Flanking,
     Rend,
+    Bludgeon,
+    ContinentSmash,
+    Fortify,
+    BloodOfSteel,
+    WideSwing,
+    CataclysmicImpact,
+    Concuss,
+    DreamlessSleep,
+    QuickStab,
+    Stiletto,
+    ThroatSlit,
+    BloodRites,
+    BladeOfCrimson,
+    FleetFeet,
+    FlashStep,
+    SecondSight,
+    WithTheWind,
+    HealingWind,
+    BreathOfLife,
+    Renewal,
+    IceBullet,
+    FrostSpear,
+    CometStrike,
+    ZoneOfSilence,
+    SpeakNoEvil,
+    AntiDrain,
+    CovetNot,
     _CantMove_Silenced = 10000
 }
 
@@ -59,6 +86,17 @@ public enum BattlerActionEffectFlags : ulong // these will never be serialized, 
     Encore = 1 << 8,
     Bodyguard = 1 << 9,
     Melee = 1 << 10,
+    WeakMarBoost = 1 << 11,
+    StrongMarBoost = 1 << 12,
+    ShortStunBuff = 1 << 13,
+    LongStunBuff = 1 << 14,
+    WeakSacrifice = 1 << 15,
+    StrongSacrifice = 1 << 16,
+    WeakFStep = 1 << 17,
+    StrongFStep = 1 << 18,
+    ShortDodgeBuff = 1 << 19,
+    LongDodgeBuff = 1 << 20,
+    DrainBlock = 1 << 21,
     MaxValue = ulong.MaxValue
 }
 
@@ -178,44 +216,18 @@ public struct BattlerActionData
         BattlerActionEffectFlags flags = 0;
         for (int i = firstTermThatsActuallyAFlag; i < flagsList.Length; i++)
         {
-            switch (flagsList[i])
+            bool isValidFlag = false;
+            for (ulong b = 1; b < ulong.MaxValue;)
             {
-                case "IsMagic":
-                    flags |= BattlerActionEffectFlags.IsMagic;
+                if (flagsList[i] == ((BattlerActionEffectFlags)b).ToString())
+                {
+                    flags |= (BattlerActionEffectFlags)b;
+                    isValidFlag = true;
                     break;
-                case "NeedsTarget":
-                    flags |= BattlerActionEffectFlags.NeedsTarget;
-                    break;
-                case "Silence":
-                    flags |= BattlerActionEffectFlags.Silence;
-                    break;
-                case "ShieldBlock":
-                    flags |= BattlerActionEffectFlags.ShieldBlock;
-                    break;
-                case "ShieldWall":
-                    flags |= BattlerActionEffectFlags.ShieldWall;
-                    break;
-                case "Drain":
-                    flags |= BattlerActionEffectFlags.Drain;
-                    break;
-                case "Barrier":
-                    flags |= BattlerActionEffectFlags.Barrier;
-                    break;
-                case "Haste":
-                    flags |= BattlerActionEffectFlags.Haste;
-                    break;
-                case "Encore":
-                    flags |= BattlerActionEffectFlags.Encore;
-                    break;
-                case "Bodyguard":
-                    flags |= BattlerActionEffectFlags.Bodyguard;
-                    break;
-                case "Melee":
-                    flags |= BattlerActionEffectFlags.Melee;
-                    break;
-                default:
-                    throw new System.NotSupportedException("BattlerActionData entry has a bad flag: " + flagsList[i]);
+                }
+                b = b << 1;
             }
+            if (isValidFlag == false) throw new System.NotSupportedException("BattlerActionData entry has a bad flag: " + flagsList[i]);
         }
         return flags;
     }
