@@ -20,3 +20,14 @@ You withdrew from battle!
  tried to cast a spell, but the words wouldn't come out!
  pulled out of the fray to recuperate!
  leapt back into the fight!
+The mace was shrouded in concussive force!
+The force surrounding the mace faded!
+Target is stunned!
+Got pumped up, boosting Martial!
+The user can dash to the front lines in time for attacks!
+The user can move freely between the lines of battle!
+The user can see the enemy's moves before they happen!
+The user's second sight faded!
+Dodged the attack!
+Targets won't be able to use life-drain magic properly!
+The draining effect was nullified!

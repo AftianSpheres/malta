@@ -25,7 +25,18 @@ public enum BattleMessageType
     Retreat,
     FailedCast,
     PulledOutOfBattle,
-    ReenteredBattle
+    ReenteredBattle,
+    StunBuff,
+    StunBuffFaded,
+    Stun,
+    PumpedUp,
+    MovesBetweenLines,
+    SwiftlyMovesBetweenLines,
+    AttunedBuff,
+    AttunedBuffFaded,
+    Dodged,
+    DrainKill,
+    FailedToDrain
 }
 
 public class BattleMessageBox : MonoBehaviour
@@ -188,6 +199,39 @@ public class BattleMessageBox : MonoBehaviour
                 break;
             case BattleMessageType.ReenteredBattle:
                 nextLine = actor.adventurer.fullName + mainStrings[21];
+                break;
+            case BattleMessageType.StunBuff:
+                nextLine = mainStrings[22];
+                break;
+            case BattleMessageType.StunBuffFaded:
+                nextLine = mainStrings[23];
+                break;
+            case BattleMessageType.Stun:
+                nextLine = mainStrings[24];
+                break;
+            case BattleMessageType.PumpedUp:
+                nextLine = mainStrings[25];
+                break;
+            case BattleMessageType.MovesBetweenLines:
+                nextLine = mainStrings[26];
+                break;
+            case BattleMessageType.SwiftlyMovesBetweenLines:
+                nextLine = mainStrings[27];
+                break;
+            case BattleMessageType.AttunedBuff:
+                nextLine = mainStrings[28];
+                break;
+            case BattleMessageType.AttunedBuffFaded:
+                nextLine = mainStrings[29];
+                break;
+            case BattleMessageType.Dodged:
+                nextLine = mainStrings[30];
+                break;
+            case BattleMessageType.DrainKill:
+                nextLine = mainStrings[31];
+                break;
+            case BattleMessageType.FailedToDrain:
+                nextLine = mainStrings[32];
                 break;
         }
         if (drawToLine1) line1 = nextLine;

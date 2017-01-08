@@ -572,12 +572,40 @@ public class Battler : MonoBehaviour
                 case AdventurerAttack.Rend:
                     defaultAction = BattlerAction.Rend;
                     break;
-            }
+                case AdventurerAttack.Bludgeon:
+                    defaultAction = BattlerAction.Bludgeon;
+                    break;
+                case AdventurerAttack.ContinentSmash:
+                    defaultAction = BattlerAction.ContinentSmash;
+                    break;
+                case AdventurerAttack.QuickStab:
+                    defaultAction = BattlerAction.QuickStab;
+                    break;
+                case AdventurerAttack.Stiletto:
+                    defaultAction = BattlerAction.Stiletto;
+                    break;
+                case AdventurerAttack.ThroatSlit:
+                    defaultAction = BattlerAction.ThroatSlit;
+                    break;
+                case AdventurerAttack.IceBullet:
+                    defaultAction = BattlerAction.IceBullet;
+                    break;
+                case AdventurerAttack.FrostSpear:
+                    defaultAction = BattlerAction.FrostSpear;
+                    break;
+                case AdventurerAttack.CometStrike:
+                    defaultAction = BattlerAction.CometStrike;
+                    break;
+                }
         }
         if (adventurer.special == AdventurerSpecial.ShieldWall) battleStartInterruptActions.Add(BattlerAction.ShieldWall);
         else if (adventurer.special == AdventurerSpecial.Barrier) battleStartInterruptActions.Add(BattlerAction.Barrier);
         else if (adventurer.special == AdventurerSpecial.Feedback) onHitInterruptActions.Add(BattlerAction.Feedback);
         else if (adventurer.special == AdventurerSpecial.Protect) onAllyHitInterruptActions.Add(BattlerAction.Protect);
+        if (HasAttack(AdventurerAttack.Concuss)) battleStartInterruptActions.Add(BattlerAction.Concuss);
+        if (HasAttack(AdventurerAttack.DreamlessSleep)) battleStartInterruptActions.Add(BattlerAction.DreamlessSleep);
+        if (HasAttack(AdventurerAttack.FleetFeet)) battleStartInterruptActions.Add(BattlerAction.FleetFeet);
+        if (HasAttack(AdventurerAttack.FlashStep)) battleStartInterruptActions.Add(BattlerAction.FlashStep);
         if (HasAttack(AdventurerAttack.GetBehindMe)) onAllyDeathblowInterruptActions.Add(BattlerAction.GetBehindMe);
         if (HasAttack(AdventurerAttack.Flanking)) onAllyDeathblowInterruptActions.Add(BattlerAction.Flanking);
         livesOnBackRow = !Adventurer.ClassIsFrontRowClass(adventurer.advClass);
