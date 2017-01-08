@@ -3,6 +3,7 @@ using System.Collections;
 
 public enum AdventurerAttack
 {
+    UninitializedVal = -1,
     None,
     MaceSwing,
     RainOfArrows,
@@ -18,5 +19,32 @@ public enum AdventurerAttack
     HammerBlow,
     GetBehindMe,
     Flanking,
-    Rend
+    Rend,
+    Bludgeon,
+    ContinentSmash,
+    Fortify,
+    BloodOfSteel,
+    WideSwing,
+    CataclysmicImpact,
+    Concuss,
+    DreamlessSleep,
+    QuickStab,
+    Stiletto,
+    ThroatSlit,
+    BloodRites,
+    BladeOfCrimson,
+    FleetFeet,
+    FlashStep,
+    SecondSight,
+    WithTheWind,
+    HealingWind,
+    BreathOfLife,
+    Renewal,
+    IceBullet,
+    FrostSpear,
+    CometStrike,
+    ZoneOfSilence,
+    SpeakNoEvil,
+    AntiDrain,
+    CovetNot
 }
