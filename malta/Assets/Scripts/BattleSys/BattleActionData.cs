@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public enum BattlerAction
 {
+    UninitializedVal = -99999,
     None,
     MaceSwing,
     Siphon,
@@ -130,6 +131,8 @@ public struct BattlerActionData
     readonly public BattlerActionInterruptType interruptType;
     readonly public BattlerActionEffectFlags flags;
     readonly public BattlerActionTarget target;
+    readonly public string name;
+    readonly public int cooldownTurns;
     readonly public int baseDamage;
     readonly public int numberOfSubtargets;
     public const int numberOfAnims = 4;
@@ -155,11 +158,13 @@ public struct BattlerActionData
     {
         actionID = (BattlerAction)index;
         string[] terms = line.Split(',');
-        interruptType = ParseInterruptType(terms[0]);
-        anim = ParseAnim(terms[1]);
-        target = ParseTarget(terms[2]);
-        baseDamage = int.Parse(terms[3]);
-        numberOfSubtargets = int.Parse(terms[4]);
+        name = terms[0];
+        cooldownTurns = int.Parse(terms[1]);
+        interruptType = ParseInterruptType(terms[2]);
+        anim = ParseAnim(terms[3]);
+        target = ParseTarget(terms[4]);
+        baseDamage = int.Parse(terms[5]);
+        numberOfSubtargets = int.Parse(terms[6]);
         flags = ParseListOfFlags(terms);
     }
 
@@ -212,7 +217,7 @@ public struct BattlerActionData
 
     private static BattlerActionEffectFlags ParseListOfFlags (string[] flagsList)
     {
-        const int firstTermThatsActuallyAFlag = 5;
+        const int firstTermThatsActuallyAFlag = 7;
         BattlerActionEffectFlags flags = 0;
         for (int i = firstTermThatsActuallyAFlag; i < flagsList.Length; i++)
         {

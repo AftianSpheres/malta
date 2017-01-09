@@ -17,8 +17,8 @@ public class SovereignInfoPanel : MonoBehaviour
     private int[] cachedSovereignStats = { -1, -1, -1, -1 };
     private string cachedSovereignName = "¡²¤€¼½¾‘’¥×äåé®®þüúíó«»áß";
     private string cachedSovereignTitle = "¡²¤€¼½¾‘’¥×äåé®®þüúíó«»áß";
-    private AdventurerAttack cachedSovereignTactic = AdventurerAttack.None;
-    private AdventurerAttack[] cachedSovereignAttacks = { AdventurerAttack.None, AdventurerAttack.None };
+    private BattlerAction cachedSovereignTactic = BattlerAction.None;
+    private BattlerAction[] cachedSovereignAttacks = { BattlerAction.None, BattlerAction.None };
     private AdventurerSpecial cachedSovereignSpecial = AdventurerSpecial.LoseBattle;
     private AdventurerMugshot cachedSovereignMugshot;
     private const string dividerString = " | ";
@@ -64,8 +64,8 @@ public class SovereignInfoPanel : MonoBehaviour
         if (cachedSovereignAttacks[0] != GameDataManager.Instance.dataStore.sovereignAdventurer.attacks[0] ||
             cachedSovereignAttacks[1] != GameDataManager.Instance.dataStore.sovereignAdventurer.attacks[1])
         {
-            cachedSovereignAttacks = GameDataManager.Instance.dataStore.sovereignAdventurer.attacks.Clone() as AdventurerAttack[];
-            if (cachedSovereignAttacks[1] == AdventurerAttack.None) sovereignAttacksArea.text = Adventurer.GetAttackName(cachedSovereignAttacks[0]);
+            cachedSovereignAttacks = GameDataManager.Instance.dataStore.sovereignAdventurer.attacks.Clone() as BattlerAction[];
+            if (cachedSovereignAttacks[1] == BattlerAction.None) sovereignAttacksArea.text = Adventurer.GetAttackName(cachedSovereignAttacks[0]);
             else sovereignAttacksArea.text = Adventurer.GetAttackName(cachedSovereignAttacks[0]) + dividerString + Adventurer.GetAttackName(cachedSovereignAttacks[1]);
         }
     }

@@ -39,7 +39,7 @@ public class SovereignWpn
     public int Martial;
     public int Magic;
     public int Speed;
-    public AdventurerAttack[] attacks;
+    public BattlerAction[] attacks;
     public WpnType wpnType;
     public WpnClass wpnClass;
     public string wpnName;
@@ -137,12 +137,12 @@ public class SovereignWpn
     {
         int advancedMovesLeft = 1;
         if (metaclass == WpnMetaclass.Technical) advancedMovesLeft++;
-        attacks = new AdventurerAttack[3];
-        Queue<Func<int, AdventurerAttack>> specialAttacksGetMethods = new Queue<Func<int, AdventurerAttack>>(3);
+        attacks = new BattlerAction[3];
+        Queue<Func<int, BattlerAction>> specialAttacksGetMethods = new Queue<Func<int, BattlerAction>>(3);
         specialAttacksGetMethods.Enqueue(GetSpecial0);
         specialAttacksGetMethods.Enqueue(GetSpecial1);
         specialAttacksGetMethods.Enqueue(GetSpecial2);
-        Func<int, AdventurerAttack>[] specialAttacksGetMethods_shuffled = new Func<int, AdventurerAttack>[3];
+        Func<int, BattlerAction>[] specialAttacksGetMethods_shuffled = new Func<int, BattlerAction>[3];
         for (int i = 0; i < 3; i++)
         {
             int r = UnityEngine.Random.Range(0, 3);
@@ -150,13 +150,13 @@ public class SovereignWpn
             else specialAttacksGetMethods_shuffled[r] = specialAttacksGetMethods.Dequeue();
         }
         for (int i = 0; i < specialAttacksGetMethods_shuffled.Length; i++) specialAttacksGetMethods.Enqueue(specialAttacksGetMethods_shuffled[i]);
-        for (int i = 0; i < attacks.Length; i++) attacks[i] = AdventurerAttack.UninitializedVal;
+        for (int i = 0; i < attacks.Length; i++) attacks[i] = BattlerAction.UninitializedVal;
         if (wpnLevel == 0)
         {
             if (metaclass == WpnMetaclass.Technical) attacks[0] = GetBasicAttack(1);
             else attacks[0] = GetBasicAttack(0);
             attacks[1] = specialAttacksGetMethods.Dequeue()(1);
-            attacks[2] = AdventurerAttack.None;
+            attacks[2] = BattlerAction.None;
         }
         else if (wpnLevel == 1)
         {
@@ -165,7 +165,7 @@ public class SovereignWpn
             {
                 if (r == 0)
                 {
-                    if (attacks[0] == AdventurerAttack.UninitializedVal)
+                    if (attacks[0] == BattlerAction.UninitializedVal)
                     {
                         advancedMovesLeft--;
                         attacks[0] = GetBasicAttack(1);
@@ -173,41 +173,41 @@ public class SovereignWpn
                 }
                 else
                 {
-                    if (attacks[1] == AdventurerAttack.UninitializedVal)
+                    if (attacks[1] == BattlerAction.UninitializedVal)
                     {
                         advancedMovesLeft--;
                         attacks[1] = specialAttacksGetMethods.Dequeue()(1);
                     }
-                    else if (attacks[2] == AdventurerAttack.UninitializedVal)
+                    else if (attacks[2] == BattlerAction.UninitializedVal)
                     {
                         advancedMovesLeft--;
                         attacks[2] = specialAttacksGetMethods.Dequeue()(1);
                     }
                 }
             }
-            if (attacks[1] == AdventurerAttack.UninitializedVal) attacks[1] = specialAttacksGetMethods.Dequeue()(1);
-            if (attacks[0] == AdventurerAttack.UninitializedVal)
+            if (attacks[1] == BattlerAction.UninitializedVal) attacks[1] = specialAttacksGetMethods.Dequeue()(1);
+            if (attacks[0] == BattlerAction.UninitializedVal)
             {
                 attacks[0] = GetBasicAttack(0);
-                if (attacks[2] == AdventurerAttack.UninitializedVal) attacks[2] = specialAttacksGetMethods.Dequeue()(1);
+                if (attacks[2] == BattlerAction.UninitializedVal) attacks[2] = specialAttacksGetMethods.Dequeue()(1);
             }
-            else attacks[2] = AdventurerAttack.None;
+            else attacks[2] = BattlerAction.None;
         }
         else if (wpnLevel == 2)
         {
             while (advancedMovesLeft > 0)
             {
                 int r = UnityEngine.Random.Range(0, 3);
-                if (attacks[r] == AdventurerAttack.UninitializedVal)
+                if (attacks[r] == BattlerAction.UninitializedVal)
                 {
                     if (r == 0) attacks[r] = GetBasicAttack(2);
                     else attacks[r] = specialAttacksGetMethods.Dequeue()(2);
                     advancedMovesLeft--;
                 }
             }
-            if (attacks[0] == AdventurerAttack.UninitializedVal) attacks[0] = GetBasicAttack(1);
-            if (attacks[1] == AdventurerAttack.UninitializedVal) attacks[1] = specialAttacksGetMethods.Dequeue()(1);
-            if (attacks[2] == AdventurerAttack.UninitializedVal) attacks[2] = specialAttacksGetMethods.Dequeue()(1);
+            if (attacks[0] == BattlerAction.UninitializedVal) attacks[0] = GetBasicAttack(1);
+            if (attacks[1] == BattlerAction.UninitializedVal) attacks[1] = specialAttacksGetMethods.Dequeue()(1);
+            if (attacks[2] == BattlerAction.UninitializedVal) attacks[2] = specialAttacksGetMethods.Dequeue()(1);
         }
         if (wpnType == WpnType.Staff)
         {
@@ -219,106 +219,106 @@ public class SovereignWpn
     /// <summary>
     /// Fixing this properly means rewriting the attack array gen as something marginally sane, so this is here until that happens.
     /// </summary>
-    void ShittyGen_HackySanityCheckForStaves(ref AdventurerAttack checkingAtk)
+    void ShittyGen_HackySanityCheckForStaves(ref BattlerAction checkingAtk)
     {
-        if (attacks[0] == AdventurerAttack.IceBullet || attacks[0] == AdventurerAttack.FrostSpear || attacks[0] == AdventurerAttack.CometStrike)
+        if (attacks[0] == BattlerAction.IceBullet || attacks[0] == BattlerAction.FrostSpear || attacks[0] == BattlerAction.CometStrike)
         {
-            if (checkingAtk == AdventurerAttack.IceBullet) checkingAtk = AdventurerAttack.HealingWind;
-            else if (checkingAtk == AdventurerAttack.FrostSpear) checkingAtk = AdventurerAttack.BreathOfLife;
-            else if (checkingAtk == AdventurerAttack.CometStrike) checkingAtk = AdventurerAttack.Renewal;
+            if (checkingAtk == BattlerAction.IceBullet) checkingAtk = BattlerAction.HealingWind;
+            else if (checkingAtk == BattlerAction.FrostSpear) checkingAtk = BattlerAction.BreathOfLife;
+            else if (checkingAtk == BattlerAction.CometStrike) checkingAtk = BattlerAction.Renewal;
         }
-        else if (attacks[0] == AdventurerAttack.HealingWind || attacks[0] == AdventurerAttack.BreathOfLife || attacks[0] == AdventurerAttack.Renewal)
+        else if (attacks[0] == BattlerAction.HealingWind || attacks[0] == BattlerAction.BreathOfLife || attacks[0] == BattlerAction.Renewal)
         {
-            if (checkingAtk == AdventurerAttack.HealingWind) checkingAtk = AdventurerAttack.IceBullet;
-            else if (checkingAtk == AdventurerAttack.BreathOfLife) checkingAtk = AdventurerAttack.FrostSpear;
-            else if (checkingAtk == AdventurerAttack.Renewal) checkingAtk = AdventurerAttack.CometStrike;
+            if (checkingAtk == BattlerAction.HealingWind) checkingAtk = BattlerAction.IceBullet;
+            else if (checkingAtk == BattlerAction.BreathOfLife) checkingAtk = BattlerAction.FrostSpear;
+            else if (checkingAtk == BattlerAction.Renewal) checkingAtk = BattlerAction.CometStrike;
         }
     }
 
-    AdventurerAttack GetBasicAttack (int lv)
+    BattlerAction GetBasicAttack (int lv)
     {
         switch (wpnType)
         {
             case WpnType.Mace:
-                if (lv == 0) return AdventurerAttack.Bludgeon;
-                else if (lv == 1) return AdventurerAttack.HammerBlow;
-                else return AdventurerAttack.ContinentSmash;
+                if (lv == 0) return BattlerAction.Bludgeon;
+                else if (lv == 1) return BattlerAction.HammerBlow;
+                else return BattlerAction.ContinentSmash;
             case WpnType.Knives:
-                if (lv == 0) return AdventurerAttack.QuickStab;
-                else if (lv == 1) return AdventurerAttack.Stiletto;
-                else return AdventurerAttack.ThroatSlit;
+                if (lv == 0) return BattlerAction.QuickStab;
+                else if (lv == 1) return BattlerAction.Stiletto;
+                else return BattlerAction.ThroatSlit;
             case WpnType.Staff:
                 if (UnityEngine.Random.Range(0, 2) == 0)
                 {
-                    if (lv == 0) return AdventurerAttack.HealingWind;
-                    else if (lv == 1) return AdventurerAttack.BreathOfLife;
-                    else return AdventurerAttack.Renewal;
+                    if (lv == 0) return BattlerAction.HealingWind;
+                    else if (lv == 1) return BattlerAction.BreathOfLife;
+                    else return BattlerAction.Renewal;
                 }
                 else
                 {
-                    if (lv == 0) return AdventurerAttack.IceBullet;
-                    else if (lv == 1) return AdventurerAttack.FrostSpear;
-                    else return AdventurerAttack.CometStrike;
+                    if (lv == 0) return BattlerAction.IceBullet;
+                    else if (lv == 1) return BattlerAction.FrostSpear;
+                    else return BattlerAction.CometStrike;
                 }
             default:
                 throw new System.Exception("Tried to get basic attack for bad weapon type: " + wpnType.ToString());
         }
     }
 
-    AdventurerAttack GetSpecial0 (int lv)
+    BattlerAction GetSpecial0 (int lv)
     {
-        AdventurerAttack a = AdventurerAttack.None;
+        BattlerAction a = BattlerAction.None;
         switch (wpnType)
         {
             case WpnType.Mace:
-                if (lv > 1) a = AdventurerAttack.BloodOfSteel;
-                else if (lv > 0) a = AdventurerAttack.Fortify;
+                if (lv > 1) a = BattlerAction.BloodOfSteel;
+                else if (lv > 0) a = BattlerAction.Fortify;
                 break;
             case WpnType.Knives:
-                if (lv > 1) a = AdventurerAttack.BladeOfCrimson;
-                else if (lv > 0) a = AdventurerAttack.BloodRites;
+                if (lv > 1) a = BattlerAction.BladeOfCrimson;
+                else if (lv > 0) a = BattlerAction.BloodRites;
                 break;
             case WpnType.Staff:
-                if (lv > 1) a = AdventurerAttack.SpeakNoEvil;
-                else if (lv > 0) a = AdventurerAttack.ZoneOfSilence;
+                if (lv > 1) a = BattlerAction.SpeakNoEvil;
+                else if (lv > 0) a = BattlerAction.ZoneOfSilence;
                 break;
         }
         return a;
     }
 
-    AdventurerAttack GetSpecial1 (int lv)
+    BattlerAction GetSpecial1 (int lv)
     {
-        AdventurerAttack a = AdventurerAttack.None;
+        BattlerAction a = BattlerAction.None;
         switch (wpnType)
         {
             case WpnType.Mace:
-                if (lv > 1) a = AdventurerAttack.CataclysmicImpact;
-                else if (lv > 0) a = AdventurerAttack.WideSwing;
+                if (lv > 1) a = BattlerAction.CataclysmicImpact;
+                else if (lv > 0) a = BattlerAction.WideSwing;
                 break;
             case WpnType.Knives:
-                if (lv > 1) a = AdventurerAttack.FlashStep;
-                else if (lv > 0) a = AdventurerAttack.FleetFeet;
+                if (lv > 1) a = BattlerAction.FlashStep;
+                else if (lv > 0) a = BattlerAction.FleetFeet;
                 break;
             case WpnType.Staff:
-                if (lv > 1) a = AdventurerAttack.CovetNot;
-                else if (lv > 0) a = AdventurerAttack.AntiDrain;
+                if (lv > 1) a = BattlerAction.CovetNot;
+                else if (lv > 0) a = BattlerAction.AntiDrain;
                 break;
         }
         return a;
     }
 
-    AdventurerAttack GetSpecial2 (int lv)
+    BattlerAction GetSpecial2 (int lv)
     {
-        AdventurerAttack a = AdventurerAttack.None;
+        BattlerAction a = BattlerAction.None;
         switch (wpnType)
         {
             case WpnType.Mace:
-                if (lv > 1) a = AdventurerAttack.DreamlessSleep;
-                else if (lv > 0) a = AdventurerAttack.Concuss;
+                if (lv > 1) a = BattlerAction.DreamlessSleep;
+                else if (lv > 0) a = BattlerAction.Concuss;
                 break;
             case WpnType.Knives:
-                if (lv > 1) a = AdventurerAttack.WithTheWind;
-                else if (lv > 0) a = AdventurerAttack.SecondSight;
+                if (lv > 1) a = BattlerAction.WithTheWind;
+                else if (lv > 0) a = BattlerAction.SecondSight;
                 break;
             case WpnType.Staff:
                 if (wpnLevel == 0)
@@ -326,15 +326,15 @@ public class SovereignWpn
                     if (UnityEngine.Random.Range(0, 2) == 0) a = GetSpecial1(lv);
                     else a = GetSpecial0(lv);
                 }
-                else if (attacks[0] == AdventurerAttack.IceBullet || attacks[0] == AdventurerAttack.FrostSpear || attacks[0] == AdventurerAttack.CometStrike)
+                else if (attacks[0] == BattlerAction.IceBullet || attacks[0] == BattlerAction.FrostSpear || attacks[0] == BattlerAction.CometStrike)
                 {
-                    if (lv > 1) a = AdventurerAttack.BreathOfLife;
-                    else if (lv > 0) a = AdventurerAttack.HealingWind;
+                    if (lv > 1) a = BattlerAction.BreathOfLife;
+                    else if (lv > 0) a = BattlerAction.HealingWind;
                 }
                 else
                 {
-                    if (lv > 1) a = AdventurerAttack.FrostSpear;
-                    else if (lv > 0) a = AdventurerAttack.IceBullet;
+                    if (lv > 1) a = BattlerAction.FrostSpear;
+                    else if (lv > 0) a = BattlerAction.IceBullet;
                 }
                 break;
         }

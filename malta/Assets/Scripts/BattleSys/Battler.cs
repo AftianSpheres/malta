@@ -12,9 +12,8 @@ public class Battler : MonoBehaviour
     public List<BattlerAction> onAllyDeathblowInterruptActions;
     public List<BattlerAction> onAllyHitInterruptActions;
     public List<BattlerAction> onHitInterruptActions;
-    public BattlerAction defaultAction;
-    public AdventurerAttack attack0;
-    public AdventurerAttack attack1;
+    public List<BattlerAction> standardBracketActions;
+    public BattlerAction defaultAction { get { return standardBracketActions[0]; } }
     public bool _underBarrier { get { return barrierTurns > 0; } }
     public bool _underEncore { get { if (isEnemy) return overseer.encoreWaitingForEnemies; else return overseer.encoreWaitingForPlayer; } }
     public bool _underSilence { get { return silentTurns > 0; } }
@@ -487,11 +486,11 @@ public class Battler : MonoBehaviour
                 }
             }
             if (adventurer.special == AdventurerSpecial.SilencingShot && turn == 0 && spellcasterInEnemyParty) action = BattlerAction.SilencingShot;
-            else if (HasAttack(AdventurerAttack.RainOfArrows) && opponents.Count > 2) action = BattlerAction.RainOfArrows;
-            else if (HasAttack(AdventurerAttack.ShieldBlock) && shieldBlockTurns < 1) action = BattlerAction.ShieldBlock;
-            else if (HasAttack(AdventurerAttack.Haste) && hasteCooldown < 1) action = BattlerAction.Haste;
-            else if (HasAttack(AdventurerAttack.BurstOfSpeed) && burstOfSpeedCooldown < 1 && turn > 0) action = BattlerAction.BurstOfSpeed;
-            else if (HasAttack(AdventurerAttack.Inferno) && opponents.Count > 1) action = BattlerAction.Inferno;
+            else if (HasAttack(BattlerAction.RainOfArrows) && opponents.Count > 2) action = BattlerAction.RainOfArrows;
+            else if (HasAttack(BattlerAction.ShieldBlock) && shieldBlockTurns < 1) action = BattlerAction.ShieldBlock;
+            else if (HasAttack(BattlerAction.Haste) && hasteCooldown < 1) action = BattlerAction.Haste;
+            else if (HasAttack(BattlerAction.BurstOfSpeed) && burstOfSpeedCooldown < 1 && turn > 0) action = BattlerAction.BurstOfSpeed;
+            else if (HasAttack(BattlerAction.Inferno) && opponents.Count > 1) action = BattlerAction.Inferno;
             else action = defaultAction;
         }
         readiedAction = action;
@@ -535,7 +534,7 @@ public class Battler : MonoBehaviour
     {
         SetBattlerActive();
         dead = false;
-        defaultAction = BattlerAction.None;
+        if (standardBracketActions == null) standardBracketActions = new List<BattlerAction>(); else standardBracketActions.Clear();
         if (battleStartInterruptActions == null) battleStartInterruptActions = new List<BattlerAction>(); else battleStartInterruptActions.Clear();
         if (onAllyHitInterruptActions == null) onAllyHitInterruptActions = new List<BattlerAction>(); else onAllyHitInterruptActions.Clear();
         if (onAllyDeathblowInterruptActions == null) onAllyDeathblowInterruptActions = new List<BattlerAction>(); else onAllyDeathblowInterruptActions.Clear();
@@ -545,77 +544,32 @@ public class Battler : MonoBehaviour
         RefreshCooldownsAndShit();
         for (int i = 0; i < adventurer.attacks.Length; i++)
         {
-            RegisterAttack(adventurer.attacks[i]);
-            if (defaultAction == BattlerAction.None) switch (adventurer.attacks[i])
+            BattlerActionData bad = BattlerActionData.get(adventurer.attacks[i]);
+            switch (bad.interruptType)
             {
-                case AdventurerAttack.MaceSwing:
-                    defaultAction = BattlerAction.MaceSwing;
+                case BattlerActionInterruptType.None:
+                    standardBracketActions.Add(adventurer.attacks[i]);
                     break;
-                case AdventurerAttack.Bowshot:
-                    defaultAction = BattlerAction.Bowshot;
+                case BattlerActionInterruptType.BattleStart:
+                    battleStartInterruptActions.Add(adventurer.attacks[i]);
                     break;
-                case AdventurerAttack.SpearThrust:
-                    defaultAction = BattlerAction.SpearThrust;
+                case BattlerActionInterruptType.OnAllyDeathblow:
+                    onAllyDeathblowInterruptActions.Add(adventurer.attacks[i]);
                     break;
-                case AdventurerAttack.Siphon:
-                    defaultAction = BattlerAction.Siphon;
+                case BattlerActionInterruptType.OnAllyHit:
+                    onAllyHitInterruptActions.Add(adventurer.attacks[i]);
                     break;
-                case AdventurerAttack.VampiricWinds:
-                    defaultAction = BattlerAction.VampiricWinds;
+                case BattlerActionInterruptType.OnHit:
+                    onHitInterruptActions.Add(adventurer.attacks[i]);
                     break;
-                case AdventurerAttack.Lightning:
-                    defaultAction = BattlerAction.Lightning;
-                    break;
-                case AdventurerAttack.HammerBlow:
-                    defaultAction = BattlerAction.HammerBlow;
-                    break;
-                case AdventurerAttack.Rend:
-                    defaultAction = BattlerAction.Rend;
-                    break;
-                case AdventurerAttack.Bludgeon:
-                    defaultAction = BattlerAction.Bludgeon;
-                    break;
-                case AdventurerAttack.ContinentSmash:
-                    defaultAction = BattlerAction.ContinentSmash;
-                    break;
-                case AdventurerAttack.QuickStab:
-                    defaultAction = BattlerAction.QuickStab;
-                    break;
-                case AdventurerAttack.Stiletto:
-                    defaultAction = BattlerAction.Stiletto;
-                    break;
-                case AdventurerAttack.ThroatSlit:
-                    defaultAction = BattlerAction.ThroatSlit;
-                    break;
-                case AdventurerAttack.IceBullet:
-                    defaultAction = BattlerAction.IceBullet;
-                    break;
-                case AdventurerAttack.FrostSpear:
-                    defaultAction = BattlerAction.FrostSpear;
-                    break;
-                case AdventurerAttack.CometStrike:
-                    defaultAction = BattlerAction.CometStrike;
-                    break;
-                }
+            }
         }
         if (adventurer.special == AdventurerSpecial.ShieldWall) battleStartInterruptActions.Add(BattlerAction.ShieldWall);
         else if (adventurer.special == AdventurerSpecial.Barrier) battleStartInterruptActions.Add(BattlerAction.Barrier);
         else if (adventurer.special == AdventurerSpecial.Feedback) onHitInterruptActions.Add(BattlerAction.Feedback);
         else if (adventurer.special == AdventurerSpecial.Protect) onAllyHitInterruptActions.Add(BattlerAction.Protect);
-        if (HasAttack(AdventurerAttack.Concuss)) battleStartInterruptActions.Add(BattlerAction.Concuss);
-        if (HasAttack(AdventurerAttack.DreamlessSleep)) battleStartInterruptActions.Add(BattlerAction.DreamlessSleep);
-        if (HasAttack(AdventurerAttack.FleetFeet)) battleStartInterruptActions.Add(BattlerAction.FleetFeet);
-        if (HasAttack(AdventurerAttack.FlashStep)) battleStartInterruptActions.Add(BattlerAction.FlashStep);
-        if (HasAttack(AdventurerAttack.GetBehindMe)) onAllyDeathblowInterruptActions.Add(BattlerAction.GetBehindMe);
-        if (HasAttack(AdventurerAttack.Flanking)) onAllyDeathblowInterruptActions.Add(BattlerAction.Flanking);
         livesOnBackRow = !Adventurer.ClassIsFrontRowClass(adventurer.advClass);
         puppet.Setup();
-    }
-
-    private void RegisterAttack (AdventurerAttack attack)
-    {
-        if (attack0 == AdventurerAttack.None) attack0 = attack;
-        else attack1 = attack;
     }
 
     public void TickCooldownsAndShit ()
@@ -654,9 +608,9 @@ public class Battler : MonoBehaviour
         if (silentTurns < turns) silentTurns = turns;
     }
 
-    private bool HasAttack (AdventurerAttack attack)
+    private bool HasAttack (BattlerAction attack)
     {
-        return attack0 == attack || attack1 == attack;
+        return standardBracketActions.Contains(attack) || battleStartInterruptActions.Contains(attack) || onHitInterruptActions.Contains(attack) || onAllyDeathblowInterruptActions.Contains(attack) || onAllyHitInterruptActions.Contains(attack);
     }
 
     private void RefreshCooldownsAndShit ()

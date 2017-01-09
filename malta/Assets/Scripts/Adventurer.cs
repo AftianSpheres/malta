@@ -48,7 +48,7 @@ public class Adventurer
     public string title;
     public string fullTitle;
     public string bioText { get; private set; }
-    public AdventurerAttack[] attacks;
+    public BattlerAction[] attacks;
     public AdventurerClass advClass { get; private set; }
     public AdventurerSpecial special;
     public AdventurerSpecies species = AdventurerSpecies.Human;
@@ -89,7 +89,7 @@ public class Adventurer
     private const string specialDescsResourcePath = "special_descs/";
     private const string mugshotsResourcePath = "mugshots/";
     private const string enemyGfxResourcePath = "mugshots/enemy/";
-    public static int[] awakeningCosts = { 0, 0, 0, 50, 50, 50 };
+    public static int[] awakeningCosts = { 50, 50, 50 };
     private static AdventurerClass[] frontRowClasses = { AdventurerClass.Warrior, AdventurerClass.Footman, AdventurerClass.Sovereign };
 
     public void Awaken ()
@@ -133,6 +133,19 @@ public class Adventurer
         while (index == lastIndex) index = Random.Range(0, bioLikes.Length - 2);
         line2 += bioLikes[1] + bioLikes[index + 2];
         bioText = line0 + line1 + line2;
+    }
+
+    public void PushWpnToSovereign ()
+    {
+        if (GameDataManager.Instance.dataStore.sovereignAdventurer != this) throw new System.Exception("Tried to update an adventurer that's not the Sovereign with weapon data!");
+        SovereignWpn w = GameDataManager.Instance.dataStore.sovWpn_Set;
+        attacks = new BattlerAction[w.attacks.Length + 1];
+        w.attacks.CopyTo(attacks, 0);
+        attacks[attacks.Length - 1] = GameDataManager.Instance.dataStore.sovereignTactic;
+        HP = w.HP;
+        Martial = w.Martial;
+        Magic = w.Magic;
+        Speed = w.Speed;
     }
 
     void LoadBioTextStrings ()
@@ -283,19 +296,12 @@ public class Adventurer
         return r;
     }
 
-    public static string GetAttackName (AdventurerAttack attack)
+    public static string GetAttackName (BattlerAction attack)
     {
-        string name = "Out of range attack name";
-        if (attackNames == null)
-        {
-            TextAsset a = Resources.Load<TextAsset>("attack_names");
-            attackNames = a.text.Split('\n');
-        }
-        if ((int)attack < attackNames.Length) name = attackNames[(int)attack];
-        return name;
+        return BattlerActionData.get(attack).name;
     }
 
-    public static string GetAttackDescription(AdventurerAttack attack)
+    public static string GetAttackDescription(BattlerAction attack)
     {
         string desc = "None";
         TextAsset a = Resources.Load<TextAsset>(attackDescsResourcePath + attack.ToString());
@@ -323,34 +329,34 @@ public class Adventurer
         return name;
     }
 
-    public static AdventurerAttack[] GetClassAttacks (AdventurerClass advClass)
+    public static BattlerAction[] GetClassAttacks (AdventurerClass advClass)
     {
-        AdventurerAttack[] attacks = { };
+        BattlerAction[] attacks = { };
         switch (advClass)
         {
             case AdventurerClass.Warrior:
-                attacks = new AdventurerAttack[] { AdventurerAttack.MaceSwing, AdventurerAttack.None };
+                attacks = new BattlerAction[] { BattlerAction.MaceSwing, BattlerAction.None };
                 break;
             case AdventurerClass.Bowman:
-                attacks = new AdventurerAttack[] { AdventurerAttack.Bowshot, AdventurerAttack.RainOfArrows };
+                attacks = new BattlerAction[] { BattlerAction.Bowshot, BattlerAction.RainOfArrows };
                 break;
             case AdventurerClass.Footman:
-                attacks = new AdventurerAttack[] { AdventurerAttack.ShieldBlock, AdventurerAttack.SpearThrust };
+                attacks = new BattlerAction[] { BattlerAction.ShieldBlock, BattlerAction.SpearThrust };
                 break;
             case AdventurerClass.Mystic:
-                attacks = new AdventurerAttack[] { AdventurerAttack.Siphon, AdventurerAttack.Haste };
+                attacks = new BattlerAction[] { BattlerAction.Siphon, BattlerAction.Haste };
                 break;
             case AdventurerClass.Sage:
-                attacks = new AdventurerAttack[] { AdventurerAttack.VampiricWinds, AdventurerAttack.BurstOfSpeed };
+                attacks = new BattlerAction[] { BattlerAction.VampiricWinds, BattlerAction.BurstOfSpeed };
                 break;
             case AdventurerClass.Wizard:
-                attacks = new AdventurerAttack[] { AdventurerAttack.Inferno, AdventurerAttack.Lightning };
+                attacks = new BattlerAction[] { BattlerAction.Inferno, BattlerAction.Lightning };
                 break;
             case AdventurerClass.Sovereign:
-                attacks = new AdventurerAttack[] { AdventurerAttack.HammerBlow, GameDataManager.Instance.dataStore.sovereignTactic };
+                attacks = new BattlerAction[] { BattlerAction.HammerBlow, GameDataManager.Instance.dataStore.sovereignTactic };
                 break;
             case AdventurerClass.Avatar:
-                attacks = new AdventurerAttack[] { AdventurerAttack.Rend, AdventurerAttack.None };
+                attacks = new BattlerAction[] { BattlerAction.Rend, BattlerAction.None };
                 break;
         }
         return attacks;

@@ -11,7 +11,7 @@ public class GameDataManager_DataStore
     public Adventurer[] houseAdventurers;
     public AdventurerClass warriorClassUnlock;
     public AdventurerClass mysticClassUnlock;
-    public AdventurerAttack sovereignTactic;
+    public BattlerAction sovereignTactic;
     public AdventurerSpecial sovereignSkill;
     public AdventurerMugshot sovereignMugshot;
     public int housingLevel;
@@ -22,6 +22,11 @@ public class GameDataManager_DataStore
     public string sovereignFirstName;
     public string sovereignLastName;
     public string sovereignName { get { return sovereignAdventurer.fullName; } }
+    public SovereignWpn sovWpn_Mace;
+    public SovereignWpn sovWpn_Knives;
+    public SovereignWpn sovWpn_Staff;
+    public SovereignWpn sovWpn_Set { get { if (sovereignEquippedWeaponType == WpnType.Mace) return sovWpn_Mace; else if (sovereignEquippedWeaponType == WpnType.Knives) return sovWpn_Knives; else return sovWpn_Staff; } }
+    public WpnType sovereignEquippedWeaponType;
     public string yourTownName;
     public string[] fakeTownNames;
     public bool pendingUpgrade_Docks;
@@ -120,9 +125,14 @@ public class GameDataManager_DataStore
         sovereignAdventurer = new Adventurer();
         warriorClassUnlock = AdventurerClass.Warrior;
         mysticClassUnlock = AdventurerClass.Mystic;
-        sovereignTactic = AdventurerAttack.GetBehindMe;
+        sovereignTactic = BattlerAction.GetBehindMe;
         sovereignSkill = AdventurerSpecial.None;
         sovereignMugshot = AdventurerMugshot.Sovereign0;
+        sovWpn_Knives = new SovereignWpn(0, WpnType.Knives);
+        sovWpn_Mace = new SovereignWpn(0, WpnType.Mace);
+        sovWpn_Staff = new SovereignWpn(0, WpnType.Staff);
+        sovereignEquippedWeaponType = WpnType.Mace;
+        sovereignAdventurer.PushWpnToSovereign();
     }
 
     public void SaveToFile(string path)
@@ -196,6 +206,12 @@ public class GameDataManager : Manager<GameDataManager>
         }
         if (dataStore.adventureLevel > 2 && !dataStore.unlock_WizardsTower) dataStore.unlock_WizardsTower = true;
 
+    }
+
+    public void ChangeSetSovWpn (WpnType wpn)
+    {
+        dataStore.sovereignEquippedWeaponType = wpn;
+        dataStore.sovereignAdventurer.PushWpnToSovereign();
     }
 
     public bool LoadFromSave ()
@@ -403,7 +419,7 @@ public class GameDataManager : Manager<GameDataManager>
         dataStore.sovereignAdventurer.special = special;
     }
 
-    public void SetSovereignTactic (AdventurerAttack attack)
+    public void SetSovereignTactic (BattlerAction attack)
     {
         dataStore.sovereignTactic = attack;
         dataStore.sovereignAdventurer.attacks[1] = attack;

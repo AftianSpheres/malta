@@ -36,7 +36,7 @@ public class HousePopup : MonoBehaviour
     private int adventurerMagicCached;
     private int adventurerSpeedCached;
     private int houseLvCached;
-    private AdventurerAttack[] adventurerAttacksCached;
+    private BattlerAction[] adventurerAttacksCached;
     private AdventurerSpecial adventurerSpecialCached = AdventurerSpecial.UninitializedValue;
     private AdventurerMugshot cachedAdventurerMugshot;
     private string cachedName;
@@ -111,7 +111,7 @@ public class HousePopup : MonoBehaviour
             adventurerAttacksCached = inspectedAdventurer.attacks;
             for (int i = 0; i < adventurerAttacksCached.Length && i < 3; i++)
             {
-                if (inspectedAdventurer.attacks[i] != AdventurerAttack.None)
+                if (inspectedAdventurer.attacks[i] != BattlerAction.None)
                 {
                     attacksStrings[i] = Adventurer.GetAttackName(inspectedAdventurer.attacks[i]);
                 }

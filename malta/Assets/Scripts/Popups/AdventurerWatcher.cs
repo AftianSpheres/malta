@@ -20,7 +20,7 @@ public class AdventurerWatcher : MonoBehaviour
     public HousePopup housePopup;
     public SwapAdventurerPopup swapPopup;
     private int[] cachedAdventurerStats = { -1, -1, -1, -1 };
-    private AdventurerAttack[] cachedAdventurerAttacks = { AdventurerAttack.None, AdventurerAttack.None };
+    private BattlerAction[] cachedAdventurerAttacks = { BattlerAction.None, BattlerAction.None };
     private AdventurerSpecial cachedAdventurerSpecial = AdventurerSpecial.LoseBattle;
     private AdventurerMugshot cachedAdventurerMugshot = AdventurerMugshot.None;
     private string[] strings;
@@ -102,11 +102,11 @@ public class AdventurerWatcher : MonoBehaviour
             {
                 if (cachedAdventurerAttacks[0] != adventurer.attacks[0] || cachedAdventurerAttacks[1] != adventurer.attacks[1])
                 {
-                    cachedAdventurerAttacks = adventurer.attacks.Clone() as AdventurerAttack[];
+                    cachedAdventurerAttacks = adventurer.attacks.Clone() as BattlerAction[];
                     string[] attacksStrings = { "", "" };
                     for (int i = 0; i < cachedAdventurerAttacks.Length && i < 2; i++)
                     {
-                        if (cachedAdventurerAttacks[i] != AdventurerAttack.None)
+                        if (cachedAdventurerAttacks[i] != BattlerAction.None)
                         {
                             attacksStrings[i] = Adventurer.GetAttackName(cachedAdventurerAttacks[i]);
                         }
