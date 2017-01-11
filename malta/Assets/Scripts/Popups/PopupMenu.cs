@@ -59,6 +59,7 @@ public class PopupMenu : MonoBehaviour
         activeButtons = new Button[buttons.Length];
         for (int i = 0; i < buttons.Length; i++)
         {
+            if (buttons[i] == null) continue;
             if (buttons[i].interactable)
             {
                 activeButtons[i] = buttons[i];

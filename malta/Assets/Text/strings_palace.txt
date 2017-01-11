@@ -29,3 +29,8 @@ Next destination: Overgrown City
 Scouts confirm that they've found the city of the forest folk. This will be an exceptionally dangerous expedition, but we have reason to believe that their city may hide something having to do with the portal...
 Next destination: Forest Labyrinth Level 
 ...We've had no word from our scouts. What's more, it seems like we'll need to offer a wager of our resources to enter... Is this really a good idea?
+Front or back row
+Front row only
+Back row only
+Current position: front row
+Current position: back row

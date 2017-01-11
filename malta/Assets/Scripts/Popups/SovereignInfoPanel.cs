@@ -6,25 +6,32 @@ public class SovereignInfoPanel : MonoBehaviour
     public PopupMenu shell;
     public PopupMenu sovereignSpecialPopup;
     public PopupMenu sovereignTacticsPopup;
+    public PopupMenu sovereignWeaponPopup;
     public Image sovereignMugshot;
     public Text sovereignNameLabel;
     public Text sovereignSpecialDesc;
     public Text sovereignTitleArea;
-    public Text sovereignAttacksArea;
-    public Text sovereignStatsArea;
     public Text sovereignTacticDesc;
+    public Text sovereignWpnArea;
+    public Text rowPlacementArea;
+    public Button rowPlacementButton;
     public string[] strings;
-    private int[] cachedSovereignStats = { -1, -1, -1, -1 };
     private string cachedSovereignName = "¡²¤€¼½¾‘’¥×äåé®®þüúíó«»áß";
     private string cachedSovereignTitle = "¡²¤€¼½¾‘’¥×äåé®®þüúíó«»áß";
     private BattlerAction cachedSovereignTactic = BattlerAction.None;
-    private BattlerAction[] cachedSovereignAttacks = { BattlerAction.None, BattlerAction.None };
+    private SovereignWpn cachedSovereignWpn = null;
+    private bool cachedSovereignRowState;
     private AdventurerSpecial cachedSovereignSpecial = AdventurerSpecial.LoseBattle;
     private AdventurerMugshot cachedSovereignMugshot;
     private const string dividerString = " | ";
-	
-	// Update is called once per frame
-	void Update ()
+
+    private void Start()
+    {
+        cachedSovereignRowState = !GameDataManager.Instance.dataStore.sovereignOnBackRow;
+    }
+
+    // Update is called once per frame
+    void Update ()
     {
         if (cachedSovereignName != GameDataManager.Instance.dataStore.sovereignName)
         {
@@ -51,22 +58,19 @@ public class SovereignInfoPanel : MonoBehaviour
             cachedSovereignTitle = GameDataManager.Instance.dataStore.sovereignAdventurer.fullTitle;
             sovereignTitleArea.text = cachedSovereignTitle;
         }
-        if (cachedSovereignStats[0] != GameDataManager.Instance.dataStore.sovereignAdventurer.HP ||
-            cachedSovereignStats[1] != GameDataManager.Instance.dataStore.sovereignAdventurer.Martial ||
-            cachedSovereignStats[2] != GameDataManager.Instance.dataStore.sovereignAdventurer.Magic ||
-            cachedSovereignStats[3] != GameDataManager.Instance.dataStore.sovereignAdventurer.Speed)
+        if (cachedSovereignWpn != GameDataManager.Instance.dataStore.sovWpn_Set)
         {
-            cachedSovereignStats = new int[] { GameDataManager.Instance.dataStore.sovereignAdventurer.HP, GameDataManager.Instance.dataStore.sovereignAdventurer.Martial,
-                GameDataManager.Instance.dataStore.sovereignAdventurer.Magic, GameDataManager.Instance.dataStore.sovereignAdventurer.Speed };
-            sovereignStatsArea.text = strings[2] + cachedSovereignStats[0] + dividerString + strings[3] + cachedSovereignStats[1] + dividerString +
-                                      strings[4] + cachedSovereignStats[2] + dividerString + strings[5] + cachedSovereignStats[3];
+            UpdateButtonWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Set, ref cachedSovereignWpn, ref strings, ref sovereignWpnArea);
         }
-        if (cachedSovereignAttacks[0] != GameDataManager.Instance.dataStore.sovereignAdventurer.attacks[0] ||
-            cachedSovereignAttacks[1] != GameDataManager.Instance.dataStore.sovereignAdventurer.attacks[1])
+        if (rowPlacementButton != null && rowPlacementButton.interactable != (GameDataManager.Instance.dataStore.sovereignEquippedWeaponType == WpnType.Knives)) rowPlacementButton.interactable = (GameDataManager.Instance.dataStore.sovereignEquippedWeaponType == WpnType.Knives);
+        if (cachedSovereignRowState != GameDataManager.Instance.dataStore.sovereignOnBackRow)
         {
-            cachedSovereignAttacks = GameDataManager.Instance.dataStore.sovereignAdventurer.attacks.Clone() as BattlerAction[];
-            if (cachedSovereignAttacks[1] == BattlerAction.None) sovereignAttacksArea.text = Adventurer.GetAttackName(cachedSovereignAttacks[0]);
-            else sovereignAttacksArea.text = Adventurer.GetAttackName(cachedSovereignAttacks[0]) + dividerString + Adventurer.GetAttackName(cachedSovereignAttacks[1]);
+            cachedSovereignRowState = GameDataManager.Instance.dataStore.sovereignOnBackRow;
+            if (cachedSovereignRowState)
+            {
+                rowPlacementArea.text = strings[35];
+            }
+            else rowPlacementArea.text = strings[34];
         }
     }
 
@@ -80,5 +84,45 @@ public class SovereignInfoPanel : MonoBehaviour
     {
         shell.SurrenderFocus();
         sovereignTacticsPopup.Open();
+    }
+
+    public void OpenSovereignWeaponPopup()
+    {
+        shell.SurrenderFocus();
+        sovereignWeaponPopup.Open();
+    }
+
+    public void SwitchRowPlacement ()
+    {
+        if (GameDataManager.Instance.dataStore.sovereignEquippedWeaponType == WpnType.Knives) GameDataManager.Instance.dataStore.sovereignOnBackRow = !GameDataManager.Instance.dataStore.sovereignOnBackRow;
+    }
+
+    public static void UpdateButtonWithWpnInfo (SovereignWpn o, ref SovereignWpn cachedSovereignWpn, ref string[] strings, ref Text sovereignWpnArea)
+    {
+        cachedSovereignWpn = o;
+        string l0 = cachedSovereignWpn.wpnName + System.Environment.NewLine;
+        string l1 = strings[2] + cachedSovereignWpn.HP + dividerString + strings[3] + cachedSovereignWpn.Martial + dividerString + strings[4] + cachedSovereignWpn.Magic + dividerString + strings[5] + cachedSovereignWpn.Speed + System.Environment.NewLine;
+        string l2 = string.Empty;
+        for (int i = 0; i < cachedSovereignWpn.attacks.Length; i++)
+        {
+            if (cachedSovereignWpn.attacks[i] != BattlerAction.UninitializedVal && cachedSovereignWpn.attacks[i] != BattlerAction.None)
+            {
+                l2 = l2 + BattlerActionData.get(cachedSovereignWpn.attacks[i]).name + System.Environment.NewLine;
+            }
+        }
+        string l3 = string.Empty;
+        switch (cachedSovereignWpn.wpnType)
+        {
+            case WpnType.Knives:
+                l3 = strings[31];
+                break;
+            case WpnType.Mace:
+                l3 = strings[32];
+                break;
+            case WpnType.Staff:
+                l3 = strings[33];
+                break;
+        }
+        sovereignWpnArea.text = l0 + l2 + l3;
     }
 }

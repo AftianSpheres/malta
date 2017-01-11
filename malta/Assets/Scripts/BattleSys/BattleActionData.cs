@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public enum BattlerAction
 {
     UninitializedVal = -99999,
-    None,
+    None = 0,
     MaceSwing,
     Siphon,
     Haste,

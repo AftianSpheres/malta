@@ -26,6 +26,7 @@ public class GameDataManager_DataStore
     public SovereignWpn sovWpn_Knives;
     public SovereignWpn sovWpn_Staff;
     public SovereignWpn sovWpn_Set { get { if (sovereignEquippedWeaponType == WpnType.Mace) return sovWpn_Mace; else if (sovereignEquippedWeaponType == WpnType.Knives) return sovWpn_Knives; else return sovWpn_Staff; } }
+    public bool sovereignOnBackRow;
     public WpnType sovereignEquippedWeaponType;
     public string yourTownName;
     public string[] fakeTownNames;
@@ -128,11 +129,6 @@ public class GameDataManager_DataStore
         sovereignTactic = BattlerAction.GetBehindMe;
         sovereignSkill = AdventurerSpecial.None;
         sovereignMugshot = AdventurerMugshot.Sovereign0;
-        sovWpn_Knives = new SovereignWpn(0, WpnType.Knives);
-        sovWpn_Mace = new SovereignWpn(0, WpnType.Mace);
-        sovWpn_Staff = new SovereignWpn(0, WpnType.Staff);
-        sovereignEquippedWeaponType = WpnType.Mace;
-        sovereignAdventurer.PushWpnToSovereign();
     }
 
     public void SaveToFile(string path)
@@ -161,17 +157,17 @@ public class GameDataManager : Manager<GameDataManager>
     private const int resourceMaximumsBaseValue= 600; // ten hours
     private const int pendingUpgradeBaseTime = 300; // five minutes;
     private const string saveName = "/save.bin";
-    public SovereignWpn[] testWpns;
+    //public SovereignWpn[] testWpns;
 
     void Start ()
     {
         lastSecondTimestamp = Time.time;
         saveExisted = LoadFromSave();
-        testWpns = new SovereignWpn[20];
-        for (int i = 0; i < testWpns.Length; i++)
-        {
-            testWpns[i] = new SovereignWpn(Random.Range(0, 3), (WpnType)Random.Range(1, 4));
-        }
+        //testWpns = new SovereignWpn[20];
+        //for (int i = 0; i < testWpns.Length; i++)
+        //{
+        //    testWpns[i] = new SovereignWpn(Random.Range(0, 3), (WpnType)Random.Range(1, 4));
+        //}
     }
 
     void Update ()
@@ -205,12 +201,22 @@ public class GameDataManager : Manager<GameDataManager>
             dataStore.unlock_raceOrc = true;
         }
         if (dataStore.adventureLevel > 2 && !dataStore.unlock_WizardsTower) dataStore.unlock_WizardsTower = true;
+        if (dataStore.sovWpn_Set == null)
+        {
+            dataStore.sovWpn_Knives = new SovereignWpn(0, WpnType.Knives);
+            dataStore.sovWpn_Mace = new SovereignWpn(0, WpnType.Mace);
+            dataStore.sovWpn_Staff = new SovereignWpn(0, WpnType.Staff);
+            dataStore.sovereignEquippedWeaponType = WpnType.Mace;
+            dataStore.sovereignAdventurer.PushWpnToSovereign();
+        }
 
     }
 
     public void ChangeSetSovWpn (WpnType wpn)
     {
         dataStore.sovereignEquippedWeaponType = wpn;
+        if (wpn == WpnType.Mace) dataStore.sovereignOnBackRow = false;
+        else if (wpn == WpnType.Staff) dataStore.sovereignOnBackRow = true;
         dataStore.sovereignAdventurer.PushWpnToSovereign();
     }
 
