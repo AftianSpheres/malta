@@ -98,6 +98,7 @@ public enum BattlerActionEffectFlags : ulong // these will never be serialized, 
     ShortDodgeBuff = 1 << 19,
     LongDodgeBuff = 1 << 20,
     DrainBlock = 1 << 21,
+    ForbidAfterTurn1 = 1 << 22,
     MaxValue = ulong.MaxValue
 }
 

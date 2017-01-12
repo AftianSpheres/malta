@@ -9,10 +9,15 @@ public class Battler : MonoBehaviour
     public Battler bodyguard;
     public List<Battler> deathblowList;
     public List<BattlerAction> battleStartInterruptActions;
+    private int[] _cooldowns_BSIA;
     public List<BattlerAction> onAllyDeathblowInterruptActions;
+    private int[] _cooldowns_OADIA;
     public List<BattlerAction> onAllyHitInterruptActions;
+    private int[] _cooldowns_OAHIA;
     public List<BattlerAction> onHitInterruptActions;
+    private int[] _cooldowns_OHIA;
     public List<BattlerAction> standardBracketActions;
+    private int[] _cooldowns_SBA;
     public BattlerAction defaultAction { get { return standardBracketActions[0]; } }
     public bool _underBarrier { get { return barrierTurns > 0; } }
     public bool _underEncore { get { if (isEnemy) return overseer.encoreWaitingForEnemies; else return overseer.encoreWaitingForPlayer; } }
@@ -29,9 +34,6 @@ public class Battler : MonoBehaviour
     public bool isValidTarget { get { return (existsInBattle && !pulledOutOfBattle); } }
     private bool getBehindMeProc;
     private int barrierTurns;
-    private int burstOfSpeedCooldown;
-    private int feedbackCooldown;
-    private int hasteCooldown;
     private int hasteTurns;
     private int shieldBlockTurns;
     private int shieldWallTurns;
@@ -58,6 +60,29 @@ public class Battler : MonoBehaviour
     {
         InitializeDisposables();
         activeBattler = true;
+    }
+
+    private void SetCooldown (BattlerAction action)
+    {
+        BattlerActionData d = BattlerActionData.get(action);
+        switch (d.interruptType)
+        {
+            case BattlerActionInterruptType.BattleStart:
+                _cooldowns_BSIA[battleStartInterruptActions.IndexOf(action)] = d.cooldownTurns;
+                break;
+            case BattlerActionInterruptType.None:
+                _cooldowns_SBA[standardBracketActions.IndexOf(action)] = d.cooldownTurns;
+                break;
+            case BattlerActionInterruptType.OnAllyDeathblow:
+                _cooldowns_OADIA[onAllyDeathblowInterruptActions.IndexOf(action)] = d.cooldownTurns;
+                break;
+            case BattlerActionInterruptType.OnAllyHit:
+                _cooldowns_OAHIA[onAllyHitInterruptActions.IndexOf(action)] = d.cooldownTurns;
+                break;
+            case BattlerActionInterruptType.OnHit:
+                _cooldowns_OHIA[onHitInterruptActions.IndexOf(action)] = d.cooldownTurns;
+                break;
+        }
     }
 
     public void Upkeep ()
@@ -286,10 +311,8 @@ public class Battler : MonoBehaviour
 
     private void UpdateSelfStateBasedOnFlags (BattlerActionEffectFlags flags)
     {
-        if ((flags & BattlerActionEffectFlags.Haste) == BattlerActionEffectFlags.Haste) hasteCooldown = 1;
         if ((flags & BattlerActionEffectFlags.Encore) == BattlerActionEffectFlags.Encore)
         {
-            burstOfSpeedCooldown = 3;
             overseer.GiveEncore(isEnemy);
         }
         if ((flags & BattlerActionEffectFlags.Bodyguard) == BattlerActionEffectFlags.Bodyguard)
@@ -338,7 +361,6 @@ public class Battler : MonoBehaviour
             UpdateSelfStateBasedOnFlags(dat.flags);
             if (readiedAction == BattlerAction.Feedback)
             {
-                feedbackCooldown = 3;
                 _effectMessages.Enqueue(BattleMessageType.Feedback);
             }
             if (_damage > 0)
@@ -471,9 +493,43 @@ public class Battler : MonoBehaviour
         dead = true;
     }
 
-    public BattlerAction GetAction (int turn, List<Battler> allies, List<Battler> opponents)
+    private bool StdActionAllowed (BattlerActionData d, int index)
     {
-        BattlerAction action = BattlerAction.None;
+        if (_cooldowns_SBA[index] > 0) return false;
+        if (d.HasEffectFlag(BattlerActionEffectFlags.ForbidAfterTurn1) && overseer.turn > 0) return false;
+        return true;
+    }
+
+    private bool StdActionDecide (BattlerActionData ld, BattlerActionData d, bool spellcasterInEnemyParty, List<Battler> allies, List<Battler> opponents)
+    {
+        if (ld.HasEffectFlag(BattlerActionEffectFlags.Encore)) return false;
+        if (d.HasEffectFlag(BattlerActionEffectFlags.Encore)) return true; // we never _don't_ want to take an encore because free turns, lol
+        if (spellcasterInEnemyParty)
+        {
+            if (ld.HasEffectFlag(BattlerActionEffectFlags.Silence)) return false;
+            if (d.HasEffectFlag(BattlerActionEffectFlags.Silence)) return true;
+        }
+        if (ld.HasEffectFlag(BattlerActionEffectFlags.Haste)) return false;
+        if (d.HasEffectFlag(BattlerActionEffectFlags.Haste)) return true;
+        if (ld.HasEffectFlag(BattlerActionEffectFlags.ShieldBlock)) return false;
+        if (d.HasEffectFlag(BattlerActionEffectFlags.ShieldBlock)) return true;
+        if (d.baseDamage > 0)
+        {
+            if (d.baseDamage * opponents.Count >= BattlerActionData.get(defaultAction).baseDamage)
+            {
+                if (ld.target == BattlerActionTarget.HitAll) return false;
+                if (d.target == BattlerActionTarget.HitAll) return true;
+            }
+        }
+        return false;
+    }
+
+    public BattlerAction GetStandardAction (int turn, List<Battler> allies, List<Battler> opponents)
+    {
+        BattlerAction action = defaultAction;
+        BattlerActionData d;
+        BattlerActionData ld;
+        ld = BattlerActionData.get(BattlerAction.None);
         if (!pulledOutOfBattle)
         {
             bool spellcasterInEnemyParty = false;
@@ -485,13 +541,19 @@ public class Battler : MonoBehaviour
                     break;
                 }
             }
-            if (adventurer.special == AdventurerSpecial.SilencingShot && turn == 0 && spellcasterInEnemyParty) action = BattlerAction.SilencingShot;
-            else if (HasAttack(BattlerAction.RainOfArrows) && opponents.Count > 2) action = BattlerAction.RainOfArrows;
-            else if (HasAttack(BattlerAction.ShieldBlock) && shieldBlockTurns < 1) action = BattlerAction.ShieldBlock;
-            else if (HasAttack(BattlerAction.Haste) && hasteCooldown < 1) action = BattlerAction.Haste;
-            else if (HasAttack(BattlerAction.BurstOfSpeed) && burstOfSpeedCooldown < 1 && turn > 0) action = BattlerAction.BurstOfSpeed;
-            else if (HasAttack(BattlerAction.Inferno) && opponents.Count > 1) action = BattlerAction.Inferno;
-            else action = defaultAction;
+
+            for (int i = 0; i < standardBracketActions.Count; i++)
+            {
+                d = BattlerActionData.get(standardBracketActions[i]);
+                if (StdActionAllowed(d, i))
+                {
+                    if (StdActionDecide(ld, d, spellcasterInEnemyParty, allies, opponents))
+                    {
+                        ld = d;
+                        action = standardBracketActions[i];
+                    }
+                }
+            }
         }
         readiedAction = action;
         return action;
@@ -541,7 +603,7 @@ public class Battler : MonoBehaviour
         if (onHitInterruptActions == null) onHitInterruptActions = new List<BattlerAction>(); else onHitInterruptActions.Clear();
         adventurer = _adventurer;
         currentHP = adventurer.HP;
-        RefreshCooldownsAndShit();
+        RefreshTempState();
         for (int i = 0; i < adventurer.attacks.Length; i++)
         {
             BattlerActionData bad = BattlerActionData.get(adventurer.attacks[i]);
@@ -564,10 +626,15 @@ public class Battler : MonoBehaviour
                     break;
             }
         }
-        if (adventurer.special == AdventurerSpecial.ShieldWall) battleStartInterruptActions.Add(BattlerAction.ShieldWall);
+        if (adventurer.special == AdventurerSpecial.ShieldWall) battleStartInterruptActions.Add(BattlerAction.ShieldWall); // to do: replace this block with a smarter solution
         else if (adventurer.special == AdventurerSpecial.Barrier) battleStartInterruptActions.Add(BattlerAction.Barrier);
         else if (adventurer.special == AdventurerSpecial.Feedback) onHitInterruptActions.Add(BattlerAction.Feedback);
         else if (adventurer.special == AdventurerSpecial.Protect) onAllyHitInterruptActions.Add(BattlerAction.Protect);
+        _cooldowns_SBA = new int[standardBracketActions.Count];
+        _cooldowns_BSIA = new int[battleStartInterruptActions.Count];
+        _cooldowns_OAHIA = new int[onAllyHitInterruptActions.Count];
+        _cooldowns_OADIA = new int[onAllyDeathblowInterruptActions.Count];
+        _cooldowns_OHIA = new int[onHitInterruptActions.Count];
         livesOnBackRow = !Adventurer.ClassIsFrontRowClass(adventurer.advClass);
         puppet.Setup();
     }
@@ -575,9 +642,11 @@ public class Battler : MonoBehaviour
     public void TickCooldownsAndShit ()
     {
         if (barrierTurns > 0) barrierTurns--;
-        if (burstOfSpeedCooldown > 0) burstOfSpeedCooldown--;
-        if (feedbackCooldown > 0) feedbackCooldown--;
-        if (hasteCooldown > 0) hasteCooldown--;
+        for (int i = 0; i < _cooldowns_BSIA.Length; i++) if (_cooldowns_BSIA[i] > 0) _cooldowns_BSIA[i]--;
+        for (int i = 0; i < _cooldowns_OADIA.Length; i++) if (_cooldowns_OADIA[i] > 0) _cooldowns_OADIA[i]--;
+        for (int i = 0; i < _cooldowns_OAHIA.Length; i++) if (_cooldowns_OAHIA[i] > 0) _cooldowns_OAHIA[i]--;
+        for (int i = 0; i < _cooldowns_OHIA.Length; i++) if (_cooldowns_OHIA[i] > 0) _cooldowns_OHIA[i]--;
+        for (int i = 0; i < _cooldowns_SBA.Length; i++) if (_cooldowns_SBA[i] > 0) _cooldowns_SBA[i]--;
         if (hasteTurns > 0) hasteTurns--;
         if (shieldWallTurns > 0) shieldWallTurns--;
         InitializeDisposables();
@@ -613,13 +682,10 @@ public class Battler : MonoBehaviour
         return standardBracketActions.Contains(attack) || battleStartInterruptActions.Contains(attack) || onHitInterruptActions.Contains(attack) || onAllyDeathblowInterruptActions.Contains(attack) || onAllyHitInterruptActions.Contains(attack);
     }
 
-    private void RefreshCooldownsAndShit ()
+    private void RefreshTempState ()
     {
         getBehindMeProc = false;
         barrierTurns = 0;
-        burstOfSpeedCooldown = 0;
-        feedbackCooldown = 0;
-        hasteCooldown = 0;
         hasteTurns = 0;
         shieldBlockTurns = 0;
         shieldWallTurns = 0;

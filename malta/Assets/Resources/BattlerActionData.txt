@@ -1,8 +1,8 @@
 NULL,0,None,None,None,0,0
 Mace Swing,0,None,Hit,TargetWeakestEnemy,6,0,NeedsTarget,Melee
 Siphon,0,None,Cast,TargetWeakestEnemy,5,0,IsMagic,Drain,NeedsTarget
-Haste,0,None,Cast,TargetOwnSide,0,0,IsMagic,Haste
-Silencing Shot,0,BattleStart,Hit,RandomTarget_ButOnlyCasters,2,0,Silence,NeedsTarget
+Haste,3,None,Cast,TargetOwnSide,0,0,IsMagic,Haste
+Silencing Shot,0,None,Hit,RandomTarget_ButOnlyCasters,2,0,Silence,NeedsTarget,ForbidAfterTurn1
 Rain of Arrows,0,None,Hit,HitAll,3,0,NeedsTarget
 Bowshot,0,None,Hit,TargetWeakestEnemy,6,0,NeedsTarget
 Shield Wall,0,BattleStart,PhysBuff,TargetOwnSide,0,0,ShieldWall
@@ -10,8 +10,8 @@ Shield Block,0,None,PhysBuff,TargetSelf,0,0,ShieldBlock
 Spear Thrust,0,None,Hit,TargetWeakestEnemy,4,0,NeedsTarget,Melee
 Barrier,0,BattleStart,Cast,TargetOwnSide,0,0,IsMagic,Barrier
 Vampiric Winds,0,None,Cast,TargetWeakestEnemy,8,1,IsMagic,Drain,NeedsTarget
-Burst of Speed,0,None,Cast,TargetOwnSide,0,0,IsMagic,Encore
-Feedback,0,OnHit,Cast,RandomTarget,10,0,IsMagic,NeedsTarget
+Burst of Speed,3,None,Cast,TargetOwnSide,0,0,IsMagic,Encore
+Feedback,3,OnHit,Cast,RandomTarget,10,0,IsMagic,NeedsTarget
 Inferno,0,None,Cast,TargetWeakestEnemy,10,0,IsMagic,NeedsTarget
 Lightning,0,None,Cast,HitAll,5,0,IsMagic,NeedsTarget
 Protect,0,OnAllyHit,Hit,TargetActingBattler,4,0,NeedsTarget
@@ -42,7 +42,7 @@ Renewal,0,None,Cast,TargetEndangeredAlly,-8,0,NeedsTarget,IsMagic
 Ice Bullet,0,None,Cast,TargetWeakestEnemy,4,0,NeedsTarget,IsMagic
 Frost Spear,0,None,Cast,TargetWeakestEnemy,6,0,NeedsTarget,IsMagic
 Comet Strike,0,None,Cast,TargetWeakestEnemy,8,0,NeedsTarget,IsMagic
-Zone of Silence,0,None,Cast,HitAll,0,0,NeedsTarget,IsMagic,Silence
-Speak No Evil,0,None,Cast,HitAll,0,0,NeedsTarget,IsMagic,Silence
-Anti-Drain,0,None,Cast,RandomTarget_ButOnlyCasters,0,0,IsMagic,DrainBlock,NeedsTarget
-Shalt Not Covet,0,None,Cast,HitAll,0,0,IsMagic,DrainBlock,NeedsTarget
+Zone of Silence,2,None,Cast,HitAll,0,0,NeedsTarget,IsMagic,Silence
+Speak No Evil,1,None,Cast,HitAll,0,0,NeedsTarget,IsMagic,Silence
+Anti-Drain,1,None,Cast,RandomTarget_ButOnlyCasters,0,0,IsMagic,DrainBlock,NeedsTarget
+Shalt Not Covet,1,None,Cast,HitAll,0,0,IsMagic,DrainBlock,NeedsTarget

@@ -244,12 +244,12 @@ public class BattleOverseer : MonoBehaviour
         standardPriorityActingBattler = bat;
         if (bat.isEnemy)
         {
-            nextAction = bat.GetAction(turn, validEnemyTargets, validPlayerTargets);
+            nextAction = bat.GetStandardAction(turn, validEnemyTargets, validPlayerTargets);
             bat.ReadyAttack(validPlayerTargets, validEnemyTargets, nextAction);
         }
         else
         {
-            nextAction = bat.GetAction(turn, validPlayerTargets, validEnemyTargets);
+            nextAction = bat.GetStandardAction(turn, validPlayerTargets, validEnemyTargets);
             bat.ReadyAttack(validEnemyTargets, validPlayerTargets, nextAction);
         }
     }

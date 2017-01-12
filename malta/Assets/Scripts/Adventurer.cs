@@ -478,6 +478,7 @@ public class Adventurer
     public static bool ClassIsFrontRowClass (AdventurerClass advClass)
     {
         bool r = false;
+        if (advClass == AdventurerClass.Sovereign) return !GameDataManager.Instance.dataStore.sovereignOnBackRow;
         for (int i = 0; i < frontRowClasses.Length; i++)
         {
             if (frontRowClasses[i] == advClass)

@@ -71,7 +71,6 @@ public class SovereignWpn
 
     public SovereignWpn(int lv, WpnType _wpnType)
     {
-        Debug.Log("Rolling weapon: level " + lv.ToString() + " " + _wpnType);
         wpnLevel = lv;
         wpnType = _wpnType;
         WpnMetaclass metaclass = (WpnMetaclass)UnityEngine.Random.Range(1, 4);
@@ -160,9 +159,10 @@ public class SovereignWpn
         }
         else if (wpnLevel == 1)
         {
-            int r = UnityEngine.Random.Range(0, 3);
+            int r;
             while (advancedMovesLeft > 0)
             {
+                r = UnityEngine.Random.Range(0, 3);
                 if (r == 0)
                 {
                     if (attacks[0] == BattlerAction.UninitializedVal)
@@ -171,14 +171,17 @@ public class SovereignWpn
                         attacks[0] = GetBasicAttack(1);
                     }
                 }
-                else
+                else if (r == 1)
                 {
                     if (attacks[1] == BattlerAction.UninitializedVal)
                     {
                         advancedMovesLeft--;
                         attacks[1] = specialAttacksGetMethods.Dequeue()(1);
                     }
-                    else if (attacks[2] == BattlerAction.UninitializedVal)
+                }
+                else
+                {
+                    if (attacks[2] == BattlerAction.UninitializedVal)
                     {
                         advancedMovesLeft--;
                         attacks[2] = specialAttacksGetMethods.Dequeue()(1);

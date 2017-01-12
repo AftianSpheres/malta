@@ -123,6 +123,6 @@ public class SovereignInfoPanel : MonoBehaviour
                 l3 = strings[33];
                 break;
         }
-        sovereignWpnArea.text = l0 + l2 + l3;
+        sovereignWpnArea.text = l0 + l1 + l2 + l3;
     }
 }
