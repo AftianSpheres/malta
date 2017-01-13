@@ -83,20 +83,20 @@ public enum BattlerActionEffectFlags : ulong // these will never be serialized, 
     ShieldWall = 1 << 4,
     Drain = 1 << 5,
     Barrier = 1 << 6,
-    Haste = 1 << 7,
+    null_7 = 1 << 7,
     Encore = 1 << 8,
     Bodyguard = 1 << 9,
     Melee = 1 << 10,
-    WeakMarBoost = 1 << 11,
-    StrongMarBoost = 1 << 12,
-    ShortStunBuff = 1 << 13,
-    LongStunBuff = 1 << 14,
-    WeakSacrifice = 1 << 15,
-    StrongSacrifice = 1 << 16,
-    WeakFStep = 1 << 17,
-    StrongFStep = 1 << 18,
-    ShortDodgeBuff = 1 << 19,
-    LongDodgeBuff = 1 << 20,
+    MarBoost = 1 << 11,
+    MagBoost = 1 << 12,
+    SpeBoost = 1 << 13,
+    StunBuff = 1 << 14,
+    Sacrifice = 1 << 15,
+    null_16 = 1 << 16,
+    FStep = 1 << 17,
+    null_18 = 1 << 18,
+    DodgeBuff = 1 << 19,
+    ForbidOnTurn1 = 1 << 20,
     DrainBlock = 1 << 21,
     ForbidAfterTurn1 = 1 << 22,
     MaxValue = ulong.MaxValue
@@ -133,6 +133,7 @@ public struct BattlerActionData
     readonly public BattlerActionEffectFlags flags;
     readonly public BattlerActionTarget target;
     readonly public string name;
+    readonly public int effectPower;
     readonly public int cooldownTurns;
     readonly public int baseDamage;
     readonly public int numberOfSubtargets;
@@ -161,11 +162,12 @@ public struct BattlerActionData
         string[] terms = line.Split(',');
         name = terms[0];
         cooldownTurns = int.Parse(terms[1]);
-        interruptType = ParseInterruptType(terms[2]);
-        anim = ParseAnim(terms[3]);
-        target = ParseTarget(terms[4]);
-        baseDamage = int.Parse(terms[5]);
-        numberOfSubtargets = int.Parse(terms[6]);
+        effectPower = int.Parse(terms[2]);
+        interruptType = ParseInterruptType(terms[3]);
+        anim = ParseAnim(terms[4]);
+        target = ParseTarget(terms[5]);
+        baseDamage = int.Parse(terms[6]);
+        numberOfSubtargets = int.Parse(terms[7]);
         flags = ParseListOfFlags(terms);
     }
 
@@ -218,12 +220,12 @@ public struct BattlerActionData
 
     private static BattlerActionEffectFlags ParseListOfFlags (string[] flagsList)
     {
-        const int firstTermThatsActuallyAFlag = 7;
+        const int firstTermThatsActuallyAFlag = 8;
         BattlerActionEffectFlags flags = 0;
         for (int i = firstTermThatsActuallyAFlag; i < flagsList.Length; i++)
         {
             bool isValidFlag = false;
-            for (ulong b = 1; b < ulong.MaxValue;)
+            for (ulong b = 1; b < (ulong)1 << 63;)
             {
                 if (flagsList[i] == ((BattlerActionEffectFlags)b).ToString())
                 {

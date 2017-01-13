@@ -35,8 +35,8 @@ public class PalacePopup : MonoBehaviour
 	    if (GameDataManager.Instance != null)
         {
             UpdateProcessing_IncomeArea();
-            if ((GameDataManager.Instance.dataStore.unlock_WizardsTower && (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower])) != wtSiteButton.activeInHierarchy)
-                wtSiteButton.SetActive(GameDataManager.Instance.dataStore.unlock_WizardsTower && (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]));
+            if ((GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock) && (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower])) != wtSiteButton.activeInHierarchy)
+                wtSiteButton.SetActive(GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock) && (GameDataManager.Instance.dataStore.buildingLv_WizardsTower < TownBuilding.buildingTypeMaxLevels[(int)BuildingType.Tower]));
         }
 	}
 

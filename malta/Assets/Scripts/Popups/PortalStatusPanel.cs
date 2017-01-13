@@ -44,7 +44,7 @@ public class PortalStatusPanel : MonoBehaviour
     {
 	    if (GameDataManager.Instance != null)
         {
-            if (!GameDataManager.Instance.dataStore.unlock_WizardsTower)
+            if (!GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock))
             {
                 if (cachedPortalStatus != PortalStatus.NoTower)
                 {

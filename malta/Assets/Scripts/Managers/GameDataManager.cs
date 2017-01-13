@@ -34,14 +34,9 @@ public class GameDataManager_DataStore
     public bool pendingUpgrade_Mason;
     public bool pendingUpgrade_Sawmill;
     public bool pendingUpgrade_Smith;
-    public bool unlock_forgeOutbuilding;
-    public bool unlock_raceFae;
-    public bool unlock_raceOrc;
     public bool unlock_sovSpe_CalledShots;
     public bool unlock_sovSpe_HammerSmash;
     public bool unlock_sovSpe_Protect;
-    public bool unlock_Taskmaster;
-    public bool unlock_WizardsTower;
     public int adventureLevel;
     public int buildingLv_Docks;
     public int buildingLv_Mason;
@@ -70,6 +65,7 @@ public class GameDataManager_DataStore
     public int lastInspectedAdventurerIndex;
     const int manaCap = 100;
     public const int housingLevelCap = 20;
+    public ProgressionFlags progressionFlags;
 
     public GameDataManager_DataStore ()
     {
@@ -80,14 +76,9 @@ public class GameDataManager_DataStore
         pendingUpgrade_Mason = false;
         pendingUpgrade_Sawmill = false;
         pendingUpgrade_Smith = false;
-        unlock_forgeOutbuilding = false;
-        unlock_raceFae = false;
-        unlock_raceOrc = false;
         unlock_sovSpe_CalledShots = false;
         unlock_sovSpe_HammerSmash = false;
         unlock_sovSpe_Protect = false;
-        unlock_Taskmaster = false;
-        unlock_WizardsTower = false;
         adventureLevel = 0;
         buildingLv_Docks = 0;
         buildingLv_Mason = 0;
@@ -129,6 +120,7 @@ public class GameDataManager_DataStore
         sovereignTactic = BattlerAction.GetBehindMe;
         sovereignSkill = AdventurerSpecial.None;
         sovereignMugshot = AdventurerMugshot.Sovereign0;
+        progressionFlags = 0;
     }
 
     public void SaveToFile(string path)
@@ -188,19 +180,19 @@ public class GameDataManager : Manager<GameDataManager>
         {
             lastSecondTimestamp = Time.time;
             UpdateProcessing_ResourceGain();
-            if (dataStore.unlock_Taskmaster) UpdateProcessing_ResourceGain(); // output doubled in the quickest, laziest way possible
+            if (HasFlag(ProgressionFlags.TaskmasterUnlock)) UpdateProcessing_ResourceGain(); // output doubled in the quickest, laziest way possible
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Docks, ref dataStore.buildingLv_Docks, ref dataStore.pendingUpgrade_Docks, ref dataStore.pendingUpgradeTimer_Docks); // this is a hack
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Mason, ref dataStore.buildingLv_Mason, ref dataStore.pendingUpgrade_Mason, ref dataStore.resBricks_maxUpgrades);
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Sawmill, ref dataStore.buildingLv_Sawmill, ref dataStore.pendingUpgrade_Sawmill, ref dataStore.resPlanks_maxUpgrades);
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Smith, ref dataStore.buildingLv_Smith, ref dataStore.pendingUpgrade_Smith, ref dataStore.resMetal_maxUpgrades);
         }
         for (int i = 0; i < dataStore.housingLevel; i++) if (!dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
-        if (dataStore.adventureLevel > 1 && (!dataStore.unlock_raceFae || !dataStore.unlock_raceOrc))
+        if (dataStore.adventureLevel > 1 && (!HasFlag(ProgressionFlags.FaeUnlock) || !HasFlag(ProgressionFlags.OrcUnlock)))
         {
-            dataStore.unlock_raceFae = true;
-            dataStore.unlock_raceOrc = true;
+            SetFlag(ProgressionFlags.FaeUnlock);
+            SetFlag(ProgressionFlags.OrcUnlock);
         }
-        if (dataStore.adventureLevel > 2 && !dataStore.unlock_WizardsTower) dataStore.unlock_WizardsTower = true;
+        if (dataStore.adventureLevel > 2 && !HasFlag(ProgressionFlags.TowerUnlock)) SetFlag(ProgressionFlags.TowerUnlock);
         if (dataStore.sovWpn_Set == null)
         {
             dataStore.sovWpn_Knives = new SovereignWpn(0, WpnType.Knives);
@@ -210,6 +202,17 @@ public class GameDataManager : Manager<GameDataManager>
             dataStore.sovereignAdventurer.PushWpnToSovereign();
         }
 
+    }
+
+    public void SetFlag (ProgressionFlags flag, bool unset = false)
+    {
+        if (unset) dataStore.progressionFlags &= ~flag;
+        else dataStore.progressionFlags |= flag;
+    }
+
+    public bool HasFlag (ProgressionFlags flag)
+    {
+        return ((dataStore.progressionFlags & flag) == flag);
     }
 
     public void ChangeSetSovWpn (WpnType wpn)
@@ -358,7 +361,7 @@ public class GameDataManager : Manager<GameDataManager>
     {
         int gain = baseGain;
         if (structureLevel > 0) gain = baseGain * Mathf.FloorToInt(Mathf.Pow(2, (structureLevel)));
-        if (dataStore.unlock_WizardsTower) gain += Mathf.RoundToInt(gain * 0.1f * dataStore.buildingLv_WizardsTower);
+        if (HasFlag(ProgressionFlags.TowerUnlock)) gain += Mathf.RoundToInt(gain * 0.1f * dataStore.buildingLv_WizardsTower);
         return gain;
     }
 

@@ -175,6 +175,8 @@ public class BattleOverseer : MonoBehaviour
         while (theater.processing) yield return 0f;
         if (tutorial)
         {
+            if (GameDataManager.Instance.HasFlag(ProgressionFlags.Tutorial0_Complete)) GameDataManager.Instance.SetFlag(ProgressionFlags.Tutorial1_Complete);
+            else GameDataManager.Instance.SetFlag(ProgressionFlags.Tutorial0_Complete);
             GameDataManager.Instance.dataStore.housingLevel++;
         }
         else
@@ -329,10 +331,10 @@ public class BattleOverseer : MonoBehaviour
     IEnumerator<float> Bootstrap ()
     {
         while (GameDataManager.Instance.dataStore == null) yield return 0f;
-        if (GameDataManager.Instance.dataStore.housingLevel < 2) tutorial = true;
+        if (!GameDataManager.Instance.HasFlag(ProgressionFlags.Tutorial1_Complete)) tutorial = true;
         if (tutorial)
         {
-            if (GameDataManager.Instance.dataStore.housingLevel == 0) adventure = AdventureSubstageLoader.adventureTuto0Substages;
+            if (!GameDataManager.Instance.HasFlag(ProgressionFlags.Tutorial0_Complete)) adventure = AdventureSubstageLoader.adventureTuto0Substages;
             else adventure = AdventureSubstageLoader.adventureTuto1Substages;
         }
         else

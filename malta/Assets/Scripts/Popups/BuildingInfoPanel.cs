@@ -102,7 +102,7 @@ public class BuildingInfoPanel : MonoBehaviour
                 else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
             }
         }
-        else if (!GameDataManager.Instance.dataStore.unlock_forgeOutbuilding)
+        else if (!GameDataManager.Instance.HasFlag(ProgressionFlags.TaskmasterUnlock))
         {
             if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
             if (GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[0] ||

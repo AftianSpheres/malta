@@ -34,10 +34,20 @@ public class Battler : MonoBehaviour
     public bool isValidTarget { get { return (existsInBattle && !pulledOutOfBattle); } }
     private bool getBehindMeProc;
     private int barrierTurns;
-    private int hasteTurns;
     private int shieldBlockTurns;
     private int shieldWallTurns;
     private int silentTurns;
+    private int _bonusMAR;
+    private int _bonusMAR_turns;
+    private int _bonusMAG;
+    private int _bonusMAG_turns;
+    private int _bonusSPE;
+    private int _bonusSPE_turns;
+    private int _sacrificePow;
+    private int _sacrificeTurns;
+    public int MAR { get { return adventurer.Martial + _bonusMAR + _sacrificePow; } }
+    public int MAG { get { return adventurer.Magic + _bonusMAG + _sacrificePow; } }
+    public int SPE { get { return adventurer.Speed + _bonusSPE + _sacrificePow; } }
     public bool activeBattler { get; private set; }
     private bool pulledOutOfBattle;
     public bool livesOnBackRow;
@@ -120,8 +130,8 @@ public class Battler : MonoBehaviour
         int offense;
         int defense;
         bool meleeAtk;
-        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) offense = adventurer.Magic;
-        else offense = adventurer.Martial;
+        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) offense = MAG;
+        else offense = MAR;
         if (dat.HasEffectFlag(BattlerActionEffectFlags.Melee)) meleeAtk = true;
         else meleeAtk = false;
         Battler target = null; // if it's left null we're doing something that doesn't have a "target" per se
@@ -133,8 +143,21 @@ public class Battler : MonoBehaviour
                     int mostDamageDealt = 0;
                     for (int i = 0; i < validEnemyTargets.Count; i++)
                     {
-                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
-                        else defense = validEnemyTargets[i].adventurer.Martial;
+                        if (validEnemyTargets[i]._sacrificePow > 0)
+                        {
+                            bool nonDodgyTargetExists = false;
+                            for (int ix = 0; ix < validEnemyTargets.Count; ix++)
+                            {
+                                if (validEnemyTargets[ix]._sacrificePow < 1)
+                                {
+                                    nonDodgyTargetExists = true;
+                                    break;
+                                }
+                            }
+                            if (nonDodgyTargetExists) continue; // don't hit a target that's ducking aggro if we can avoid it
+                        }
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].MAG;
+                        else defense = validEnemyTargets[i].MAR;
                         if (validEnemyTargets[i].livesOnBackRow && meleeAtk) defense += 1;
                         damage = CalcDamage(dat.baseDamage, offense, defense);
                         if (damage >= validEnemyTargets[i].currentHP) // take kills if you can
@@ -163,7 +186,7 @@ public class Battler : MonoBehaviour
                     while (!foundTarget)
                     {
                         target = validEnemyTargets[Random.Range(0, validEnemyTargets.Count)];
-                        if (target.livesOnBackRow && meleeAtk)
+                        if (target.livesOnBackRow && meleeAtk || target._sacrificePow > 0)
                         {
                             if (Random.Range(0, 4) == 0) foundTarget = true;
                         }
@@ -184,9 +207,8 @@ public class Battler : MonoBehaviour
                         foundTarget = false;
                         while (!foundTarget)
                         {
-
                             target = nuVet[Random.Range(0, nuVet.Count)];
-                            if (target.livesOnBackRow && meleeAtk)
+                            if (target.livesOnBackRow && meleeAtk || target._sacrificePow > 0)
                             {
                                 if (Random.Range(0, 4) == 0) foundTarget = true;
                             }
@@ -202,8 +224,8 @@ public class Battler : MonoBehaviour
                     target = null;
                     for (int i = 0; i < validEnemyTargets.Count; i++)
                     {
-                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
-                        else defense = validEnemyTargets[i].adventurer.Martial;
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].MAG;
+                        else defense = validEnemyTargets[i].MAR;
                         if (validEnemyTargets[i].livesOnBackRow && meleeAtk) defense += 1;
                         damage = CalcDamage(dat.baseDamage, offense, defense);
                         if (damage >= validEnemyTargets[i].currentHP) deathblowList.Add(validEnemyTargets[i]);
@@ -213,7 +235,22 @@ public class Battler : MonoBehaviour
                     target = this;
                     break;
                 case BattlerActionTarget.TargetEndangeredAlly:
-                    target = overseer.currentTurnTarget;
+                    if (dat.interruptType != BattlerActionInterruptType.None)
+                    {
+                        if (overseer.currentTurnTarget != this) target = overseer.currentTurnTarget;
+                    }
+                    else
+                    {
+                        int remainingHP = int.MaxValue;
+                        for (int i = 0; i < friends.Count; i++)
+                        {
+                            if (friends[i].currentHP < remainingHP)
+                            {
+                                friends[i].currentHP = remainingHP;
+                                target = friends[i];
+                            }
+                        }
+                    }
                     break;
                 case BattlerActionTarget.TargetActingBattler:
                     target = overseer.standardPriorityActingBattler;
@@ -228,12 +265,6 @@ public class Battler : MonoBehaviour
     public void ApplyBarrier (int turns = 1)
     {
         if (barrierTurns < turns) barrierTurns = turns;
-        puppet.incomingBuff = true;
-    }
-
-    public void ApplyHaste (int turns = 1)
-    {
-        if (hasteTurns < turns) hasteTurns = turns;
         puppet.incomingBuff = true;
     }
 
@@ -294,19 +325,63 @@ public class Battler : MonoBehaviour
     private void EnqueueEffectMessagesBasedOnFlags (BattlerActionEffectFlags flags)
     {
         if ((flags & BattlerActionEffectFlags.Barrier) == BattlerActionEffectFlags.Barrier) _effectMessages.Enqueue(BattleMessageType.Barrier);
-        if ((flags & BattlerActionEffectFlags.Haste) == BattlerActionEffectFlags.Haste) _effectMessages.Enqueue(BattleMessageType.Haste);
+        if ((flags & BattlerActionEffectFlags.SpeBoost) == BattlerActionEffectFlags.SpeBoost) _effectMessages.Enqueue(BattleMessageType.Haste);
         if ((flags & BattlerActionEffectFlags.ShieldBlock) == BattlerActionEffectFlags.ShieldBlock) _effectMessages.Enqueue(BattleMessageType.ShieldBlock);
         if ((flags & BattlerActionEffectFlags.ShieldWall) == BattlerActionEffectFlags.ShieldWall) _effectMessages.Enqueue(BattleMessageType.ShieldWall);
         if ((flags & BattlerActionEffectFlags.Silence) == BattlerActionEffectFlags.Silence) _effectMessages.Enqueue(BattleMessageType.Silence);
     }
 
-    public void ApplyEffectsBasedOnFlags (BattlerActionEffectFlags flags)
+    public void ApplyEffectsBasedOnFlags (BattlerActionEffectFlags flags, int str, int len)
     {
-        if ((flags & BattlerActionEffectFlags.Barrier) == BattlerActionEffectFlags.Barrier) ApplyBarrier();
-        if ((flags & BattlerActionEffectFlags.Haste) == BattlerActionEffectFlags.Haste) ApplyHaste();
-        if ((flags & BattlerActionEffectFlags.ShieldBlock) == BattlerActionEffectFlags.ShieldBlock) ApplyShieldBlock();
-        if ((flags & BattlerActionEffectFlags.ShieldWall) == BattlerActionEffectFlags.ShieldWall) ApplyShieldWall();
-        if ((flags & BattlerActionEffectFlags.Silence) == BattlerActionEffectFlags.Silence) Silence();
+        if ((flags & BattlerActionEffectFlags.Barrier) == BattlerActionEffectFlags.Barrier) ApplyBarrier(str);
+        if ((flags & BattlerActionEffectFlags.ShieldBlock) == BattlerActionEffectFlags.ShieldBlock) ApplyShieldBlock(str);
+        if ((flags & BattlerActionEffectFlags.ShieldWall) == BattlerActionEffectFlags.ShieldWall) ApplyShieldWall(str);
+        if ((flags & BattlerActionEffectFlags.Silence) == BattlerActionEffectFlags.Silence) Silence(str);
+        if ((flags & BattlerActionEffectFlags.MarBoost) == BattlerActionEffectFlags.MarBoost) GiveBonusMar(str, len);
+        if ((flags & BattlerActionEffectFlags.MagBoost) == BattlerActionEffectFlags.MagBoost) GiveBonusMag(str, len);
+        if ((flags & BattlerActionEffectFlags.SpeBoost) == BattlerActionEffectFlags.SpeBoost) GiveBonusSpe(str, len);
+        if ((flags & BattlerActionEffectFlags.Sacrifice) == BattlerActionEffectFlags.Sacrifice) MakeSacrifice(str, len);
+    }
+
+    void MakeSacrifice (int stat, int turns)
+    {
+        int dmg = currentHP / 3;
+        if (currentHP - dmg == 0) dmg--;
+        if (dmg == 0) dmg = 1;
+        DealDamage(dmg);
+        _sacrificePow = stat;
+        _sacrificeTurns = turns;
+        puppet.incomingBuff = true;
+    }
+
+    void GiveBonusMar (int mar, int turns)
+    {
+        if (_bonusMAR < 0 || _bonusMAR_turns < 1)
+        {
+            _bonusMAR = mar;
+            _bonusMAR_turns = turns;
+            puppet.incomingBuff = true;
+        }
+    }
+
+    void GiveBonusMag (int mag, int turns)
+    {
+        if (_bonusMAG < 0 || _bonusMAG_turns < 1)
+        {
+            _bonusMAG = mag;
+            _bonusMAG_turns = turns;
+            puppet.incomingBuff = true;
+        }
+    }
+
+    void GiveBonusSpe (int spe, int turns)
+    {
+        if (_bonusSPE < 0 || _bonusSPE_turns < 1)
+        {
+            _bonusSPE = spe;
+            _bonusSPE_turns = turns;
+            puppet.incomingBuff = true;
+        }
     }
 
     private void UpdateSelfStateBasedOnFlags (BattlerActionEffectFlags flags)
@@ -345,17 +420,17 @@ public class Battler : MonoBehaviour
             int _damage = dat.baseDamage;
             int offense;
             int defense;
-            if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) offense = adventurer.Magic;
-            else offense = adventurer.Martial;
+            if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) offense = MAG;
+            else offense = MAR;
             if (_target == null)
             {
-                if (dat.target == BattlerActionTarget.TargetOwnSide) for (int i = 0; i < friends.Count; i++) friends[i].ApplyEffectsBasedOnFlags(dat.flags);
-                else if (dat.target == BattlerActionTarget.HitAll) for (int i = 0; i < validEnemyTargets.Count; i++) validEnemyTargets[i].ApplyEffectsBasedOnFlags(dat.flags);
+                if (dat.target == BattlerActionTarget.TargetOwnSide) for (int i = 0; i < friends.Count; i++) friends[i].ApplyEffectsBasedOnFlags(dat.flags, dat.effectPower, dat.cooldownTurns);
+                else if (dat.target == BattlerActionTarget.HitAll) for (int i = 0; i < validEnemyTargets.Count; i++) validEnemyTargets[i].ApplyEffectsBasedOnFlags(dat.flags, dat.effectPower, dat.cooldownTurns);
             }
             else
             {
-                _target.ApplyEffectsBasedOnFlags(dat.flags);
-                for (int i = 0; i < _subtargets.Count; i++) _subtargets[i].ApplyEffectsBasedOnFlags(dat.flags);
+                _target.ApplyEffectsBasedOnFlags(dat.flags, dat.effectPower, dat.cooldownTurns);
+                for (int i = 0; i < _subtargets.Count; i++) _subtargets[i].ApplyEffectsBasedOnFlags(dat.flags, dat.effectPower, dat.cooldownTurns);
             }
             EnqueueEffectMessagesBasedOnFlags(dat.flags);
             UpdateSelfStateBasedOnFlags(dat.flags);
@@ -372,21 +447,21 @@ public class Battler : MonoBehaviour
                 }
                 if (dat.target == BattlerActionTarget.HitAll) for (int i = 0; i < validEnemyTargets.Count; i++)
                     {
-                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].adventurer.Magic;
-                        else defense = validEnemyTargets[i].adventurer.Martial;
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = validEnemyTargets[i].MAG;
+                        else defense = validEnemyTargets[i].MAR;
                         if (validEnemyTargets[i].livesOnBackRow && dat.HasEffectFlag(BattlerActionEffectFlags.Melee)) defense++;
                         _damageDealt += validEnemyTargets[i].DealDamage(CalcDamage(_damage, offense, defense));
                     }
                 else if (_target != null)
                 {
-                    if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _target.adventurer.Magic;
-                    else defense = _target.adventurer.Martial;
+                    if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _target.MAG;
+                    else defense = _target.MAR;
                     if (_target.livesOnBackRow && dat.HasEffectFlag(BattlerActionEffectFlags.Melee)) defense++;
                     _damageDealt += _target.DealDamage(CalcDamage(_damage, offense, defense));
                     for (int i = 0; i < _subtargets.Count; i++)
                     {
-                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _subtargets[i].adventurer.Magic;
-                        else defense = _subtargets[i].adventurer.Martial;
+                        if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) defense = _subtargets[i].MAG;
+                        else defense = _subtargets[i].MAR;
                         if (_subtargets[i].livesOnBackRow && dat.HasEffectFlag(BattlerActionEffectFlags.Melee)) defense++;
                         _damageDealt += _subtargets[i].DealDamage(CalcDamage(_damage, offense, defense));
                     }
@@ -497,6 +572,8 @@ public class Battler : MonoBehaviour
     {
         if (_cooldowns_SBA[index] > 0) return false;
         if (d.HasEffectFlag(BattlerActionEffectFlags.ForbidAfterTurn1) && overseer.turn > 0) return false;
+        if (d.HasEffectFlag(BattlerActionEffectFlags.ForbidOnTurn1) && overseer.turn == 0) return false;
+        if (d.HasEffectFlag(BattlerActionEffectFlags.Sacrifice) && currentHP == 1) return false;
         return true;
     }
 
@@ -509,8 +586,29 @@ public class Battler : MonoBehaviour
             if (ld.HasEffectFlag(BattlerActionEffectFlags.Silence)) return false;
             if (d.HasEffectFlag(BattlerActionEffectFlags.Silence)) return true;
         }
-        if (ld.HasEffectFlag(BattlerActionEffectFlags.Haste)) return false;
-        if (d.HasEffectFlag(BattlerActionEffectFlags.Haste)) return true;
+        if (_sacrificePow < 1)
+        {
+            if (currentHP == adventurer.HP || Random.Range(0, 2) == 0)
+            {
+                if (ld.HasEffectFlag(BattlerActionEffectFlags.Sacrifice)) return false;
+                if (d.HasEffectFlag(BattlerActionEffectFlags.Sacrifice)) return true;
+            }
+        }
+        if (_bonusMAR < 1)
+        {
+            if (ld.HasEffectFlag(BattlerActionEffectFlags.MarBoost)) return false;
+            if (d.HasEffectFlag(BattlerActionEffectFlags.MarBoost)) return true;
+        }
+        if (_bonusMAG < 1)
+        {
+            if (ld.HasEffectFlag(BattlerActionEffectFlags.MagBoost)) return false;
+            if (d.HasEffectFlag(BattlerActionEffectFlags.MagBoost)) return true;
+        }
+        if (_bonusSPE < 1)
+        {
+            if (ld.HasEffectFlag(BattlerActionEffectFlags.SpeBoost)) return false;
+            if (d.HasEffectFlag(BattlerActionEffectFlags.SpeBoost)) return true;
+        }
         if (ld.HasEffectFlag(BattlerActionEffectFlags.ShieldBlock)) return false;
         if (d.HasEffectFlag(BattlerActionEffectFlags.ShieldBlock)) return true;
         if (d.baseDamage > 0)
@@ -647,15 +745,21 @@ public class Battler : MonoBehaviour
         for (int i = 0; i < _cooldowns_OAHIA.Length; i++) if (_cooldowns_OAHIA[i] > 0) _cooldowns_OAHIA[i]--;
         for (int i = 0; i < _cooldowns_OHIA.Length; i++) if (_cooldowns_OHIA[i] > 0) _cooldowns_OHIA[i]--;
         for (int i = 0; i < _cooldowns_SBA.Length; i++) if (_cooldowns_SBA[i] > 0) _cooldowns_SBA[i]--;
-        if (hasteTurns > 0) hasteTurns--;
+        if (_bonusMAR_turns > 0) _bonusMAR_turns--;
+        if (_bonusMAR_turns == 0 && _bonusMAR != 0) _bonusMAR = 0;
+        if (_bonusMAG_turns > 0) _bonusMAG_turns--;
+        if (_bonusMAG_turns == 0 && _bonusMAG != 0) _bonusMAG = 0;
+        if (_bonusSPE_turns > 0) _bonusSPE_turns--;
+        if (_bonusSPE_turns == 0 && _bonusSPE != 0) _bonusSPE = 0;
+        if (_sacrificeTurns > 0) _sacrificeTurns--;
+        if (_sacrificeTurns == 0 && _sacrificePow != 0) _sacrificePow = 0;
         if (shieldWallTurns > 0) shieldWallTurns--;
         InitializeDisposables();
     }
 
     public void RollMoveSpeed ()
     {
-        float speed = adventurer.Speed;
-        if (hasteTurns > 0) speed += 3;
+        float speed = SPE;
         if (speed < 1) speed = 1;
         moveSpeed = Random.Range(1.0f, speed);
     }
@@ -686,10 +790,17 @@ public class Battler : MonoBehaviour
     {
         getBehindMeProc = false;
         barrierTurns = 0;
-        hasteTurns = 0;
         shieldBlockTurns = 0;
         shieldWallTurns = 0;
         silentTurns = 0;
+        _bonusMAR = 0;
+        _bonusMAR_turns = 0;
+        _bonusMAG = 0;
+        _bonusMAG_turns = 0;
+        _bonusSPE = 0;
+        _bonusSPE_turns = 0;
+        _sacrificePow = 0;
+        _sacrificeTurns = 0;
         InitializeDisposables();
     }
 

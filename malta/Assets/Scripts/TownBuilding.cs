@@ -39,13 +39,13 @@ public class TownBuilding : MonoBehaviour
         {  
             if (buildingType != BuildingType.Forest)
             {
-                if ((GameDataManager.Instance.dataStore.housingLevel > 0) != spriteRenderer.enabled) spriteRenderer.enabled = (GameDataManager.Instance.dataStore.housingLevel > 0);
+                if ((GameDataManager.Instance.HasFlag(ProgressionFlags.Tutorial1_Complete)) != spriteRenderer.enabled) spriteRenderer.enabled = (GameDataManager.Instance.HasFlag(ProgressionFlags.Tutorial1_Complete));
                 if (spriteRenderer.enabled) RefreshBuildingAssociations();
             }
             switch (buildingType)
             {
                 case BuildingType.Tower:
-                    if (GameDataManager.Instance.dataStore.unlock_WizardsTower != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.dataStore.unlock_WizardsTower;
+                    if (GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock) != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock);
                     if (spriteRenderer.enabled) RefreshBuildingAssociations();
                     break;
             }
@@ -67,9 +67,8 @@ public class TownBuilding : MonoBehaviour
         switch (buildingType)
         {
             case BuildingType.Forge:
-                GameDataManager.Instance.dataStore.unlock_Taskmaster = true;
+                GameDataManager.Instance.SetFlag(ProgressionFlags.TaskmasterUnlock);
                 buildingAlteredSinceLastUpdate = true;
-                GameDataManager.Instance.dataStore.unlock_forgeOutbuilding = true;
                 break;
             default:
                 throw new System.Exception("Can't add outbuilding to building of type " + buildingType.ToString());

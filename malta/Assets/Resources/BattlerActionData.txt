@@ -1,48 +1,48 @@
-NULL,0,None,None,None,0,0
-Mace Swing,0,None,Hit,TargetWeakestEnemy,6,0,NeedsTarget,Melee
-Siphon,0,None,Cast,TargetWeakestEnemy,5,0,IsMagic,Drain,NeedsTarget
-Haste,3,None,Cast,TargetOwnSide,0,0,IsMagic,Haste
-Silencing Shot,0,None,Hit,RandomTarget_ButOnlyCasters,2,0,Silence,NeedsTarget,ForbidAfterTurn1
-Rain of Arrows,0,None,Hit,HitAll,3,0,NeedsTarget
-Bowshot,0,None,Hit,TargetWeakestEnemy,6,0,NeedsTarget
-Shield Wall,0,BattleStart,PhysBuff,TargetOwnSide,0,0,ShieldWall
-Shield Block,0,None,PhysBuff,TargetSelf,0,0,ShieldBlock
-Spear Thrust,0,None,Hit,TargetWeakestEnemy,4,0,NeedsTarget,Melee
-Barrier,0,BattleStart,Cast,TargetOwnSide,0,0,IsMagic,Barrier
-Vampiric Winds,0,None,Cast,TargetWeakestEnemy,8,1,IsMagic,Drain,NeedsTarget
-Burst of Speed,3,None,Cast,TargetOwnSide,0,0,IsMagic,Encore
-Feedback,3,OnHit,Cast,RandomTarget,10,0,IsMagic,NeedsTarget
-Inferno,0,None,Cast,TargetWeakestEnemy,10,0,IsMagic,NeedsTarget
-Lightning,0,None,Cast,HitAll,5,0,IsMagic,NeedsTarget
-Protect,0,OnAllyHit,Hit,TargetActingBattler,4,0,NeedsTarget
-Hammer Blow,0,None,Hit,TargetWeakestEnemy,7,0,NeedsTarget,Melee
-Get Behind Me!,0,OnAllyDeathblow,PhysBuff,TargetEndangeredAlly,0,0,Bodyguard,NeedsTarget
-Flanking,0,OnAllyDeathblow,Hit,TargetActingBattler,6,0,NeedsTarget
-Rend,0,None,Cast,TargetWeakestEnemy,99,0,IsMagic,NeedsTarget
-Bludgeon,0,None,Hit,TargetWeakestEnemy,5,0,NeedsTarget,Melee
-Continent Smash,0,None,Hit,TargetWeakestEnemy,10,0,NeedsTarget,Melee
-Fortify,0,None,PhysBuff,TargetSelf,0,0,WeakMarBoost
-Blood of Steel,0,None,PhysBuff,TargetSelf,0,0,StrongMarBoost
-Wide Swing,0,None,Hit,HitAll,3,0,NeedsTarget,Melee
-Cataclysmic Impact,0,None,Hit,HitAll,6,0,NeedsTarget,Melee
-Concuss,0,BattleStart,PhysBuff,TargetSelf,0,0,ShortStunBuff
-Dreamless Sleep,0,BattleStart,PhysBuff,TargetSelf,0,0,LongStunBuff
-Quick Stab,0,None,Hit,TargetWeakestEnemy,5,0,NeedsTarget,Melee
-Stiletto,0,None,Hit,TargetWeakestEnemy,7,0,NeedsTarget,Melee
-Throat Slit,0,None,Hit,TargetWeakestEnemy,10,0,NeedsTarget,Melee
-Blood Rites,0,None,Cast,TargetSelf,0,0,WeakSacrifice,IsMagic
-Blade of Crimson,0,None,Cast,TargetSelf,0,0,StrongSacrifice,IsMagic
-Fleet Feet,0,BattleStart,Cast,TargetSelf,0,0,WeakFStep,IsMagic
-Flash Step,0,BattleStart,Cast,TargetSelf,0,0,StrongFStep,IsMagic
-Second Sight,0,None,Cast,TargetSelf,0,0,ShortDodgeBuff,IsMagic
-With the Wind,0,None,Cast,TargetSelf,0,0,LongDodgeBuff,IsMagic
-Healing Wind,0,None,Cast,TargetEndangeredAlly,-4,0,NeedsTarget,IsMagic
-Breath of Life,0,None,Cast,TargetEndangeredAlly,-6,0,NeedsTarget,IsMagic
-Renewal,0,None,Cast,TargetEndangeredAlly,-8,0,NeedsTarget,IsMagic
-Ice Bullet,0,None,Cast,TargetWeakestEnemy,4,0,NeedsTarget,IsMagic
-Frost Spear,0,None,Cast,TargetWeakestEnemy,6,0,NeedsTarget,IsMagic
-Comet Strike,0,None,Cast,TargetWeakestEnemy,8,0,NeedsTarget,IsMagic
-Zone of Silence,2,None,Cast,HitAll,0,0,NeedsTarget,IsMagic,Silence
-Speak No Evil,1,None,Cast,HitAll,0,0,NeedsTarget,IsMagic,Silence
-Anti-Drain,1,None,Cast,RandomTarget_ButOnlyCasters,0,0,IsMagic,DrainBlock,NeedsTarget
-Shalt Not Covet,1,None,Cast,HitAll,0,0,IsMagic,DrainBlock,NeedsTarget
+NULL,0,0,None,None,None,0,0
+Mace Swing,0,0,None,Hit,TargetWeakestEnemy,6,0,NeedsTarget,Melee
+Siphon,0,0,None,Cast,TargetWeakestEnemy,5,0,IsMagic,Drain,NeedsTarget
+Haste,1,3,None,Cast,TargetOwnSide,0,0,IsMagic,SpeBoost
+Silencing Shot,0,1,None,Hit,RandomTarget_ButOnlyCasters,2,0,Silence,NeedsTarget,ForbidAfterTurn1
+Rain of Arrows,0,0,None,Hit,HitAll,3,0,NeedsTarget
+Bowshot,0,0,None,Hit,TargetWeakestEnemy,6,0,NeedsTarget
+Shield Wall,0,1,BattleStart,PhysBuff,TargetOwnSide,0,0,ShieldWall
+Shield Block,0,1,None,PhysBuff,TargetSelf,0,0,ShieldBlock
+Spear Thrust,0,0,None,Hit,TargetWeakestEnemy,4,0,NeedsTarget,Melee
+Barrier,0,2,BattleStart,Cast,TargetOwnSide,0,0,IsMagic,Barrier
+Vampiric Winds,0,0,None,Cast,TargetWeakestEnemy,8,1,IsMagic,Drain,NeedsTarget
+Burst of Speed,3,0,None,Cast,TargetOwnSide,0,0,IsMagic,Encore,ForbidOnTurn1
+Feedback,3,0,OnHit,Cast,RandomTarget,10,0,IsMagic,NeedsTarget
+Inferno,0,0,None,Cast,TargetWeakestEnemy,10,0,IsMagic,NeedsTarget
+Lightning,0,0,None,Cast,HitAll,5,0,IsMagic,NeedsTarget
+Protect,0,0,OnAllyHit,Hit,TargetActingBattler,4,0,NeedsTarget
+Hammer Blow,0,0,None,Hit,TargetWeakestEnemy,7,0,NeedsTarget,Melee
+Get Behind Me!,0,0,OnAllyDeathblow,PhysBuff,TargetEndangeredAlly,0,0,Bodyguard,NeedsTarget
+Flanking,0,0,OnAllyDeathblow,Hit,TargetActingBattler,6,0,NeedsTarget
+Rend,0,0,None,Cast,TargetWeakestEnemy,99,0,IsMagic,NeedsTarget
+Bludgeon,0,0,None,Hit,TargetWeakestEnemy,5,0,NeedsTarget,Melee
+Continent Smash,0,0,None,Hit,TargetWeakestEnemy,10,0,NeedsTarget,Melee
+Fortify,2,1,None,PhysBuff,TargetSelf,0,0,MarBoost
+Blood of Steel,2,2,None,PhysBuff,TargetSelf,0,0,MarBoost
+Wide Swing,0,0,None,Hit,HitAll,3,0,NeedsTarget,Melee
+Cataclysmic Impact,0,0,None,Hit,HitAll,6,0,NeedsTarget,Melee
+Concuss,0,1,BattleStart,PhysBuff,TargetSelf,0,0,StunBuff
+Dreamless Sleep,0,2,BattleStart,PhysBuff,TargetSelf,0,0,StunBuff
+Quick Stab,0,0,None,Hit,TargetWeakestEnemy,5,0,NeedsTarget,Melee
+Stiletto,0,0,None,Hit,TargetWeakestEnemy,7,0,NeedsTarget,Melee
+Throat Slit,0,0,None,Hit,TargetWeakestEnemy,10,0,NeedsTarget,Melee
+Blood Rites,0,1,None,Cast,TargetSelf,0,0,Sacrifice,IsMagic
+Blade of Crimson,0,2,None,Cast,TargetSelf,0,0,Sacrifice,IsMagic
+Fleet Feet,2,1,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
+Flash Step,2,2,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
+Second Sight,3,1,None,Cast,TargetSelf,0,0,DodgeBuff,IsMagic
+With the Wind,3,2,None,Cast,TargetSelf,0,0,DodgeBuff,IsMagic
+Healing Wind,0,0,None,Cast,TargetEndangeredAlly,-4,0,NeedsTarget,IsMagic
+Breath of Life,0,0,None,Cast,TargetEndangeredAlly,-6,0,NeedsTarget,IsMagic
+Renewal,0,0,None,Cast,TargetEndangeredAlly,-8,0,NeedsTarget,IsMagic
+Ice Bullet,0,0,None,Cast,TargetWeakestEnemy,4,0,NeedsTarget,IsMagic
+Frost Spear,0,0,None,Cast,TargetWeakestEnemy,6,0,NeedsTarget,IsMagic
+Comet Strike,0,0,None,Cast,TargetWeakestEnemy,8,0,NeedsTarget,IsMagic
+Zone of Silence,2,1,None,Cast,HitAll,0,0,NeedsTarget,IsMagic,Silence
+Speak No Evil,1,1,None,Cast,HitAll,0,0,NeedsTarget,IsMagic,Silence
+Anti-Drain,3,1,None,Cast,RandomTarget_ButOnlyCasters,0,0,IsMagic,DrainBlock,NeedsTarget
+Shalt Not Covet,3,1,None,Cast,HitAll,0,0,IsMagic,DrainBlock,NeedsTarget

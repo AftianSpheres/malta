@@ -87,9 +87,9 @@ public class ForgePopup : MonoBehaviour
     /// <param name="steps">How far down do we want to follow this piece of shit?</param>
     private void _in_FuckingAwfulSwitchStatement(int steps)
     {
-        if (GameDataManager.Instance.dataStore.unlock_forgeOutbuilding)
+        if (GameDataManager.Instance.HasFlag(ProgressionFlags.TaskmasterUnlock))
         {
-            if (GameDataManager.Instance.dataStore.unlock_Taskmaster) status = ForgeStatus.Outbuilding_Taskmaster;
+            status = ForgeStatus.Outbuilding_Taskmaster;
             RefreshReqsLabels();
         }
         else if (GameDataManager.Instance.dataStore.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.dataStore.mysticClassUnlock != AdventurerClass.Mystic && steps > 0)

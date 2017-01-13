@@ -288,7 +288,7 @@ Dec.31 2016-128
 4:13 PM - on
 5:17 PM - off
 
-Jan. 1 2016-54
+Jan. 1 2017-54
 1:00 PM - start
 1:22 PM - off
 3:12 PM - on
@@ -298,11 +298,11 @@ Jan. 1 2016-54
 4:00 PM - on
 4:10 PM - off
 
-Jan. 2 2016-36
+Jan. 2 2017-36
 9:22 AM - start
 9:48 AM - off
 
-Jan. 3 2016-74
+Jan. 3 2017-74
 1:45 PM - start
 2:38 PM - off
 2:53 PM - on
@@ -310,36 +310,40 @@ Jan. 3 2016-74
 3:16 PM - on
 3:18 PM - off
 
-Jan. 4 2016-64
+Jan. 4 2017-64
 8:15 PM - start
 9:19 PM - off
 
-Jan. 5 2016-152
+Jan. 5 2017-152
 12:45 PM - start
 2:16 PM - off
 4:18 PM - on
 5:19 PM - off
 
-Jan. 6 2016-73
+Jan. 6 2017-73
 1:36 PM - start
 2:26 PM - off
 7:34 PM - on
 7:57 PM - off
 
-Jan. 7 2016-176
+Jan. 7 2017-176
 10:57 AM - start
 12:12 PM - off
 2:57 PM - on
 4:38 PM - off
 
-Jan. 8 2016-172
+Jan. 8 2017-172
 12:30 PM - start
 2:22 PM - off
 8:28 PM - on
 9:28 PM - off
 
-Jan. 11 2016-112
+Jan. 11 2017-112
 5:51 PM - start
 6:55 PM - off
 1:53 AM - on
 2:41 AM - off
+
+Jan. 13 2017-90
+2:26 AM - start
+3:56 AM - off
