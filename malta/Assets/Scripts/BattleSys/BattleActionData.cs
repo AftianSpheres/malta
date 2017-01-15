@@ -52,7 +52,8 @@ public enum BattlerAction
     SpeakNoEvil,
     AntiDrain,
     CovetNot,
-    _CantMove_Silenced = 10000
+    _CantMove_Silenced = 10000,
+    _CantMove_Stunned = 10001
 }
 
 public enum BattlerActionInterruptType

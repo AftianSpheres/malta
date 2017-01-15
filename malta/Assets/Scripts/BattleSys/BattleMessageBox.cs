@@ -40,7 +40,8 @@ public enum BattleMessageType
     MagBoost,
     StatBoostsLost,
     SacrificeLost,
-    Sacrifice
+    Sacrifice,
+    StunnedNoMove
 }
 
 public class BattleMessageBox : MonoBehaviour
@@ -248,6 +249,10 @@ public class BattleMessageBox : MonoBehaviour
                 break;
             case BattleMessageType.Sacrifice:
                 nextLine = mainStrings[36];
+                break;
+            case BattleMessageType.StunnedNoMove:
+                if (overseer.currentActingBattler.isEnemy) nextLine = actor.adventurer.title + mainStrings[37];
+                else nextLine = actor.adventurer.fullName + mainStrings[37];
                 break;
         }
         if (drawToLine1) line1 = nextLine;

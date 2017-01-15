@@ -48,6 +48,9 @@ public class Battler : MonoBehaviour
     private int _sacrificePow;
     private int _sacrificeTurns;
     private int drainBlockTurns;
+    private int stunBuffTurns;
+    private int stunnedTurns;
+    private int dodgeBuffTurns;
     public int MAR { get { return adventurer.Martial + _bonusMAR + _sacrificePow; } }
     public int MAG { get { return adventurer.Magic + _bonusMAG + _sacrificePow; } }
     public int SPE { get { return adventurer.Speed + _bonusSPE + _sacrificePow; } }
@@ -251,7 +254,7 @@ public class Battler : MonoBehaviour
                         {
                             if (friends[i].currentHP < remainingHP)
                             {
-                                friends[i].currentHP = remainingHP;
+                                remainingHP = friends[i].currentHP;
                                 target = friends[i];
                             }
                         }
@@ -267,22 +270,31 @@ public class Battler : MonoBehaviour
         return target;
     }
 
-    public void ApplyBarrier (int turns = 1)
+    public void ApplyBarrier (int turns)
     {
-        if (barrierTurns < turns) barrierTurns = turns;
-        puppet.incomingBuff = true;
+        if (barrierTurns < turns)
+        {
+            barrierTurns = turns;
+            puppet.incomingBuff = true;
+        }
     }
 
-    public void ApplyShieldBlock (int turns = 1)
+    public void ApplyShieldBlock (int turns)
     {
-        if (shieldBlockTurns < turns) shieldBlockTurns = turns;
-        puppet.incomingBuff = true;
+        if (shieldBlockTurns < turns)
+        {
+            shieldBlockTurns = turns;
+            puppet.incomingBuff = true;
+        }
     }
 
-    public void ApplyShieldWall (int turns = 1)
+    public void ApplyShieldWall (int turns)
     {
-        if (shieldWallTurns < turns) shieldWallTurns = turns;
-        puppet.incomingBuff = true;
+        if (shieldWallTurns < turns)
+        {
+            shieldWallTurns = turns;
+            puppet.incomingBuff = true;
+        }
     }
 
     public void AttackWith (List<Battler> validEnemyTargets, List<Battler> friends, BattlerAction action)
@@ -338,6 +350,8 @@ public class Battler : MonoBehaviour
         if ((flags & BattlerActionEffectFlags.SpeBoost) == BattlerActionEffectFlags.SpeBoost) _effectMessages.Enqueue(BattleMessageType.Haste);
         if ((flags & BattlerActionEffectFlags.Sacrifice) == BattlerActionEffectFlags.Sacrifice) _effectMessages.Enqueue(BattleMessageType.Sacrifice);
         if ((flags & BattlerActionEffectFlags.DrainBlock) == BattlerActionEffectFlags.DrainBlock) _effectMessages.Enqueue(BattleMessageType.DrainKill);
+        if ((flags & BattlerActionEffectFlags.StunBuff) == BattlerActionEffectFlags.StunBuff) _effectMessages.Enqueue(BattleMessageType.StunBuff);
+        if ((flags & BattlerActionEffectFlags.DodgeBuff) == BattlerActionEffectFlags.DodgeBuff) _effectMessages.Enqueue(BattleMessageType.AttunedBuff);
         if ((flags & BattlerActionEffectFlags.FStep) == BattlerActionEffectFlags.FStep)
         {
             if (str > 1) _effectMessages.Enqueue(BattleMessageType.SwiftlyMovesBetweenLines);
@@ -357,17 +371,42 @@ public class Battler : MonoBehaviour
         if ((flags & BattlerActionEffectFlags.Sacrifice) == BattlerActionEffectFlags.Sacrifice) MakeSacrifice(str, len);
         if ((flags & BattlerActionEffectFlags.DrainBlock) == BattlerActionEffectFlags.DrainBlock) DrainBlock(str);
         if ((flags & BattlerActionEffectFlags.FStep) == BattlerActionEffectFlags.FStep) FlashStep(str);
+        if ((flags & BattlerActionEffectFlags.StunBuff) == BattlerActionEffectFlags.StunBuff) StunBuff(str);
+        if ((flags & BattlerActionEffectFlags.DodgeBuff) == BattlerActionEffectFlags.DodgeBuff) DodgeBuff(str);
+    }
+
+    void DodgeBuff (int turns)
+    {
+        if (dodgeBuffTurns < turns)
+        {
+            dodgeBuffTurns = turns;
+            puppet.incomingBuff = true;
+        }
     }
 
     void FlashStep (int lv)
     {
         if (lv > 1) _breachFoeLines = true;
         _breachOwnLines = true;
+        puppet.incomingBuff = true;
     }
 
     void DrainBlock (int turns)
     {
-        if (drainBlockTurns < turns) drainBlockTurns = turns;
+        if (drainBlockTurns < turns)
+        {
+            drainBlockTurns = turns;
+            puppet.incomingBuff = true;
+        }
+    }
+
+    void StunBuff (int turns)
+    {
+        if (stunBuffTurns < turns)
+        {
+            stunBuffTurns = turns;
+            puppet.incomingBuff = true;
+        }
     }
 
     void MakeSacrifice (int stat, int turns)
@@ -411,6 +450,11 @@ public class Battler : MonoBehaviour
         }
     }
 
+    public void Stun ()
+    {
+        if (stunnedTurns < 1) stunnedTurns = 1; // stun is really powerful so you can't stack it
+    }
+
     private void UpdateSelfStateBasedOnFlags (BattlerActionEffectFlags flags)
     {
         if ((flags & BattlerActionEffectFlags.Encore) == BattlerActionEffectFlags.Encore)
@@ -427,7 +471,12 @@ public class Battler : MonoBehaviour
     public void ExecuteAttack (List<Battler> validEnemyTargets, List<Battler> friends)
     {
         BattlerActionData dat = BattlerActionData.get(readiedAction);
-        if (silentTurns > 0)
+        if (stunnedTurns > 0)
+        {
+            stunnedTurns--;
+            readiedAction = BattlerAction._CantMove_Stunned;       
+        }
+        else if (silentTurns > 0)
         {
             silentTurns--;
             if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) readiedAction = BattlerAction._CantMove_Silenced;
@@ -437,7 +486,12 @@ public class Battler : MonoBehaviour
             AcquireTarget(validEnemyTargets, friends, readiedAction);
             if (_target == null) readiedAction = BattlerAction.None; // can't reacquire target - can't do anything
         }
-        if (readiedAction == BattlerAction._CantMove_Silenced)
+        if (readiedAction == BattlerAction._CantMove_Stunned)
+        {
+            overseer.messageBox.Step(BattleMessageType.StunnedNoMove, this);
+            overseer.lastActionAnim = BattlerActionAnim.None;
+        }
+        else if (readiedAction == BattlerAction._CantMove_Silenced)
         {
             overseer.messageBox.Step(BattleMessageType.FailedCast, this);
             overseer.lastActionAnim = BattlerActionAnim.None;
@@ -449,7 +503,8 @@ public class Battler : MonoBehaviour
             int defense;
             if (dat.HasEffectFlag(BattlerActionEffectFlags.IsMagic)) offense = MAG;
             else offense = MAR;
-            if (dat.HasEffectFlag(BattlerActionEffectFlags.Melee) && !_breachOwnLines) offense--;
+            bool melee = dat.HasEffectFlag(BattlerActionEffectFlags.Melee);
+            if (melee && !_breachOwnLines) offense--;
             if (offense < 0) offense = 0;
             if (_target == null)
             {
@@ -492,6 +547,13 @@ public class Battler : MonoBehaviour
                         else defense = validEnemyTargets[i].MAR;
                         if (validEnemyTargets[i].livesOnBackRow && dat.HasEffectFlag(BattlerActionEffectFlags.Melee) && !_breachFoeLines) defense++;
                         _damageDealt += validEnemyTargets[i].DealDamage(CalcDamage(_damage, offense, defense));
+                        if (melee && stunBuffTurns > 0)
+                        {
+                            stunBuffTurns--;
+                            validEnemyTargets[i].Stun();
+                            _effectMessages.Enqueue(BattleMessageType.Stun);
+                            if (stunBuffTurns < 1) _effectMessages.Enqueue(BattleMessageType.StunBuffFaded);
+                        }
                     }
                 else if (_target != null)
                 {
@@ -505,6 +567,13 @@ public class Battler : MonoBehaviour
                         else defense = _subtargets[i].MAR;
                         if (_subtargets[i].livesOnBackRow && dat.HasEffectFlag(BattlerActionEffectFlags.Melee) && !_breachFoeLines) defense++;
                         _damageDealt += _subtargets[i].DealDamage(CalcDamage(_damage, offense, defense));
+                    }
+                    if (melee && stunBuffTurns > 0)
+                    {
+                        stunBuffTurns--;
+                        _target.Stun();
+                        _effectMessages.Enqueue(BattleMessageType.Stun);
+                        if (stunBuffTurns < 1) _effectMessages.Enqueue(BattleMessageType.StunBuffFaded);
                     }
                 }
                 else throw new System.Exception("Battler " + gameObject.name + " tried to use a damage-dealing action, but with no target.");
@@ -575,6 +644,13 @@ public class Battler : MonoBehaviour
     {
         if (damage > 0)
         {
+            if (dodgeBuffTurns > 0)
+            {
+                dodgeBuffTurns--;
+                damage = 0;
+                overseer.messageBox.Step(BattleMessageType.Dodged);
+                if (dodgeBuffTurns < 1) overseer.messageBox.Step(BattleMessageType.AttunedBuffFaded);
+            }
             if (bodyguard != null)
             {
                 bodyguard.DealDamage(damage / 4);
@@ -598,7 +674,7 @@ public class Battler : MonoBehaviour
             }
             if (damage < 0) damage = 0;
         }
-        currentHP -= damage;
+        currentHP = currentHP - damage;
         if (currentHP > adventurer.HP) currentHP = adventurer.HP;
         else if (currentHP <= 0)
         {
@@ -691,7 +767,6 @@ public class Battler : MonoBehaviour
                     break;
                 }
             }
-
             for (int i = 0; i < standardBracketActions.Count; i++)
             {
                 d = BattlerActionData.get(standardBracketActions[i]);
@@ -737,8 +812,7 @@ public class Battler : MonoBehaviour
             case BattlerAction.Barrier:
                 if (barrierTurns > 0) action = BattlerAction.None; // don't barrier if we've already barriered our barrier
                 break;
-        }
-        
+        }        
         return action;
     }
 
@@ -874,6 +948,8 @@ public class Battler : MonoBehaviour
         _bonusSPE_turns = 0;
         _sacrificePow = 0;
         _sacrificeTurns = 0;
+        stunnedTurns = 0;
+        dodgeBuffTurns = 0;
         InitializeDisposables();
     }
 

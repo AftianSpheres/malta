@@ -22,6 +22,7 @@ public class BattleOverseer : MonoBehaviour
     public bool standardActionPriorityBracket;
     public bool retreatingAtStartOfNextTurn { get; private set; }
     public bool currentlyInFight { get; private set; }
+    public int fightsLeft { get { return adventure.Length - battleNo; } }
     [System.NonSerialized] public AdventureSubstage[] adventure;
     [System.NonSerialized] public int battleNo = 0;
     private bool currentBattleResolved;

@@ -440,6 +440,7 @@ public class TownBuilding : MonoBehaviour
                 else buildingStateIndex = 1;
                 break;
         }
+        if (buildingMessage != null && buildingMessage.gameObject.activeSelf != spriteRenderer.enabled) buildingMessage.gameObject.SetActive(spriteRenderer.enabled);
         if (buildingSprites.Length > 0)
         {
             spriteRenderer.sprite = buildingSprites[buildingStateIndex];

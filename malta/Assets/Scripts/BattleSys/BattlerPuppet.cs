@@ -45,7 +45,7 @@ public class BattlerPuppet : MonoBehaviour
         if (killedPuppet && !damageAnimGadget.triggeredGadget && transform.localScale == originalScale) DeathAnim(); // let hit anims play before vanishing 
         if (pullOutButton != null)
         {
-            if (!battler.activeBattler)
+            if (!battler.activeBattler || battler.overseer.fightsLeft < 1)
             {
                 if (pullOutButton.gameObject.activeSelf) pullOutButton.gameObject.SetActive(false);
             }
