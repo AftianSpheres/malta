@@ -5,7 +5,7 @@ Silenced the target!
 Shield Wall will protect allies this turn!
 Braced against an upcoming attack!
 Healed an ally!
-All allies' Speed is boosted next turn!
+Boosted allies' Speed!
 Put up a barrier around allies!
 Healed allies!
 The user's side got an encore!
@@ -31,3 +31,7 @@ The user's second sight faded!
 Dodged the attack!
 Targets won't be able to use life-drain magic properly!
 The draining effect was nullified!
+Focused to enhance magical aptitude!
+Stat boosts faded!
+The rush of spilt blood faded!
+Made a blood sacrifice to gain power!

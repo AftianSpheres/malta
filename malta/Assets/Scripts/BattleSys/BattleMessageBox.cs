@@ -36,7 +36,11 @@ public enum BattleMessageType
     AttunedBuffFaded,
     Dodged,
     DrainKill,
-    FailedToDrain
+    FailedToDrain,
+    MagBoost,
+    StatBoostsLost,
+    SacrificeLost,
+    Sacrifice
 }
 
 public class BattleMessageBox : MonoBehaviour
@@ -232,6 +236,18 @@ public class BattleMessageBox : MonoBehaviour
                 break;
             case BattleMessageType.FailedToDrain:
                 nextLine = mainStrings[32];
+                break;
+            case BattleMessageType.MagBoost:
+                nextLine = mainStrings[33];
+                break;
+            case BattleMessageType.StatBoostsLost:
+                nextLine = mainStrings[34];
+                break;
+            case BattleMessageType.SacrificeLost:
+                nextLine = mainStrings[35];
+                break;
+            case BattleMessageType.Sacrifice:
+                nextLine = mainStrings[36];
                 break;
         }
         if (drawToLine1) line1 = nextLine;

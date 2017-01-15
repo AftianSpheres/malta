@@ -83,7 +83,7 @@ public enum BattlerActionEffectFlags : ulong // these will never be serialized, 
     ShieldWall = 1 << 4,
     Drain = 1 << 5,
     Barrier = 1 << 6,
-    null_7 = 1 << 7,
+    Healing = 1 << 7,
     Encore = 1 << 8,
     Bodyguard = 1 << 9,
     Melee = 1 << 10,
@@ -169,6 +169,7 @@ public struct BattlerActionData
         baseDamage = int.Parse(terms[6]);
         numberOfSubtargets = int.Parse(terms[7]);
         flags = ParseListOfFlags(terms);
+        if ((flags & BattlerActionEffectFlags.Healing) == BattlerActionEffectFlags.Healing) baseDamage = baseDamage * -1;
     }
 
     private static BattlerActionAnim ParseAnim (string animStr)

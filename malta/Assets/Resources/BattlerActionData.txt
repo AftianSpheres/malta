@@ -32,13 +32,13 @@ Stiletto,0,0,None,Hit,TargetWeakestEnemy,7,0,NeedsTarget,Melee
 Throat Slit,0,0,None,Hit,TargetWeakestEnemy,10,0,NeedsTarget,Melee
 Blood Rites,0,1,None,Cast,TargetSelf,0,0,Sacrifice,IsMagic
 Blade of Crimson,0,2,None,Cast,TargetSelf,0,0,Sacrifice,IsMagic
-Fleet Feet,2,1,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
-Flash Step,2,2,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
+Fleet Feet,0,1,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
+Flash Step,0,2,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
 Second Sight,3,1,None,Cast,TargetSelf,0,0,DodgeBuff,IsMagic
 With the Wind,3,2,None,Cast,TargetSelf,0,0,DodgeBuff,IsMagic
-Healing Wind,0,0,None,Cast,TargetEndangeredAlly,-4,0,NeedsTarget,IsMagic
-Breath of Life,0,0,None,Cast,TargetEndangeredAlly,-6,0,NeedsTarget,IsMagic
-Renewal,0,0,None,Cast,TargetEndangeredAlly,-8,0,NeedsTarget,IsMagic
+Healing Wind,0,0,None,Cast,TargetEndangeredAlly,4,0,NeedsTarget,IsMagic,Healing
+Breath of Life,0,0,None,Cast,TargetEndangeredAlly,6,0,NeedsTarget,IsMagic,Healing
+Renewal,0,0,None,Cast,TargetEndangeredAlly,8,0,NeedsTarget,IsMagic,Healing
 Ice Bullet,0,0,None,Cast,TargetWeakestEnemy,4,0,NeedsTarget,IsMagic
 Frost Spear,0,0,None,Cast,TargetWeakestEnemy,6,0,NeedsTarget,IsMagic
 Comet Strike,0,0,None,Cast,TargetWeakestEnemy,8,0,NeedsTarget,IsMagic
