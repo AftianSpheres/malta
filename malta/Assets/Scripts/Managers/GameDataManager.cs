@@ -9,8 +9,8 @@ public class GameDataManager_DataStore
     public SceneIDType lastScene;
     public Adventurer sovereignAdventurer;
     public Adventurer[] houseAdventurers;
-    public AdventurerClass warriorClassUnlock;
-    public AdventurerClass mysticClassUnlock;
+    //public AdventurerClass warriorClassUnlock;
+    //public AdventurerClass mysticClassUnlock;
     public BattlerAction sovereignTactic;
     public AdventurerSpecial sovereignSkill;
     public AdventurerMugshot sovereignMugshot;
@@ -66,6 +66,10 @@ public class GameDataManager_DataStore
     const int manaCap = 100;
     public const int housingLevelCap = 20;
     public ProgressionFlags progressionFlags;
+    public SovereignWpn buyable0;
+    public SovereignWpn buyable1;
+    public WarriorPromotes unlockedWarriorPromotes;
+    public MysticPromotes unlockedMysticPromotes;
 
     public GameDataManager_DataStore ()
     {
@@ -115,12 +119,16 @@ public class GameDataManager_DataStore
             houseAdventurers[i] = new Adventurer();
         }
         sovereignAdventurer = new Adventurer();
-        warriorClassUnlock = AdventurerClass.Warrior;
-        mysticClassUnlock = AdventurerClass.Mystic;
+        //warriorClassUnlock = AdventurerClass.Warrior;
+        //mysticClassUnlock = AdventurerClass.Mystic;
         sovereignTactic = BattlerAction.GetBehindMe;
         sovereignSkill = AdventurerSpecial.None;
         sovereignMugshot = AdventurerMugshot.Sovereign0;
         progressionFlags = 0;
+        buyable0 = null;
+        buyable1 = null;
+        unlockedMysticPromotes = MysticPromotes.None;
+        unlockedWarriorPromotes = WarriorPromotes.None;
     }
 
     public void SaveToFile(string path)
@@ -186,7 +194,7 @@ public class GameDataManager : Manager<GameDataManager>
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Sawmill, ref dataStore.buildingLv_Sawmill, ref dataStore.pendingUpgrade_Sawmill, ref dataStore.resPlanks_maxUpgrades);
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Smith, ref dataStore.buildingLv_Smith, ref dataStore.pendingUpgrade_Smith, ref dataStore.resMetal_maxUpgrades);
         }
-        for (int i = 0; i < dataStore.housingLevel; i++) if (!dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
+        for (int i = 0; i < dataStore.housingLevel; i++) if (!dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
         if (dataStore.adventureLevel > 1 && (!HasFlag(ProgressionFlags.FaeUnlock) || !HasFlag(ProgressionFlags.OrcUnlock)))
         {
             SetFlag(ProgressionFlags.FaeUnlock);
@@ -202,6 +210,31 @@ public class GameDataManager : Manager<GameDataManager>
             dataStore.sovereignAdventurer.PushWpnToSovereign();
         }
 
+    }
+
+    public void RerollBuyableWpns ()
+    {
+        WpnType wpnType0 = (WpnType)Random.Range(1, 4);
+        WpnType wpnType1 = (WpnType)Random.Range(1, 4);
+        switch (dataStore.adventureLevel)
+        {
+            case 0:
+                dataStore.buyable0 = new SovereignWpn(1, wpnType0);
+                dataStore.buyable1 = new SovereignWpn(0, wpnType1);
+                break;
+            case 1:
+                dataStore.buyable0 = new SovereignWpn(1, wpnType0);
+                dataStore.buyable1 = new SovereignWpn(1, wpnType1);
+                break;
+            case 2:
+                dataStore.buyable0 = new SovereignWpn(2, wpnType0);
+                dataStore.buyable1 = new SovereignWpn(1, wpnType1);
+                break;
+            default:
+                dataStore.buyable0 = new SovereignWpn(2, wpnType0);
+                dataStore.buyable1 = new SovereignWpn(2, wpnType1);
+                break;
+        }
     }
 
     public void SetFlag (ProgressionFlags flag, bool unset = false)
@@ -305,7 +338,7 @@ public class GameDataManager : Manager<GameDataManager>
         RecalculateResourceMaximums();
         for (int i = 0; i < dataStore.housingLevel; i++)
         {
-            dataStore.houseAdventurers[i].Reroll(dataStore.warriorClassUnlock, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
+            dataStore.houseAdventurers[i].Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
         }
         dataStore.sovereignMugshot = (AdventurerMugshot)Random.Range((int)AdventurerMugshot.Sovereign0, (int)AdventurerMugshot.Sovereign7 + 1);
         dataStore.sovereignAdventurer.Reroll(AdventurerClass.Sovereign, AdventurerSpecies.Human, false, new int[] { 0, 0, 0, 0 });
@@ -383,22 +416,24 @@ public class GameDataManager : Manager<GameDataManager>
         return gain;
     }
 
-    public void PromoteMysticsTo (AdventurerClass advClass)
+    public void UnlockMysticPromote (MysticPromotes promote)
     {
-        for (int i = 0; i < dataStore.houseAdventurers.Length; i++)
-        {
-            if (dataStore.houseAdventurers[i] != null && dataStore.houseAdventurers[i].advClass == dataStore.mysticClassUnlock) dataStore.houseAdventurers[i].Reclass(advClass);
-        }
-        dataStore.mysticClassUnlock = advClass;
+        dataStore.unlockedMysticPromotes = dataStore.unlockedMysticPromotes | promote;
     }
 
-    public void PromoteWarriorsTo (AdventurerClass advClass)
+    public bool MysticPromoteUnlocked (MysticPromotes promote)
     {
-        for (int i = 0; i < dataStore.houseAdventurers.Length; i++)
-        {
-            if (dataStore.houseAdventurers[i] != null && dataStore.houseAdventurers[i].advClass == dataStore.warriorClassUnlock) dataStore.houseAdventurers[i].Reclass(advClass);
-        }
-        dataStore.warriorClassUnlock = advClass;
+        return ((dataStore.unlockedMysticPromotes & promote) == promote);
+    }
+
+    public void UnlockWarriorPromote (WarriorPromotes promote)
+    {
+        dataStore.unlockedWarriorPromotes = dataStore.unlockedWarriorPromotes | promote;
+    }
+
+    public bool WarriorPromoteUnlocked (WarriorPromotes promote)
+    {
+        return ((dataStore.unlockedWarriorPromotes & promote) == promote);
     }
 
     public void SetBuildingUpgradePending (BuildingType building)

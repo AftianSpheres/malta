@@ -707,12 +707,50 @@ public class Battler : MonoBehaviour
 
     private bool StdActionDecide (BattlerActionData ld, BattlerActionData d, bool spellcasterInEnemyParty, List<Battler> allies, List<Battler> opponents)
     {
+        for (int i = 0; i < opponents.Count; i++)
+        {
+            int offense;
+            int defense;
+            bool magic;
+            bool melee;
+            if (ld.baseDamage > 0 && !ld.HasEffectFlag(BattlerActionEffectFlags.Healing))
+            {
+                magic = ld.HasEffectFlag(BattlerActionEffectFlags.IsMagic);
+                if (magic) offense = MAG;
+                else offense = MAR;
+                melee = ld.HasEffectFlag(BattlerActionEffectFlags.Melee);
+                if (melee && !_breachOwnLines && livesOnBackRow) offense--;
+                if (offense < 0) offense = 0;
+                if (magic) defense = opponents[i].MAG;
+                else defense = opponents[i].MAR;
+                if (melee && !_breachFoeLines && opponents[i].livesOnBackRow) defense++;
+                if (CalcDamage(ld.baseDamage, offense, defense) >= opponents[i].currentHP) return false; // take kills
+            } 
+            if (d.baseDamage > 0 && !d.HasEffectFlag(BattlerActionEffectFlags.Healing))
+            {
+                magic = d.HasEffectFlag(BattlerActionEffectFlags.IsMagic);
+                if (magic) offense = MAG;
+                else offense = MAR;
+                melee = d.HasEffectFlag(BattlerActionEffectFlags.Melee);
+                if (melee && !_breachOwnLines && livesOnBackRow) offense--;
+                if (offense < 0) offense = 0;
+                if (magic) defense = opponents[i].MAG;
+                else defense = opponents[i].MAR;
+                if (melee && !_breachFoeLines && opponents[i].livesOnBackRow) defense++;
+                if (CalcDamage(d.baseDamage, offense, defense) >= opponents[i].currentHP) return true; // take kills
+            }
+        }
         if (ld.HasEffectFlag(BattlerActionEffectFlags.Encore)) return false;
         if (d.HasEffectFlag(BattlerActionEffectFlags.Encore)) return true; // we never _don't_ want to take an encore because free turns, lol
         if (spellcasterInEnemyParty)
         {
             if (ld.HasEffectFlag(BattlerActionEffectFlags.Silence)) return false;
             if (d.HasEffectFlag(BattlerActionEffectFlags.Silence)) return true;
+        }
+        if (dodgeBuffTurns < 1)
+        {
+            if (ld.HasEffectFlag(BattlerActionEffectFlags.DodgeBuff)) return false;
+            if (d.HasEffectFlag(BattlerActionEffectFlags.DodgeBuff)) return true;
         }
         if (_sacrificePow < 1)
         {
@@ -890,12 +928,12 @@ public class Battler : MonoBehaviour
             _bonusSPE = 0;
             lostStatBoosts = true;
         }
-        if (lostStatBoosts) _effectMessages.Enqueue(BattleMessageType.StatBoostsLost);
+        if (lostStatBoosts) overseer.messageBox.Step(BattleMessageType.StatBoostsLost);
         if (_sacrificeTurns > 0) _sacrificeTurns--;
         if (_sacrificeTurns == 0 && _sacrificePow != 0)
         {
             _sacrificePow = 0;
-            _effectMessages.Enqueue(BattleMessageType.SacrificeLost);
+            overseer.messageBox.Step(BattleMessageType.SacrificeLost);
         }
         if (shieldWallTurns > 0) shieldWallTurns--;
         InitializeDisposables();
