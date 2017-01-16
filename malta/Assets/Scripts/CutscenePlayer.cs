@@ -230,7 +230,6 @@ public class CutscenePlayer : MonoBehaviour
         }
         else if (subtype == CutscenePlayerSubtype.BattleAnim)
         {
-            if ((BattlerActionAnim)index == BattlerActionAnim.None) return;
             script = Resources.Load<TextAsset>(battleAnimsPath + ((BattlerActionAnim)index).ToString());
         }
         else throw new Exception("Subtype was valid and got unset sometime between Awake() and a LoadCutscene() call. This is, uh, weird.");

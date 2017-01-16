@@ -1,0 +1,10 @@
+Changing Weaponry
+The guard member you found is equipped with a mace, much like yourself. Sometimes it's not so wise to go into battle with too many party members that do the same basic job... Your Sovereign can carry a variety of different weapons into battle, though!
+
+Maces are suitable for sturdy front-line offense. They provide good damage output and durability, though they're not terribly subtle.
+
+A set of knives provides versatile, nimble offensive capabilities that are usable from either the front or back lines. Equipped with knives, your Sovereign might need a little bit more support, but in exchange for that support, you get a lot of power that can be brought to bear in all sorts of combat scenarios.
+
+Staves allow you to cast magic from the back lines. The finer points of the job your Sovereign does will vary dramatically based on which spells you know, though...
+
+Changing weapons changes both your stats and your known attacks. There are also ways to obtain stronger weapons - though you can only store one weapon of each type at a time, so...

@@ -8,15 +8,16 @@ public class BattleDamageNumbersGadget : MonoBehaviour
     public float moveDist;
     public float lifespan;
     private float timeAlive;
-    private Color originalColor;
+    public Color colorDmg;
+    public Color colorHeal;
     private Vector3 originalPosition;
+    private int dmg;
     private bool triggeredGadget = false;
 
 
 	// Use this for initialization
 	void Start ()
     {
-        originalColor = uiText.color;
         originalPosition = transform.position;
         uiText.enabled = false;
 	}
@@ -54,7 +55,10 @@ public class BattleDamageNumbersGadget : MonoBehaviour
                     transform.position = transform.position + (Vector3.right * moveDist * Time.deltaTime);
                     break;
             }
-            uiText.color = Color.Lerp(originalColor, Color.clear, timeAlive / lifespan);
+            Color c;
+            if (dmg < 0) c = colorHeal;
+            else c = colorDmg;
+            uiText.color = Color.Lerp(c, Color.clear, timeAlive / lifespan);
             if (timeAlive > lifespan)
             {
                 uiText.enabled = false;
@@ -63,11 +67,24 @@ public class BattleDamageNumbersGadget : MonoBehaviour
         }
 	}
 
-    public void Trigger(int dmg)
+    public void Trigger(int _dmg)
     {
+        dmg = _dmg;
+        if (dmg == 0) return;
         uiText.enabled = true;
         uiText.text = dmg.ToString();
-        uiText.color = originalColor;
+        Color c;
+        if (dmg < 0)
+        {
+            c = colorHeal;
+            uiText.text = (-1 * dmg).ToString();
+        }
+        else
+        {
+            c = colorDmg;
+            uiText.text = dmg.ToString();
+        }
+        uiText.color = c;
         transform.position = originalPosition;
         timeAlive = 0;
         triggeredGadget = true;
