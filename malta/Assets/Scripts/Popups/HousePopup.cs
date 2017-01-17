@@ -165,7 +165,7 @@ public class HousePopup : MonoBehaviour
         if (GameDataManager.Instance.SpendResourcesIfPossible(20, 20, 20))
         {
             housingUnitUpgraded = true;
-            inspectedAdventurer.Promote();
+            inspectedAdventurer.MakeElite();
         }
         else
         {

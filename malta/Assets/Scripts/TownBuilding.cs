@@ -122,23 +122,12 @@ public class TownBuilding : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks how much a new class upgrade should cost. Second is 3x cost of first.
+    /// Atm all this does is give us the costs of the taskmaster quarters, lol
     /// </summary>
     public static int[] GetUpgradeCost_Forge ()
     {
         int[] costs;
-        if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Warrior && GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Mystic)
-        {
-            costs = new int[] { 10, 10, 10 };
-        }
-        else if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Mystic)
-        {
-            costs = new int[] { 30, 30, 30 };
-        }
-        else
-        {
-            costs = new int[] { 90, 90, 90 };
-        }
+        costs = new int[] { 90, 90, 90 };
         return costs;
     }
 

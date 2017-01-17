@@ -119,8 +119,6 @@ public class GameDataManager_DataStore
             houseAdventurers[i] = new Adventurer();
         }
         sovereignAdventurer = new Adventurer();
-        //warriorClassUnlock = AdventurerClass.Warrior;
-        //mysticClassUnlock = AdventurerClass.Mystic;
         sovereignTactic = BattlerAction.GetBehindMe;
         sovereignSkill = AdventurerSpecial.None;
         sovereignMugshot = AdventurerMugshot.Sovereign0;
@@ -170,8 +168,12 @@ public class GameDataManager : Manager<GameDataManager>
         }
     }
 
-    void Update ()
+    void DebugBlob ()
     {
+        if (Input.GetKeyDown(KeyCode.Home))
+        {
+            RerollBuyableWpns();
+        }
         if (Input.GetKey(KeyCode.Pause))
         {
             Time.timeScale = 100.0f; // speed things up for testing
@@ -184,6 +186,11 @@ public class GameDataManager : Manager<GameDataManager>
             dataStore.resPlanks += 30;
             dataStore.resMana += 30;
         }
+    }
+
+    void Update ()
+    {
+        DebugBlob();
         if (Time.time - lastSecondTimestamp >= 1.0f)
         {
             lastSecondTimestamp = Time.time;
@@ -330,6 +337,35 @@ public class GameDataManager : Manager<GameDataManager>
         RegenerateDataStore();
         if (File.Exists(Application.persistentDataPath + saveName)) File.Delete(Application.persistentDataPath + saveName);
         if (Application.platform == RuntimePlatform.WebGLPlayer) Application.ExternalCall("sync");
+    }
+
+    public void GiveSovereignBuyableWpn (bool wpn2 = false)
+    {
+        const int wpnLvMax = 2;
+        SovereignWpn boughtWpn;
+        if (wpn2)
+        {
+            boughtWpn = dataStore.buyable1;
+            dataStore.buyable1 = null;
+        }
+        else
+        {
+            boughtWpn = dataStore.buyable0;
+            dataStore.buyable0 = null;
+        }
+        switch (boughtWpn.wpnType)
+        {
+            case WpnType.Mace:
+                dataStore.sovWpn_Mace = boughtWpn;
+                break;
+            case WpnType.Knives:
+                dataStore.sovWpn_Knives = boughtWpn;
+                break;
+            case WpnType.Staff:
+                dataStore.sovWpn_Staff = boughtWpn;
+                break;
+        }
+        if (boughtWpn.wpnLevel == wpnLvMax && !HasFlag(ProgressionFlags.FirstTier2WpnBought)) SetFlag(ProgressionFlags.FirstTier2WpnBought);
     }
 
     public void RegenerateDataStore()

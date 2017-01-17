@@ -4,8 +4,7 @@ using UnityEngine.UI;
 enum ForgeStatus
 {
     Uninitialized,
-    NoUpgrades,
-    AtLeastOneUpgrade,
+    NotReadyForOutbuilding,
     ReadyForOutbuilding,
     Outbuilding_Taskmaster
 }
@@ -13,33 +12,42 @@ enum ForgeStatus
 public class ForgePopup : MonoBehaviour
 {
     public PopupMenu shell;
-    public GameObject bowmanButton;
     public GameObject explainArea;
-    public GameObject footmanButton;
-    public GameObject sageButton;
     public GameObject taskmasterArea;
     public GameObject taskmasterButton;
-    public GameObject wizardButton;
+    public Button wpnBtn0;
+    public Button wpnBtn1;
     public PopupMenu insufficientResourcesPopup;
-    public Text[] bowmanButtonReqsLabels;
-    public Text[] footmanButtonReqsLabels;
-    public Text[] sageButtonReqsLabels;
     public Text[] taskmasterButtonReqsLabels;
-    public Text[] wizardButtonReqsLabels;
     public Text explainAreaText;
-    public Text mysticUpgradeText;
-    public Text warriorUpgradeText;
+    public Text explainAreaWarning;
+    public Text wpnBtn0Text;
+    public Text wpnBtn0TypeLabel;
+    public Text[] wpnBtn0StdMatsReqs;
+    public Text wpnBtn0ManaReq;
+    public Text[] wpnBtn1StdMatsReqs;
+    public Text wpnBtn1ManaReq;
+    public Text wpnBtn1Text;
+    public Text wpnBtn1TypeLabel;
     public TextAsset stringsResource;
+    public TextAsset wpnsStringsResource;
     public TownBuilding townBuilding;
+    private SovereignWpn cWpn0;
+    private SovereignWpn cWpn1;
     private string[] strings;
+    private string[] wpnsStrings;
     private float explainAreaExpiryTimer = -1;
     private const float explainAreaExpiryTime = 0.5f;
     private ForgeStatus status;
+    const int lv0cost = 15;
+    const int lv1cost = 30;
+    const int lv2cost = 20;
 
     // Use this for initialization
     void Start ()
     {
         strings = stringsResource.text.Split('\n');
+        wpnsStrings = wpnsStringsResource.text.Split('\n');
     }
 
     // Update is called once per frame
@@ -55,25 +63,29 @@ public class ForgePopup : MonoBehaviour
             {
                 explainArea.SetActive(false);
             }
-            switch (status) // this is gross. probably rip it out & do something cleaner later on. (probably the one thing that'd ever be made more elegant by switch fallthrough, lol)
+            _HandleWpnButton(ref GameDataManager.Instance.dataStore.buyable0, ref cWpn0, ref wpnBtn0, ref wpnBtn0Text, ref wpnBtn0TypeLabel, ref wpnBtn0ManaReq, ref wpnBtn0StdMatsReqs, ref wpnsStrings, ref strings);
+            _HandleWpnButton(ref GameDataManager.Instance.dataStore.buyable1, ref cWpn1, ref wpnBtn1, ref wpnBtn1Text, ref wpnBtn1TypeLabel, ref wpnBtn1ManaReq, ref wpnBtn1StdMatsReqs, ref wpnsStrings, ref strings);
+            if (GameDataManager.Instance.HasFlag(ProgressionFlags.TaskmasterUnlock))
             {
-                case ForgeStatus.Uninitialized:
-                    _in_FuckingAwfulSwitchStatement(3);
-                    break;
-                case ForgeStatus.NoUpgrades:
-                    _in_FuckingAwfulSwitchStatement(2);
-                    break;
-                case ForgeStatus.AtLeastOneUpgrade:
-                    ConformClassUpgradeButtonsToGameState();
-                    _in_FuckingAwfulSwitchStatement(1);
-                    break;
+                status = ForgeStatus.Outbuilding_Taskmaster;
+                RefreshReqsLabels();
+            }
+            else if (GameDataManager.Instance.HasFlag(ProgressionFlags.FirstTier2WpnBought))
+            {
+                status = ForgeStatus.ReadyForOutbuilding;
+                RefreshReqsLabels();
+            }
+            else
+            {
+                status = ForgeStatus.NotReadyForOutbuilding;
+                RefreshReqsLabels();
+            }
+            switch (status)
+            {
                 case ForgeStatus.ReadyForOutbuilding:
-                    ConformClassUpgradeButtonsToGameState();
                     if (!taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(true);
-                    _in_FuckingAwfulSwitchStatement(0);
                     break;
                 case ForgeStatus.Outbuilding_Taskmaster:
-                    ConformClassUpgradeButtonsToGameState();
                     if (taskmasterButton.activeInHierarchy) taskmasterButton.SetActive(false);
                     if (!taskmasterArea.activeInHierarchy) taskmasterArea.SetActive(true);
                     break;
@@ -81,51 +93,36 @@ public class ForgePopup : MonoBehaviour
         }
 	}
 
-    /// <summary>
-    /// This is still gross and needs to be ripped out entirely but at least this makes it maintainable.
-    /// </summary>
-    /// <param name="steps">How far down do we want to follow this piece of shit?</param>
-    private void _in_FuckingAwfulSwitchStatement(int steps)
+    static void _HandleWpnButton (ref SovereignWpn buyable, ref SovereignWpn cWpn, ref Button wpnBtn, ref Text wpnBtnText, ref Text typeLabel, ref Text wpnBtnManaReq, ref Text[] wpnBtnStdMatsReqs, ref string[] wpnsStrings, ref string[] strings)
     {
-        if (GameDataManager.Instance.HasFlag(ProgressionFlags.TaskmasterUnlock))
+        if (buyable == null || buyable.wpnType == WpnType.None)
         {
-            status = ForgeStatus.Outbuilding_Taskmaster;
-            RefreshReqsLabels();
+            wpnBtn.interactable = false;
+            cWpn = null;
+            wpnBtnText.text = strings[0];
+            typeLabel.text = "";
         }
-        else if (GameDataManager.Instance.dataStore.warriorClassUnlock != AdventurerClass.Warrior && GameDataManager.Instance.dataStore.mysticClassUnlock != AdventurerClass.Mystic && steps > 0)
+        else if (buyable != cWpn)
         {
-            status = ForgeStatus.ReadyForOutbuilding;
-            RefreshReqsLabels();
-        }
-        else if (GameDataManager.Instance.dataStore.warriorClassUnlock != AdventurerClass.Warrior ^ GameDataManager.Instance.dataStore.mysticClassUnlock != AdventurerClass.Mystic && steps > 1)
-        {
-            status = ForgeStatus.AtLeastOneUpgrade;
-            RefreshReqsLabels();
-        }
-        else if (steps > 2)
-        {
-            status = ForgeStatus.NoUpgrades;
-            RefreshReqsLabels();
-        }
-    }
-
-    private void ConformClassUpgradeButtonsToGameState ()
-    {
-        if (GameDataManager.Instance.dataStore.warriorClassUnlock != AdventurerClass.Warrior && (bowmanButton.activeInHierarchy || footmanButton.activeInHierarchy))
-        {
-            bowmanButton.SetActive(false);
-            footmanButton.SetActive(false);
-            warriorUpgradeText.gameObject.SetActive(true);
-            if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Bowman) warriorUpgradeText.text = strings[4];
-            else warriorUpgradeText.text = strings[5];
-        }
-        if (GameDataManager.Instance.dataStore.mysticClassUnlock != AdventurerClass.Mystic && (sageButton.activeInHierarchy || wizardButton.activeInHierarchy))
-        {
-            sageButton.SetActive(false);
-            wizardButton.SetActive(false);
-            mysticUpgradeText.gameObject.SetActive(true);
-            if (GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Sage) mysticUpgradeText.text = strings[6];
-            else mysticUpgradeText.text = strings[7];
+            wpnBtn.interactable = true;
+            SovereignInfoPanel.UpdateTextFieldWithWpnInfo(buyable, ref cWpn, ref wpnsStrings, ref wpnBtnText);
+            typeLabel.text = SovereignWpn.GetWpnTypeString(cWpn.wpnType);
+            if (cWpn.wpnLevel > 1)
+            {
+                wpnBtnManaReq.text = lv2cost.ToString();
+                wpnBtnManaReq.transform.parent.gameObject.SetActive(true);
+                for (int i = 0; i < wpnBtnStdMatsReqs.Length; i++) wpnBtnStdMatsReqs[i].transform.parent.gameObject.SetActive(false);
+            }
+            else
+            {
+                wpnBtnManaReq.transform.parent.gameObject.SetActive(false);
+                for (int i = 0; i < wpnBtnStdMatsReqs.Length; i++)
+                {
+                    if (cWpn.wpnLevel == 0) wpnBtnStdMatsReqs[i].text = lv0cost.ToString();
+                    else wpnBtnStdMatsReqs[i].text = lv1cost.ToString();
+                    wpnBtnStdMatsReqs[i].transform.parent.gameObject.SetActive(true);
+                }
+            }
         }
     }
 
@@ -134,10 +131,73 @@ public class ForgePopup : MonoBehaviour
         int[] costs = TownBuilding.GetUpgradeCost_Forge();
         for (int i = 0; i < costs.Length; i++)
         {
-            bowmanButtonReqsLabels[i].text = footmanButtonReqsLabels[i].text = sageButtonReqsLabels[i].text = taskmasterButtonReqsLabels[i].text = wizardButtonReqsLabels[i].text = costs[i].ToString();
+            taskmasterButtonReqsLabels[i].text = costs[i].ToString();
         }
     }
     
+    public void BuyWpnButtonInteraction (bool wpn2)
+    {
+        SovereignWpn buyable;
+        if (wpn2) buyable = GameDataManager.Instance.dataStore.buyable1;
+        else buyable = GameDataManager.Instance.dataStore.buyable0;
+        if (buyable.wpnLevel > 1)
+        {
+            if (GameDataManager.Instance.SpendManaIfPossible(lv2cost))
+            {
+                GameDataManager.Instance.GiveSovereignBuyableWpn(wpn2);
+                shell.Close();
+            }
+            else
+            {
+                shell.SurrenderFocus();
+                insufficientResourcesPopup.Open();
+            }
+        }
+        else
+        {
+            int[] costs;
+            if (buyable.wpnLevel == 0) costs = new int[] { lv0cost, lv0cost, lv0cost };
+            else costs = new int[] { lv1cost, lv1cost, lv1cost };
+            if (GameDataManager.Instance.SpendResourcesIfPossible(costs))
+            {
+                GameDataManager.Instance.GiveSovereignBuyableWpn(wpn2);
+                shell.Close();
+            }
+            else
+            {
+                shell.SurrenderFocus();
+                insufficientResourcesPopup.Open();
+            }
+        }
+    }
+
+    public void BuyWpnButtonMouseover (bool wpn2)
+    {
+        SovereignWpn buyable;
+        if (wpn2) buyable = GameDataManager.Instance.dataStore.buyable1;
+        else buyable = GameDataManager.Instance.dataStore.buyable0;
+        if (buyable != null && buyable.wpnType != WpnType.None)
+        {
+            switch (buyable.wpnType)
+            {
+                case WpnType.Mace:
+                    SovereignInfoPanel.UpdateTextFieldWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Mace, ref GameDataManager.Instance.dataStore.sovWpn_Mace, ref wpnsStrings, ref explainAreaText);
+                    explainAreaWarning.text = strings[1];
+                    break;
+                case WpnType.Knives:
+                    SovereignInfoPanel.UpdateTextFieldWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Knives, ref GameDataManager.Instance.dataStore.sovWpn_Knives, ref wpnsStrings, ref explainAreaText);
+                    explainAreaWarning.text = strings[2];
+                    break;
+                case WpnType.Staff:
+                    SovereignInfoPanel.UpdateTextFieldWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Staff, ref GameDataManager.Instance.dataStore.sovWpn_Staff, ref wpnsStrings, ref explainAreaText);
+                    explainAreaWarning.text = strings[3];
+                    break;
+            }
+            explainArea.SetActive(true);
+            explainAreaExpiryTimer = float.PositiveInfinity;
+        }
+    }
+
     public void BuildTaskmasterQuartersButtonInteraction ()
     {
         int[] costs = TownBuilding.GetUpgradeCost_Forge();
@@ -157,87 +217,5 @@ public class ForgePopup : MonoBehaviour
         explainAreaExpiryTimer = explainAreaExpiryTime;
     }
 
-    public void MysticToSageButtonMouseoverEntry ()
-    {
-        if (GameStateManager.Instance.PopupHasFocus(shell))
-        {
-            if (!explainArea.activeInHierarchy) explainArea.SetActive(true);
-            if (explainAreaText.text != strings[2]) explainAreaText.text = strings[2];
-            explainAreaExpiryTimer = -1.0f;
-        }
-    }
 
-    public void MysticToSageButtonInteraction ()
-    {
-        int[] costs = TownBuilding.GetUpgradeCost_Forge();
-        if (GameDataManager.Instance.SpendResourcesIfPossible(costs)) GameDataManager.Instance.PromoteMysticsTo(AdventurerClass.Sage);
-        else
-        {
-            shell.SurrenderFocus();
-            insufficientResourcesPopup.Open();
-        }
-    }
-
-    public void MysticToWizardButtonMouseoverEntry ()
-    {
-        if (GameStateManager.Instance.PopupHasFocus(shell))
-        {
-            if (!explainArea.activeInHierarchy) explainArea.SetActive(true);
-            if (explainAreaText.text != strings[3]) explainAreaText.text = strings[3];
-            explainAreaExpiryTimer = -1.0f;
-        }
-    }
-
-    public void MysticToWizardButtonInteraction ()
-    {
-        int[] costs = TownBuilding.GetUpgradeCost_Forge();
-        if (GameDataManager.Instance.SpendResourcesIfPossible(costs)) GameDataManager.Instance.PromoteMysticsTo(AdventurerClass.Wizard);
-        else
-        {
-            shell.SurrenderFocus();
-            insufficientResourcesPopup.Open();
-        }
-    }
-
-    public void WarriorToBowmanButtonMouseoverEntry ()
-    {
-        if (GameStateManager.Instance.PopupHasFocus(shell))
-        {
-            if (!explainArea.activeInHierarchy) explainArea.SetActive(true);
-            if (explainAreaText.text != strings[0]) explainAreaText.text = strings[0];
-            explainAreaExpiryTimer = -1.0f;
-        }
-    }
-
-    public void WarriorToBowmanButtonInteraction ()
-    {
-        int[] costs = TownBuilding.GetUpgradeCost_Forge();
-        if (GameDataManager.Instance.SpendResourcesIfPossible(costs)) GameDataManager.Instance.PromoteWarriorsTo(AdventurerClass.Bowman);
-        else
-        {
-            shell.SurrenderFocus();
-            insufficientResourcesPopup.Open();
-        }
-    }
-
-    public void WarriorToFootmanButtonMouseoverEntry ()
-    {
-        if (GameStateManager.Instance.PopupHasFocus(shell))
-        {
-            if (!explainArea.activeInHierarchy) explainArea.SetActive(true);
-            if (explainAreaText.text != strings[1]) explainAreaText.text = strings[1];
-            explainAreaExpiryTimer = -1.0f;
-        }
-    }
-
-    public void WarriorToFootmanButtonInteraction ()
-    {
-        int[] costs = TownBuilding.GetUpgradeCost_Forge();
-        if (GameDataManager.Instance.SpendResourcesIfPossible(costs)) GameDataManager.Instance.PromoteWarriorsTo(AdventurerClass.Footman);
-        else
-        {
-            shell.SurrenderFocus();
-            insufficientResourcesPopup.Open();
-        }
-    }
 }

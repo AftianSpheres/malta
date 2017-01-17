@@ -49,6 +49,7 @@ public class Adventurer
     public string fullTitle;
     public string bioText { get; private set; }
     public BattlerAction[] attacks;
+    public AdventurerClass baseClass { get; private set; }
     public AdventurerClass advClass { get; private set; }
     public AdventurerSpecial special;
     public AdventurerSpecies species = AdventurerSpecies.Human;
@@ -63,6 +64,7 @@ public class Adventurer
     public int individualSpeed { get; private set; }
     public bool awakened { get; private set; }
     public bool isElite { get; private set; }
+    public bool isPromoted { get; private set; }
     public bool initialized { get; private set; }
     private static string[] attackNames;
     private static string[] classNames;
@@ -89,8 +91,10 @@ public class Adventurer
     private const string specialDescsResourcePath = "special_descs/";
     private const string mugshotsResourcePath = "mugshots/";
     private const string enemyGfxResourcePath = "mugshots/enemy/";
-    public static int[] awakeningCosts = { 50, 50, 50 };
-    private static AdventurerClass[] frontRowClasses = { AdventurerClass.Warrior, AdventurerClass.Footman, AdventurerClass.Sovereign };
+    public static readonly int[] awakeningCosts = { 50, 50, 50 };
+    public static readonly AdventurerClass[] frontRowClasses = { AdventurerClass.Warrior, AdventurerClass.Footman, AdventurerClass.Sovereign };
+    public static readonly AdventurerClass[] warriorTypeClasses = { AdventurerClass.Warrior, AdventurerClass.Bowman, AdventurerClass.Footman };
+    public static readonly AdventurerClass[] mysticTypeClasses = { AdventurerClass.Mystic, AdventurerClass.Sage, AdventurerClass.Wizard };
 
     public void Awaken ()
     {
@@ -247,7 +251,14 @@ public class Adventurer
         fullName = firstName + " " + lastName;
     }
 
-    public void Promote ()
+    public void PromoteToTier2 (AdventurerClass _advClass)
+    {
+        if (isPromoted) throw new System.Exception("Can't promote a promoted adventurer");
+        Reclass(_advClass);
+        isPromoted = true;
+    }
+
+    public void MakeElite ()
     {
         isElite = true;
         RerollFullTitle();
@@ -263,6 +274,19 @@ public class Adventurer
 
     public void Reroll (AdventurerClass _advClass, AdventurerSpecies _species, bool _isElite, int[] individualStats)
     {
+        for (int i = 0; i < warriorTypeClasses.Length; i++)
+        {
+            if (warriorTypeClasses[i] == _advClass)
+            {
+                baseClass = AdventurerClass.Warrior;
+                break;
+            }
+            if (mysticTypeClasses[i] == _advClass)
+            {
+                baseClass = AdventurerClass.Mystic;
+                break;
+            }
+        }
         advClass = _advClass;
         species = _species;
         isElite = _isElite;

@@ -24,9 +24,9 @@ public class SovereignWpnPopup : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if (cachedMace != GameDataManager.Instance.dataStore.sovWpn_Mace) SovereignInfoPanel.UpdateButtonWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Mace, ref cachedMace, ref strings, ref maceArea);
-        if (cachedStaff != GameDataManager.Instance.dataStore.sovWpn_Staff) SovereignInfoPanel.UpdateButtonWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Staff, ref cachedStaff, ref strings, ref staffArea);
-        if (cachedKnives != GameDataManager.Instance.dataStore.sovWpn_Knives) SovereignInfoPanel.UpdateButtonWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Knives, ref cachedKnives, ref strings, ref knivesArea);
+        if (cachedMace != GameDataManager.Instance.dataStore.sovWpn_Mace) SovereignInfoPanel.UpdateTextFieldWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Mace, ref cachedMace, ref strings, ref maceArea);
+        if (cachedStaff != GameDataManager.Instance.dataStore.sovWpn_Staff) SovereignInfoPanel.UpdateTextFieldWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Staff, ref cachedStaff, ref strings, ref staffArea);
+        if (cachedKnives != GameDataManager.Instance.dataStore.sovWpn_Knives) SovereignInfoPanel.UpdateTextFieldWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Knives, ref cachedKnives, ref strings, ref knivesArea);
 	}
 
     public void SetMace ()

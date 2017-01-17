@@ -12,8 +12,6 @@ public class RetrainPopup : MonoBehaviour
     private string[] strings;
     private AdventurerClass cachedClass;
     private string cachedName = "Rock \"The Dwayne\" Johnson"; // this is literally anything namegen won't throw at you
-    private static AdventurerClass[] warriorClassEvolutions = { AdventurerClass.Warrior, AdventurerClass.Bowman, AdventurerClass.Footman };
-    private static AdventurerClass[] mysticClassEvolutions = { AdventurerClass.Mystic, AdventurerClass.Sage, AdventurerClass.Wizard };
 
     // Use this for initialization
     void Start ()
@@ -24,40 +22,28 @@ public class RetrainPopup : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if (associatedAdventurer != null)
+        if (associatedAdventurer != null && !associatedAdventurer.isPromoted)
         {
             if (cachedName != associatedAdventurer.fullName)
             {
                 cachedName = associatedAdventurer.fullName;
                 inquiryLabel.text = strings[0] + cachedName + strings[1];
             }
-            for (int i = 0; i < warriorClassEvolutions.Length; i++)
+            if (cachedClass != associatedAdventurer.baseClass)
             {
-                if (associatedAdventurer.advClass == warriorClassEvolutions[i])
-                {
-                    if (cachedClass != GameDataManager.Instance.dataStore.mysticClassUnlock)
-                    {
-                        cachedClass = GameDataManager.Instance.dataStore.mysticClassUnlock;
-                        reclassButtonLabel.text = strings[2] + Adventurer.GetClassName(GameDataManager.Instance.dataStore.mysticClassUnlock);
-                    }
-                    break;
-                }
-                else if (associatedAdventurer.advClass == mysticClassEvolutions[i])
-                {
-                    if (cachedClass != GameDataManager.Instance.dataStore.warriorClassUnlock)
-                    {
-                        cachedClass = GameDataManager.Instance.dataStore.warriorClassUnlock;
-                        reclassButtonLabel.text = strings[2] + Adventurer.GetClassName(GameDataManager.Instance.dataStore.warriorClassUnlock);
-                    }
-                    break;
-                }
+                cachedClass = associatedAdventurer.baseClass;
+                AdventurerClass advC;
+                if (cachedClass == AdventurerClass.Warrior) advC = AdventurerClass.Mystic;
+                else advC = AdventurerClass.Warrior;
+                reclassButtonLabel.text = strings[2] + Adventurer.GetClassName(advC);
             }
         }
 	}
 
     public void ConfirmedRetrain ()
     {
-        associatedAdventurer.Reclass(cachedClass);
+        if (cachedClass == AdventurerClass.Warrior) associatedAdventurer.Reclass(AdventurerClass.Mystic);
+        else associatedAdventurer.Reclass(AdventurerClass.Warrior);
         shell.Close();
     }
 }

@@ -191,6 +191,7 @@ public class BattleOverseer : MonoBehaviour
             }
             GameDataManager.Instance.dataStore.adventureLevel++;
         }
+        GameDataManager.Instance.RerollBuyableWpns();
         battleEndPopup.Open();
     }
 
@@ -206,6 +207,7 @@ public class BattleOverseer : MonoBehaviour
             GameDataManager.Instance.dataStore.resMetal += baseEndlessAdventurePayout[2] / 2;
         }
         yield return Timing.WaitForSeconds(battleStepLength * 3);
+        GameDataManager.Instance.RerollBuyableWpns();
         battleEndPopup.Open();
     }
 
@@ -215,6 +217,7 @@ public class BattleOverseer : MonoBehaviour
         yield return Timing.WaitUntilDone(theater.LoseBattle());
         while (theater.processing) yield return 0f;
         yield return Timing.WaitForSeconds(battleStepLength);
+        GameDataManager.Instance.RerollBuyableWpns();
         screenChanger.Activate();
     }
 

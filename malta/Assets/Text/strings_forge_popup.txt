@@ -1,8 +1,4 @@
-Upgrade your Warriors to nimble Bowmen, who trade defense for speed, power and range.
-Upgrade your Warriors to sturdy Footmen, who boast a modest power increase and substantially more durability.
-Upgrade your Mystics to wise Sages, who specialize in party support.
-Upgrade your Mystics to potent Wizards, who concentrate on pure destructive force.
-Warrior has been upgraded to Bowman!
-Warrior has been upgraded to Footman!
-Mystic has been upgraded to Sage!
-Mystic has been upgraded to Wizard!
+Out of stock!
+Buying a Mace will replace your current Mace!
+Buying a set of Knives will replace your current Knives!
+Buying a Staff will replace your current Staff!

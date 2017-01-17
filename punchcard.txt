@@ -359,3 +359,11 @@ Jan. 15 2017-78
 10:11 PM - off
 1:49 AM - on
 2:26 AM - off
+
+Jan. 16 2017-101
+8:39 PM - start
+9:18 PM - off
+10:45 PM - on
+11:34 PM - off
+12:05 AM - on
+12:18 AM - off

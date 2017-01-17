@@ -68,6 +68,11 @@ public class SovereignWpn
     private static string[] wpnPrefixes;
     private const string wpnPrefixesResourcePath = "wpn_prefixes";
 
+    public static string GetWpnTypeString(WpnType _wpnType)
+    {
+        MakeSureStringArraysArePopulated();
+        return wpnTypeNames[(int)_wpnType];
+    }
 
     public SovereignWpn(int lv, WpnType _wpnType)
     {
@@ -80,7 +85,7 @@ public class SovereignWpn
         GetName();
     }
 
-    void GetName()
+    static void MakeSureStringArraysArePopulated ()
     {
         if (wpnClassNames == null)
         {
@@ -100,6 +105,11 @@ public class SovereignWpn
             if (a == null) throw new Exception("Can't get wpn prefix strings from file");
             wpnPrefixes = a.text.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
         }
+    }
+
+    void GetName()
+    {
+        MakeSureStringArraysArePopulated();
         wpnName = wpnPrefixes[UnityEngine.Random.Range(0, wpnPrefixes.Length)] + " " + wpnClassNames[(int)wpnClass] + " " + wpnTypeNames[(int)wpnType]; 
     }
 

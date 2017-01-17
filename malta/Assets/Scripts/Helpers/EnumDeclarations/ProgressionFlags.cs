@@ -11,6 +11,7 @@ public enum ProgressionFlags : int // signed int for bitflags is eww but Unity t
     TowerUnlock = 1 << 5,
     FaeUnlock = 1 << 6,
     OrcUnlock = 1 << 7,
-    EndOfTutorialProgression = 1 << 8
+    EndOfTutorialProgression = 1 << 8,
+    FirstTier2WpnBought = 1 << 9
 
 }

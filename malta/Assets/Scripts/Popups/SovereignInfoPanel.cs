@@ -60,7 +60,7 @@ public class SovereignInfoPanel : MonoBehaviour
         }
         if (cachedSovereignWpn != GameDataManager.Instance.dataStore.sovWpn_Set)
         {
-            UpdateButtonWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Set, ref cachedSovereignWpn, ref strings, ref sovereignWpnArea);
+            UpdateTextFieldWithWpnInfo(GameDataManager.Instance.dataStore.sovWpn_Set, ref cachedSovereignWpn, ref strings, ref sovereignWpnArea);
         }
         if (rowPlacementButton != null && rowPlacementButton.interactable != (GameDataManager.Instance.dataStore.sovereignEquippedWeaponType == WpnType.Knives)) rowPlacementButton.interactable = (GameDataManager.Instance.dataStore.sovereignEquippedWeaponType == WpnType.Knives);
         if (cachedSovereignRowState != GameDataManager.Instance.dataStore.sovereignOnBackRow)
@@ -97,32 +97,35 @@ public class SovereignInfoPanel : MonoBehaviour
         if (GameDataManager.Instance.dataStore.sovereignEquippedWeaponType == WpnType.Knives) GameDataManager.Instance.dataStore.sovereignOnBackRow = !GameDataManager.Instance.dataStore.sovereignOnBackRow;
     }
 
-    public static void UpdateButtonWithWpnInfo (SovereignWpn o, ref SovereignWpn cachedSovereignWpn, ref string[] strings, ref Text sovereignWpnArea)
+    public static void UpdateTextFieldWithWpnInfo (SovereignWpn o, ref SovereignWpn cachedSovereignWpn, ref string[] strings, ref Text sovereignWpnArea)
     {
-        cachedSovereignWpn = o;
-        string l0 = cachedSovereignWpn.wpnName + System.Environment.NewLine;
-        string l1 = strings[2] + cachedSovereignWpn.HP + dividerString + strings[3] + cachedSovereignWpn.Martial + dividerString + strings[4] + cachedSovereignWpn.Magic + dividerString + strings[5] + cachedSovereignWpn.Speed + System.Environment.NewLine;
-        string l2 = string.Empty;
-        for (int i = 0; i < cachedSovereignWpn.attacks.Length; i++)
+        if (o != null)
         {
-            if (cachedSovereignWpn.attacks[i] != BattlerAction.UninitializedVal && cachedSovereignWpn.attacks[i] != BattlerAction.None)
+            cachedSovereignWpn = o;
+            string l0 = cachedSovereignWpn.wpnName + System.Environment.NewLine;
+            string l1 = strings[2] + cachedSovereignWpn.HP + dividerString + strings[3] + cachedSovereignWpn.Martial + dividerString + strings[4] + cachedSovereignWpn.Magic + dividerString + strings[5] + cachedSovereignWpn.Speed + System.Environment.NewLine;
+            string l2 = string.Empty;
+            for (int i = 0; i < cachedSovereignWpn.attacks.Length; i++)
             {
-                l2 = l2 + BattlerActionData.get(cachedSovereignWpn.attacks[i]).name + System.Environment.NewLine;
+                if (cachedSovereignWpn.attacks[i] != BattlerAction.UninitializedVal && cachedSovereignWpn.attacks[i] != BattlerAction.None)
+                {
+                    l2 = l2 + BattlerActionData.get(cachedSovereignWpn.attacks[i]).name + System.Environment.NewLine;
+                }
             }
+            string l3 = string.Empty;
+            switch (cachedSovereignWpn.wpnType)
+            {
+                case WpnType.Knives:
+                    l3 = strings[31];
+                    break;
+                case WpnType.Mace:
+                    l3 = strings[32];
+                    break;
+                case WpnType.Staff:
+                    l3 = strings[33];
+                    break;
+            }
+            sovereignWpnArea.text = l0 + l1 + l2 + l3;
         }
-        string l3 = string.Empty;
-        switch (cachedSovereignWpn.wpnType)
-        {
-            case WpnType.Knives:
-                l3 = strings[31];
-                break;
-            case WpnType.Mace:
-                l3 = strings[32];
-                break;
-            case WpnType.Staff:
-                l3 = strings[33];
-                break;
-        }
-        sovereignWpnArea.text = l0 + l1 + l2 + l3;
     }
 }
