@@ -8,6 +8,7 @@ public class HousePopup : MonoBehaviour
     public GameObject advPanelPrototype;
     public GameObject advPanelsParent;
     public GameObject lvButton;
+    public GameObject promoteButton;
     public AdventurerWatcher[] houseAdvWatchers;
     public Adventurer inspectedAdventurer;
     public int advIndex;
@@ -17,6 +18,7 @@ public class HousePopup : MonoBehaviour
     public PopupMenu insufficientResourcesPopup;
     public RetrainPopup retrainPopup;
     public EvictPopup evictPopup;
+    public PromotePopup promotePopup;
     public Button awakenButton;
     public Button outbuildingButton;
     public Image mugshot;
@@ -72,6 +74,42 @@ public class HousePopup : MonoBehaviour
         {
             if (housingUnitUpgraded && outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(false);
             else if (!housingUnitUpgraded && !outbuildingButton.IsActive()) outbuildingButton.gameObject.SetActive(true);
+        }
+        if (promoteButton != null)
+        {
+            if (inspectedAdventurer.advClass == AdventurerClass.Warrior)
+            {
+                for (int i = 1; i < 1 << 31; )
+                {
+                    if (!promoteButton.activeSelf)
+                    {
+                        if (GameDataManager.Instance.WarriorPromoteUnlocked((WarriorPromotes)i))
+                        {
+                            promoteButton.SetActive(true);
+                            break;
+                        }
+                    }
+                    i = i << 1;
+                    if (i == 1 << 31 && promoteButton.activeSelf) promoteButton.SetActive(false);
+                }
+            }
+            else if (inspectedAdventurer.advClass == AdventurerClass.Mystic)
+            {
+                for (int i = 1; i < 1 << 31; )
+                {
+                    if (!promoteButton.activeSelf)
+                    {
+                        if (GameDataManager.Instance.MysticPromoteUnlocked((MysticPromotes)i))
+                        {
+                            promoteButton.SetActive(true);
+                            break;
+                        }
+                    }
+                    i = i << 1;
+                    if (i == 1 << 31 && promoteButton.activeSelf) promoteButton.SetActive(false);
+                }
+            }
+            else if (promoteButton.activeSelf) promoteButton.SetActive(false);
         }
         if (inspectedAdventurer.fullName != cachedName)
         {
@@ -232,5 +270,11 @@ public class HousePopup : MonoBehaviour
     {
         rt.SetParent(advPanelsParent.transform, true);
         rt.anchoredPosition = new Vector2(0, (Mathf.Abs(rt.sizeDelta.y) / 2) - (listIndex * (advPanelHeight + advPanelsSpacing))); // I don't pretend to understand this. rects are a mystery. why can't you be nice and clunky low-level stuff, rects?
+    }
+
+    public void PromoteUnit ()
+    {
+        shell.SurrenderFocus();
+        promotePopup.OpenOn(inspectedAdventurer);
     }
 }
