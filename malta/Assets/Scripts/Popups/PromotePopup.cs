@@ -7,34 +7,19 @@ public class PromotePopup : MonoBehaviour
     public PopupMenu shell;
     public PopupMenu insufficientResourcesPopup;
     public TextAsset stringsResource;
-    public RectTransform dropdownOptsParent;
-    public RectTransform scrollRectTransform;
+    public Dropdown dd;
     private Adventurer adv;
     public Text promoteText;
-    public GameObject dropdownOptPrototype;
     private List<AdventurerClass> advClasses;
-    private List<GameObject> ddOpts;
-    private List<Text> unlockedClassLabels;
-    private List<Toggle> toggles;
-    private int validItems;
     public AdventurerClass setClass;
     private string[] strings;
     const int manaCost = 10;
-    const float scrollRectSizePerItem = 28;
-    private Vector3 dropdownOptSize;
 
 	// Use this for initialization
 	void Awake ()
     {
         strings = Util.GetLinesFrom(stringsResource);
-        ddOpts = new List<GameObject>();
-        //dropdownOptPrototype.SetActive(false);
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-	
+        advClasses = new List<AdventurerClass>();
 	}
 
     public void OpenOn (Adventurer _adv)
@@ -44,17 +29,17 @@ public class PromotePopup : MonoBehaviour
         if (_adv.advClass == AdventurerClass.Warrior) PopulateDropdownForWarrior();
         else if (_adv.advClass == AdventurerClass.Mystic) PopulateDropdownForMystic();
         else throw new System.Exception("Opened promote popup on unpromotable unit of class " + adv.advClass.ToString());
-    }
-
-    GameObject _makeOption ()
-    {
-        return (GameObject)Instantiate(dropdownOptPrototype, dropdownOptsParent);
+        if (dd.options.Count < 2) dd.interactable = false;
+        else dd.interactable = true;
+        SetClassSelectionBasedOnVal();
     }
 
     void PopulateDropdownForWarrior ()
     {
+        dd.ClearOptions();
+        List<Dropdown.OptionData> ddOpts = new List<Dropdown.OptionData>();
         List<WarriorPromotes> l = new List<WarriorPromotes>();
-        for (int i = 1; i < 1 << 31; )
+        for (int i = 1; i > 1 << 31; ) // whoops, bit shifting a signed int will do that, lol
         {
             if (GameDataManager.Instance.WarriorPromoteUnlocked((WarriorPromotes)i))
             {
@@ -62,34 +47,24 @@ public class PromotePopup : MonoBehaviour
             }
             i = i << 1;
         }
-        validItems = 0;
         for (int i = 0; i < l.Count; i++)
         {
             if (i >= ddOpts.Count)
             {
-                ddOpts.Add(_makeOption());
-                unlockedClassLabels.Add(ddOpts[i].transform.Find("Item Label").GetComponent<Text>());
-                toggles.Add(ddOpts[i].GetComponent<Toggle>());
                 advClasses.Add(AdventurerClass.None);
             }
             advClasses[i] = _warriorPromoteToAdvClass(l[i]);
-            unlockedClassLabels[i].text = Adventurer.GetClassName(advClasses[i]);
-            ddOpts[i].name = "ddOpt: " + unlockedClassLabels[i].text;
-            ddOpts[i].SetActive(true);
-            validItems++;
+            ddOpts.Add(new Dropdown.OptionData(Adventurer.GetClassName(advClasses[i])));
         }
-        for (int i = l.Count; i < ddOpts.Count; i++)
-        {
-            ddOpts[i].name = "ddOpt: dead";
-            ddOpts[i].SetActive(false);
-        }
-        RecalcAndPopulateScrollRect();
+        dd.AddOptions(ddOpts);
     }
 
     void PopulateDropdownForMystic ()
     {
+        dd.ClearOptions();
+        List<Dropdown.OptionData> ddOpts = new List<Dropdown.OptionData>();
         List<MysticPromotes> l = new List<MysticPromotes>();
-        for (int i = 1; i < 1 << 31;)
+        for (int i = 1; i > 1 << 31;)
         {
             if (GameDataManager.Instance.MysticPromoteUnlocked((MysticPromotes)i))
             {
@@ -97,43 +72,16 @@ public class PromotePopup : MonoBehaviour
             }
             i = i << 1;
         }
-        validItems = 0;
         for (int i = 0; i < l.Count; i++)
         {
             if (i >= ddOpts.Count)
             {
-                ddOpts.Add(_makeOption());
-                unlockedClassLabels.Add(ddOpts[i].transform.Find("Item Label").GetComponent<Text>());
-                toggles.Add(ddOpts[i].GetComponent<Toggle>());
                 advClasses.Add(AdventurerClass.None);
             }
             advClasses[i] = _mysticPromoteToAdvClass(l[i]);
-            unlockedClassLabels[i].text = Adventurer.GetClassName(advClasses[i]);
-            ddOpts[i].name = "ddOpt: " + unlockedClassLabels[i].text;
-            ddOpts[i].SetActive(true);
-            validItems++;
+            ddOpts.Add(new Dropdown.OptionData(Adventurer.GetClassName(advClasses[i])));
         }
-        for (int i = l.Count; i < ddOpts.Count; i++)
-        {
-            ddOpts[i].name = "ddOpt: dead";
-            ddOpts[i].SetActive(false);
-        }
-        RecalcAndPopulateScrollRect();
-    }
-
-    void RecalcAndPopulateScrollRect ()
-    {
-        for (int i = 0; i < validItems; i++) ddOpts[i].transform.SetParent(transform, true);
-        dropdownOptsParent.SetParent(transform, true);
-        scrollRectTransform.sizeDelta = dropdownOptsParent.sizeDelta = new Vector2(dropdownOptsParent.sizeDelta.x, scrollRectSizePerItem * validItems);
-        scrollRectTransform.anchoredPosition = dropdownOptsParent.anchoredPosition = Vector2.zero;
-        dropdownOptsParent.SetParent(scrollRectTransform, true);
-        for (int i = 0; i < validItems; i++)
-        {
-            RectTransform rt = ddOpts[i].transform as RectTransform;
-            rt.SetParent(dropdownOptsParent, true);
-            rt.anchoredPosition = new Vector2(0, (Mathf.Abs(rt.sizeDelta.y) / 2) - (i * scrollRectSizePerItem));
-        }
+        dd.AddOptions(ddOpts);
     }
 
     private AdventurerClass _warriorPromoteToAdvClass (WarriorPromotes wp)
@@ -160,17 +108,9 @@ public class PromotePopup : MonoBehaviour
         throw new System.Exception(mp.ToString() + "ain't a thing, etc. etc.");
     }
 
-    public void SetClassSelectionBasedOnGameObjectRef (GameObject caller)
+    public void SetClassSelectionBasedOnVal ()
     {
-        for (int i = 0; i < ddOpts.Count; i++)
-        {
-            if (ddOpts[i] == caller)
-            {
-                SetClassSelection(advClasses[i]);
-                break;
-            }
-            if (i == ddOpts.Count) throw new System.Exception("Couldn't tie " + caller.name + " to a class..."); // if we get to the end of the search loop and it's not there...
-        }
+        SetClassSelection(advClasses[dd.value]);
     }
 
     void SetClassSelection (AdventurerClass _newClass)

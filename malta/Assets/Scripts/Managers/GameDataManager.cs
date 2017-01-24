@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -70,6 +70,10 @@ public class GameDataManager_DataStore
     public SovereignWpn buyable1;
     public WarriorPromotes unlockedWarriorPromotes;
     public MysticPromotes unlockedMysticPromotes;
+    public WarriorPromotes nextWarriorPromote;
+    public MysticPromotes nextMysticPromote;
+    public int[] nextPromoteUnlockCosts;
+    public int nextPromoteUnlockBattles;
 
     public GameDataManager_DataStore ()
     {
@@ -172,7 +176,7 @@ public class GameDataManager : Manager<GameDataManager>
     {
         if (Input.GetKeyDown(KeyCode.Home))
         {
-            RerollBuyableWpns();
+            BattleEndDataRefresh();
         }
         if (Input.GetKey(KeyCode.Pause))
         {
@@ -219,7 +223,61 @@ public class GameDataManager : Manager<GameDataManager>
 
     }
 
-    public void RerollBuyableWpns ()
+    void DetermineNextPromoteUnlock ()
+    {
+        int unlockedWpCount = 0;
+        int unlockedMpCount = 0;
+        List<WarriorPromotes> availableWp = new List<WarriorPromotes>();
+        List<MysticPromotes> availableMp = new List<MysticPromotes>();
+        for (int i = 1; i > 1 << 31; )
+        {
+            if (WarriorPromoteUnlocked((WarriorPromotes)i)) unlockedWpCount++;
+            else availableWp.Add((WarriorPromotes)i);
+            if (MysticPromoteUnlocked((MysticPromotes)i)) unlockedMpCount++;
+            else availableMp.Add((MysticPromotes)i);
+            i = i << 1;
+        }
+        int wScore = 0;
+        int mScore = 0;
+        if (availableWp.Count > 0)
+        {
+            if (dataStore.unlockedWarriorPromotes == 0) wScore++;
+            if (dataStore.nextMysticPromote != MysticPromotes.None) wScore++;
+        }
+        if (availableMp.Count > 0)
+        {
+            if (dataStore.unlockedMysticPromotes == 0) mScore++;
+            if (dataStore.nextWarriorPromote != WarriorPromotes.None) mScore++;
+        }
+        if (wScore > 0 && mScore > 0)
+        {
+            if (Random.Range(0, 2) == 0) wScore = 0;
+            else mScore = 0; 
+        }
+        if (wScore > 0)
+        {
+            dataStore.nextWarriorPromote = (WarriorPromotes)Random.Range(0, availableWp.Count);
+            dataStore.nextMysticPromote = MysticPromotes.None;
+        }
+        else if (mScore > 0)
+        {
+            dataStore.nextMysticPromote = (MysticPromotes)Random.Range(0, availableMp.Count);
+            dataStore.nextWarriorPromote = WarriorPromotes.None;
+        }
+        else
+        {
+            dataStore.nextWarriorPromote = WarriorPromotes.None;
+            dataStore.nextMysticPromote = MysticPromotes.None;
+        }
+        int c = unlockedWpCount + unlockedMpCount;
+        if (c < 1) dataStore.nextPromoteUnlockBattles = 0;
+        else if (dataStore.nextWarriorPromote == WarriorPromotes.None && dataStore.nextMysticPromote == MysticPromotes.None) dataStore.nextPromoteUnlockBattles = int.MinValue;
+        else dataStore.nextPromoteUnlockBattles = Random.Range(c, c * 3);
+        int r = 20 + (c * 30);
+        dataStore.nextPromoteUnlockCosts = new int[] { r, r, r };
+    }
+
+    void RerollBuyableWpns ()
     {
         WpnType wpnType0 = (WpnType)Random.Range(1, 4);
         WpnType wpnType1 = (WpnType)Random.Range(1, 4);
@@ -242,6 +300,27 @@ public class GameDataManager : Manager<GameDataManager>
                 dataStore.buyable1 = new SovereignWpn(2, wpnType1);
                 break;
         }
+    }
+
+    public void UnlockNextPromote ()
+    {
+        if (dataStore.nextWarriorPromote != WarriorPromotes.None)
+        {
+            UnlockWarriorPromote(dataStore.nextWarriorPromote);
+            dataStore.nextWarriorPromote = WarriorPromotes.None;
+        }
+        else if (dataStore.nextMysticPromote != MysticPromotes.None)
+        {
+            UnlockMysticPromote(dataStore.nextMysticPromote);
+            dataStore.nextMysticPromote = MysticPromotes.None;
+        }
+        DetermineNextPromoteUnlock();
+    }
+
+    public void BattleEndDataRefresh ()
+    {
+        RerollBuyableWpns();
+        if (dataStore.nextPromoteUnlockBattles > 0) dataStore.nextPromoteUnlockBattles--;
     }
 
     public void SetFlag (ProgressionFlags flag, bool unset = false)
@@ -372,6 +451,7 @@ public class GameDataManager : Manager<GameDataManager>
     {
         dataStore = new GameDataManager_DataStore();
         RecalculateResourceMaximums();
+        DetermineNextPromoteUnlock();
         for (int i = 0; i < dataStore.housingLevel; i++)
         {
             dataStore.houseAdventurers[i].Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());

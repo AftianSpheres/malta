@@ -77,39 +77,32 @@ public class HousePopup : MonoBehaviour
         }
         if (promoteButton != null)
         {
+            bool v = false;
             if (inspectedAdventurer.advClass == AdventurerClass.Warrior)
             {
-                for (int i = 1; i < 1 << 31; )
+                for (int i = 1; i > 1 << 31; )
                 {
-                    if (!promoteButton.activeSelf)
+                    if (GameDataManager.Instance.WarriorPromoteUnlocked((WarriorPromotes)i))
                     {
-                        if (GameDataManager.Instance.WarriorPromoteUnlocked((WarriorPromotes)i))
-                        {
-                            promoteButton.SetActive(true);
-                            break;
-                        }
+                        v = true;
+                        break;
                     }
                     i = i << 1;
-                    if (i == 1 << 31 && promoteButton.activeSelf) promoteButton.SetActive(false);
                 }
             }
             else if (inspectedAdventurer.advClass == AdventurerClass.Mystic)
             {
-                for (int i = 1; i < 1 << 31; )
+                for (int i = 1; i > 1 << 31; )
                 {
-                    if (!promoteButton.activeSelf)
+                    if (GameDataManager.Instance.MysticPromoteUnlocked((MysticPromotes)i))
                     {
-                        if (GameDataManager.Instance.MysticPromoteUnlocked((MysticPromotes)i))
-                        {
-                            promoteButton.SetActive(true);
-                            break;
-                        }
+                        v = true;
+                        break;
                     }
                     i = i << 1;
-                    if (i == 1 << 31 && promoteButton.activeSelf) promoteButton.SetActive(false);
                 }
             }
-            else if (promoteButton.activeSelf) promoteButton.SetActive(false);
+            if (promoteButton.activeSelf != v) promoteButton.SetActive(v);
         }
         if (inspectedAdventurer.fullName != cachedName)
         {

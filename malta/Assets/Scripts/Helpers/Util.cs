@@ -6,7 +6,7 @@ public static class Util
 
     public static string[] GetLinesFrom(TextAsset a)
     {
-        return a.text.Split(new string[] { "\r\n", "\n" }, 2, System.StringSplitOptions.None);
+        return a.text.Split(new string[] { "\r\n", "\n" }, System.StringSplitOptions.None);
     }
 
     public static bool isVowel(char c)

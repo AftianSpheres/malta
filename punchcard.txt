@@ -377,3 +377,7 @@ Jan. 21 2017-79
 5:47 AM - off
 8:43 AM - start
 9:22 AM - off
+
+Jan. 24 2017-78
+2:26 PM - start
+3:44 PM - off

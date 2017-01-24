@@ -1,0 +1,2 @@
+[bad special desc]
+There's no special desc file defined for this option.

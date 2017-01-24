@@ -14,4 +14,5 @@ public enum BuildingType
     Tower,
     Portal,
     Forest,
+    Library
 }

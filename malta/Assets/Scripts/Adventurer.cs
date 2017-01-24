@@ -91,6 +91,7 @@ public class Adventurer
     private const string specialDescsResourcePath = "special_descs/";
     private const string mugshotsResourcePath = "mugshots/";
     private const string enemyGfxResourcePath = "mugshots/enemy/";
+    private const string badSpecialName = "BadSpecial";
     public static readonly int[] awakeningCosts = { 50, 50, 50 };
     public static readonly AdventurerClass[] frontRowClasses = { AdventurerClass.Warrior, AdventurerClass.Footman, AdventurerClass.Sovereign };
     public static readonly AdventurerClass[] warriorTypeClasses = { AdventurerClass.Warrior, AdventurerClass.Bowman, AdventurerClass.Footman };
@@ -335,9 +336,10 @@ public class Adventurer
 
     public static string GetSpecialDescription (AdventurerSpecial special)
     {
-        string desc = "No special ability";
+        string desc;
         TextAsset a = Resources.Load<TextAsset>(specialDescsResourcePath + special.ToString());
         if (a != null) desc = a.text;
+        else desc = special.ToString() + Resources.Load<TextAsset>(specialDescsResourcePath + badSpecialName).text;
         return desc;
     }
 
