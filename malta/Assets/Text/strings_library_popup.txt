@@ -1,0 +1,10 @@
+Untranslated text
+ Codex
+A dusty old codex in an ancient script. The illustrations suggest that it has something to do with martial arts...
+A dusty old codex in an ancient script. The illustrations suggest that it has something to do with magic...
+An ancient book of martial codes and field tactics that allows Warriors to promote to Footmen.
+An ancient book containing beautiful songs of the most glorious deaths. Allows Warriors to promote to Bowmen.
+An ancient book containing tales of things that exist in spaces beyond mortal understanding. Allows Mystics to promote to Sages.
+An ancient book containing poems that tell of a grotesque, vile darkness. Allows Mystics to promote to Wizards.
+An ancient book that... just sort of reads "DEBUG THIS" for like 300 pages.
+A dusty old codex in an ancient script. Someone stuck a sticker on the cover that says "THIS IS A BUG."

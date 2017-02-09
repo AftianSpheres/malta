@@ -516,6 +516,30 @@ public class Adventurer
         return r;
     }
 
+    public static AdventurerClass _warriorPromoteToAdvClass(WarriorPromotes wp)
+    {
+        switch (wp)
+        {
+            case WarriorPromotes.Bowman:
+                return AdventurerClass.Bowman;
+            case WarriorPromotes.Footman:
+                return AdventurerClass.Footman;
+        }
+        throw new System.Exception(wp.ToString() + " doesn't correspond to a valid AdventurerClass. Which might just mean you need to add it to the lookup func???");
+    }
+
+    public static AdventurerClass _mysticPromoteToAdvClass(MysticPromotes mp)
+    {
+        switch (mp)
+        {
+            case MysticPromotes.Sage:
+                return AdventurerClass.Sage;
+            case MysticPromotes.Wizard:
+                return AdventurerClass.Wizard;
+        }
+        throw new System.Exception(mp.ToString() + "ain't a thing, etc. etc.");
+    }
+
     public void Permadeath ()
     {
         initialized = false;

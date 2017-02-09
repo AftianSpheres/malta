@@ -9,8 +9,6 @@ public class GameDataManager_DataStore
     public SceneIDType lastScene;
     public Adventurer sovereignAdventurer;
     public Adventurer[] houseAdventurers;
-    //public AdventurerClass warriorClassUnlock;
-    //public AdventurerClass mysticClassUnlock;
     public BattlerAction sovereignTactic;
     public AdventurerSpecial sovereignSkill;
     public AdventurerMugshot sovereignMugshot;

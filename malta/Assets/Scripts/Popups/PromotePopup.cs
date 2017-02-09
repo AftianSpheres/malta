@@ -53,7 +53,7 @@ public class PromotePopup : MonoBehaviour
             {
                 advClasses.Add(AdventurerClass.None);
             }
-            advClasses[i] = _warriorPromoteToAdvClass(l[i]);
+            advClasses[i] = Adventurer._warriorPromoteToAdvClass(l[i]);
             ddOpts.Add(new Dropdown.OptionData(Adventurer.GetClassName(advClasses[i])));
         }
         dd.AddOptions(ddOpts);
@@ -78,34 +78,10 @@ public class PromotePopup : MonoBehaviour
             {
                 advClasses.Add(AdventurerClass.None);
             }
-            advClasses[i] = _mysticPromoteToAdvClass(l[i]);
+            advClasses[i] = Adventurer._mysticPromoteToAdvClass(l[i]);
             ddOpts.Add(new Dropdown.OptionData(Adventurer.GetClassName(advClasses[i])));
         }
         dd.AddOptions(ddOpts);
-    }
-
-    private AdventurerClass _warriorPromoteToAdvClass (WarriorPromotes wp)
-    {
-        switch (wp)
-        {
-            case WarriorPromotes.Bowman:
-                return AdventurerClass.Bowman;
-            case WarriorPromotes.Footman:
-                return AdventurerClass.Footman;
-        }
-        throw new System.Exception(wp.ToString() + " doesn't correspond to a valid AdventurerClass. Which might just mean you need to add it to the lookup func???");
-    }
-
-    private AdventurerClass _mysticPromoteToAdvClass (MysticPromotes mp)
-    {
-        switch (mp)
-        {
-            case MysticPromotes.Sage:
-                return AdventurerClass.Sage;
-            case MysticPromotes.Wizard:
-                return AdventurerClass.Wizard;
-        }
-        throw new System.Exception(mp.ToString() + "ain't a thing, etc. etc.");
     }
 
     public void SetClassSelectionBasedOnVal ()
