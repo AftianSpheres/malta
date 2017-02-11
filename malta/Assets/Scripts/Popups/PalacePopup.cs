@@ -4,13 +4,14 @@ using System.Collections;
 
 public class PalacePopup : MonoBehaviour
 {
-    public TownBuilding[] houses;
     public Text incomeBrick;
     public Text incomeMetal;
     public Text incomePlanks;
     public PortalStatusPanel portalStatus;
     public SovereignInfoPanel sovereignInfo;
     public PopupMenu shell;
+    public PopupMenu housePopup;
+    public PopupMenu libraryPopup;
     public PopupMenu docksPopup;
     public PopupMenu forgePopup;
     public PopupMenu masonPopup;
@@ -76,10 +77,16 @@ public class PalacePopup : MonoBehaviour
         LevelLoadManager.Instance.EnterLevel(SceneIDType.OverworldScene, BuildingType.Tower);
     }
 
-    public void OpenHousePopup (int index)
+    public void OpenHousePopup ()
     {
         shell.Close();
-        houses[index].OpenPopupOnBuilding();
+        housePopup.Open();
+    }
+
+    public void OpenLibraryPopup ()
+    {
+        shell.Close();
+        libraryPopup.Open();
     }
 
     private void UpdateProcessing_IncomeArea ()

@@ -45,9 +45,9 @@ public class BuildingInfoPanel : MonoBehaviour
         {
             switch (buildingType)
             {
-                //case BuildingType.House:
-                    //UpdateProcessing_Houses();
-                    //break;
+                case BuildingType.House:
+                    UpdateProcessing_Barracks();
+                    break;
                 //case BuildingType.Forge:
                     //UpdateProcessing_Forge();
                     //break;
@@ -126,55 +126,34 @@ public class BuildingInfoPanel : MonoBehaviour
     //  }
     //}
 
-    //private void UpdateProcessing_Houses ()
-    //{
-    //    if (GameDataManager.Instance.dataStore.housesBuilt[nonUniqueBuildingsIndex] == false)
-    //    {
-    //        if (devTypeLabel.text != strings[18]) devTypeLabel.text = strings[18];
-    //        if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-    //        if (GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[0] ||
-    //            GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[1] ||
-    //            GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[2])
-    //        {
-    //            cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
-    //            RefreshResourceCounters(TownBuilding.houseConstructionCosts);
-    //            if (GameDataManager.Instance.CheckMaterialAvailability(TownBuilding.houseConstructionCosts))
-    //            {
-    //                if (devStatusLabel.text != strings[14]) devStatusLabel.text = strings[14];
-    //            }
-    //            else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
-    //        }
-    //    }
-    //    else
-    //    {
-    //        if (GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex]!= null && GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex].initialized)
-    //        {
-    //            if (devTypeLabel.text != GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex].fullTitle) devTypeLabel.text = GameDataManager.Instance.dataStore.houseAdventurers[nonUniqueBuildingsIndex].fullTitle;
-    //        }
-    //        else if (devTypeLabel.text != strings[19]) devTypeLabel.text = strings[19];
-    //        if (GameDataManager.Instance.dataStore.housesOutbuildingsBuilt[nonUniqueBuildingsIndex])
-    //        {
-    //            if (materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(false);
-    //            if (devStatusLabel.text != strings[17]) devStatusLabel.text = strings[17];
-    //        }
-    //        else
-    //        {
-    //            if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-    //            if (GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[0] ||
-    //                GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[1] ||
-    //                GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[2])
-    //            {
-    //                cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
-    //                RefreshResourceCounters(TownBuilding.houseOutbuildingCosts);
-    //                if (GameDataManager.Instance.CheckMaterialAvailability(TownBuilding.houseOutbuildingCosts))
-    //                {
-    //                    if (devStatusLabel.text != strings[16]) devStatusLabel.text = strings[16];
-    //                }
-    //                else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
-    //            }
-    //        }
-    //    }
-    //}
+    private void UpdateProcessing_Barracks ()
+    {
+        if (GameDataManager.Instance.dataStore.housingLevel != buildingLevelCached)
+        {
+            buildingLevelCached = GameDataManager.Instance.dataStore.housingLevel;
+            devTypeLabel.text = strings[32] + Environment.NewLine + strings[31] + buildingLevelCached; 
+        }
+        if (GameDataManager.Instance.dataStore.housingLevel < GameDataManager_DataStore.housingLevelCap)
+        {
+            if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
+            if (GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[0] || GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[1] || GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[2])
+            {
+                cachedMaterialQuantities = new int[] { GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal };
+                int[] costs = TownBuilding.GetUpgradeCost_House(GameDataManager.Instance.dataStore.housingLevel);
+                RefreshResourceCounters(costs);
+                if (GameDataManager.Instance.CheckMaterialAvailability(costs))
+                {
+                    if (devStatusLabel.text != strings[12]) devStatusLabel.text = strings[12];
+                }
+                else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[13];
+            }
+        }
+        else
+        {
+            if (materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(false);
+            if (devStatusLabel.text != strings[17]) devStatusLabel.text = strings[17];
+        }
+    }
 
     private void UpdateProcessing_UpgradableBuildings (ref bool pendingUpgrade, ref int pendingUpgradeTimer, ref int baseBuildingLv, int nameStringIndex, Func<int, int[]> costsLookupFunction)
     {

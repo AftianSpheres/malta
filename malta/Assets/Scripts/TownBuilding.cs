@@ -36,7 +36,7 @@ public class TownBuilding : MonoBehaviour
     void Update ()
     {
         if (GameDataManager.Instance != null) // only matters in editor, but prevents silly timing-related crashes
-        {  
+        {
             if (buildingType != BuildingType.Forest)
             {
                 if ((GameDataManager.Instance.HasFlag(ProgressionFlags.Tutorial1_Complete)) != spriteRenderer.enabled) spriteRenderer.enabled = (GameDataManager.Instance.HasFlag(ProgressionFlags.Tutorial1_Complete));
@@ -46,6 +46,14 @@ public class TownBuilding : MonoBehaviour
             {
                 case BuildingType.Tower:
                     if (GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock) != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock);
+                    if (spriteRenderer.enabled) RefreshBuildingAssociations();
+                    break;
+                case BuildingType.Library:
+                    if (spriteRenderer.enabled)
+                    {
+                        if (GameDataManager.Instance.dataStore.unlockedWarriorPromotes == WarriorPromotes.None && GameDataManager.Instance.dataStore.unlockedMysticPromotes == MysticPromotes.None && GameDataManager.Instance.dataStore.nextPromoteUnlockBattles != 0) spriteRenderer.enabled = false;
+                        else spriteRenderer.enabled = true;
+                    }
                     if (spriteRenderer.enabled) RefreshBuildingAssociations();
                     break;
             }

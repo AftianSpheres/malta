@@ -29,3 +29,9 @@ Woodlands
 Clay Pit
 Wizard's Tower
 Status: Class upgrade ready
+Max adventurers: 
+Barracks
+???
+Library
+Status: No new tomes in stock
+Status: There's a new tome to translate

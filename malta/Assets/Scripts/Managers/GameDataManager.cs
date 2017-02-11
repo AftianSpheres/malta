@@ -229,10 +229,16 @@ public class GameDataManager : Manager<GameDataManager>
         List<MysticPromotes> availableMp = new List<MysticPromotes>();
         for (int i = 1; i > 1 << 31; )
         {
-            if (WarriorPromoteUnlocked((WarriorPromotes)i)) unlockedWpCount++;
-            else availableWp.Add((WarriorPromotes)i);
-            if (MysticPromoteUnlocked((MysticPromotes)i)) unlockedMpCount++;
-            else availableMp.Add((MysticPromotes)i);
+            if (i <= WarriorPromotes_Metadata.LastVal)
+            {
+                if (WarriorPromoteUnlocked((WarriorPromotes)i)) unlockedWpCount++;
+                else availableWp.Add((WarriorPromotes)i);
+            }
+            if (i <= MysticPromotes_Metadata.LastVal)
+            {
+                if (MysticPromoteUnlocked((MysticPromotes)i)) unlockedMpCount++;
+                else availableMp.Add((MysticPromotes)i);
+            }
             i = i << 1;
         }
         int wScore = 0;
@@ -240,12 +246,12 @@ public class GameDataManager : Manager<GameDataManager>
         if (availableWp.Count > 0)
         {
             if (dataStore.unlockedWarriorPromotes == 0) wScore++;
-            if (dataStore.nextMysticPromote != MysticPromotes.None) wScore++;
+            if (unlockedWpCount <= unlockedMpCount) wScore++;
         }
         if (availableMp.Count > 0)
         {
             if (dataStore.unlockedMysticPromotes == 0) mScore++;
-            if (dataStore.nextWarriorPromote != WarriorPromotes.None) mScore++;
+            if (unlockedMpCount <= unlockedWpCount) mScore++;
         }
         if (wScore > 0 && mScore > 0)
         {
@@ -254,12 +260,12 @@ public class GameDataManager : Manager<GameDataManager>
         }
         if (wScore > 0)
         {
-            dataStore.nextWarriorPromote = (WarriorPromotes)Random.Range(0, availableWp.Count);
+            dataStore.nextWarriorPromote = availableWp[Random.Range(0, availableMp.Count)];
             dataStore.nextMysticPromote = MysticPromotes.None;
         }
         else if (mScore > 0)
         {
-            dataStore.nextMysticPromote = (MysticPromotes)Random.Range(0, availableMp.Count);
+            dataStore.nextMysticPromote = availableMp[Random.Range(0, availableMp.Count)];
             dataStore.nextWarriorPromote = WarriorPromotes.None;
         }
         else

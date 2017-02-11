@@ -15,6 +15,7 @@ public class LibraryPopup : MonoBehaviour
     private List<LibraryPopup_BookPanel> bookPanels;
     private WarriorPromotes cachedWp;
     private MysticPromotes cachedMp;
+    private int cachedBattles = -1;
     private string[] strings;
     private float basicSize;
 
@@ -25,12 +26,13 @@ public class LibraryPopup : MonoBehaviour
         bookPanelPrototype.gameObject.SetActive(false);
         InitialPanelGen();
         strings = Util.GetLinesFrom(stringsResource);
+        PopulateScrollArea();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if ((cachedWp & GameDataManager.Instance.dataStore.unlockedWarriorPromotes) != cachedWp || (cachedMp & GameDataManager.Instance.dataStore.unlockedMysticPromotes) != cachedMp) PopulateScrollArea();
+        if (cachedWp != GameDataManager.Instance.dataStore.unlockedWarriorPromotes || cachedMp != GameDataManager.Instance.dataStore.unlockedMysticPromotes || cachedBattles != GameDataManager.Instance.dataStore.nextPromoteUnlockBattles) PopulateScrollArea();
 	}
 
     void InitialPanelGen ()
@@ -49,10 +51,22 @@ public class LibraryPopup : MonoBehaviour
             b[bi + i] = bp.button;
         }
         shell.buttons = b;
+        RectTransform rt = bookPanelPrototype.transform as RectTransform;
+        rt.SetParent(transform, true);
     }
 
     void PopulateScrollArea ()
     {
+        RectTransform rt;
+        RectTransform defaultRectT = bookPanelPrototype.transform as RectTransform;
+        Vector3 topPanelPos = defaultRectT.anchoredPosition;
+        const float posOffset = 88;
+        for (int i = 0; i < bookPanels.Count; i++)
+        {
+            rt = bookPanels[i].transform as RectTransform;
+            rt.SetParent(transform, true);
+        }
+        cachedBattles = GameDataManager.Instance.dataStore.nextPromoteUnlockBattles;
         cachedWp = GameDataManager.Instance.dataStore.unlockedWarriorPromotes;
         cachedMp = GameDataManager.Instance.dataStore.unlockedMysticPromotes;
         int localIndex = 0;
@@ -62,9 +76,11 @@ public class LibraryPopup : MonoBehaviour
             {
                 bookPanels[localIndex].gameObject.SetActive(true);
                 _processTranslatedBookPanel(bookPanels[localIndex], Adventurer._warriorPromoteToAdvClass((WarriorPromotes)i));
+                rt = bookPanels[localIndex].transform as RectTransform;
+                rt.anchoredPosition = topPanelPos + (localIndex * posOffset * Vector3.down);
                 localIndex++;
-                i = i << 1;
             }
+            i = i << 1;
         }
         for (int i = 1; i > 1 << 31;)
         {
@@ -72,9 +88,11 @@ public class LibraryPopup : MonoBehaviour
             {
                 bookPanels[localIndex].gameObject.SetActive(true);
                 _processTranslatedBookPanel(bookPanels[localIndex], Adventurer._mysticPromoteToAdvClass((MysticPromotes)i));
+                rt = bookPanels[localIndex].transform as RectTransform;
+                rt.anchoredPosition = topPanelPos + (localIndex * posOffset * Vector3.down);
                 localIndex++;
-                i = i << 1;
             }
+            i = i << 1;
         }
         if (GameDataManager.Instance.dataStore.nextPromoteUnlockBattles == 0)
         {
@@ -90,9 +108,16 @@ public class LibraryPopup : MonoBehaviour
             bp.plankCnt.text = GameDataManager.Instance.dataStore.nextPromoteUnlockCosts[1].ToString();
             bp.metalCnt.text = GameDataManager.Instance.dataStore.nextPromoteUnlockCosts[2].ToString();
             bp.icon.sprite = untranslatedIcon;
+            rt = bookPanels[localIndex].transform as RectTransform;
+            rt.anchoredPosition = topPanelPos + (localIndex * posOffset * Vector3.down);
             localIndex++;
         }
         scrollAreaRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, localIndex * basicSize);
+        for (int i = 0; i < bookPanels.Count; i++)
+        {
+            rt = bookPanels[i].transform as RectTransform;
+            rt.SetParent(scrollAreaRect, true);
+        }
     }
 
     void _processTranslatedBookPanel (LibraryPopup_BookPanel bp, AdventurerClass advClass)
