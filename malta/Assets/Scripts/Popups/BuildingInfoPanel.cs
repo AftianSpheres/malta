@@ -19,9 +19,15 @@ public class BuildingInfoPanel : MonoBehaviour
     public int nonUniqueBuildingsIndex;
     public GameObject materialsNeededSection;
     public GameObject pendingUpgradeTimerSection;
+    public GameObject materialsNeededBrick;
+    public GameObject materialsNeededPlanks;
+    public GameObject materialsNeededMetal;
+    public GameObject materialsNeededMana;
+    public GameObject panelShroud;
     public Text bricksResCounter;
     public Text planksResCounter;
     public Text metalResCounter;
+    public Text manaResCounter;
     public Text timerCounter;
     public Text devStatusLabel;
     public Text devTypeLabel;
@@ -48,9 +54,12 @@ public class BuildingInfoPanel : MonoBehaviour
                 case BuildingType.House:
                     UpdateProcessing_Barracks();
                     break;
-                //case BuildingType.Forge:
-                    //UpdateProcessing_Forge();
-                    //break;
+                case BuildingType.Forge:
+                    UpdateProcessing_Forge();
+                    break;
+                case BuildingType.Library:
+                    UpdateProcessing_Library();
+                    break;
                 case BuildingType.Docks:
                     UpdateProcessing_UpgradableBuildings(ref GameDataManager.Instance.dataStore.pendingUpgrade_Docks, ref GameDataManager.Instance.dataStore.pendingUpgradeTimer_Docks, 
                         ref GameDataManager.Instance.dataStore.buildingLv_Docks, 22, TownBuilding.GetUpgradeCost_Docks);
@@ -83,48 +92,94 @@ public class BuildingInfoPanel : MonoBehaviour
         timerCounter.text = PopupMenu.GetTimerReadout(timer, level);
     }
 
-    //private void UpdateProcessing_Forge ()
-    //{
-    //    if (GameDataManager.Instance.dataStore.warriorClassUnlock == AdventurerClass.Warrior || GameDataManager.Instance.dataStore.mysticClassUnlock == AdventurerClass.Mystic)
-    //    {
-    //      if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-    //      if (GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[0] ||
-    //          GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[1] ||
-    //          GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[2])
-    //      {
-    //          cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
-    //          int[] costs = TownBuilding.GetUpgradeCost_Forge();
-    //          RefreshResourceCounters(costs);
-    //          if (GameDataManager.Instance.CheckMaterialAvailability(costs))
-    //          {
-    //              if (devStatusLabel.text != strings[30]) devStatusLabel.text = strings[30];
-    //          }
-    //          else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
-    //      }
-    //  }
-    //  else if (!GameDataManager.Instance.HasFlag(ProgressionFlags.TaskmasterUnlock))
-    //  {
-    //      if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
-    //      if (GameDataManager.Instance.dataStore.resBricks != cachedMaterialQuantities[0] ||
-    //          GameDataManager.Instance.dataStore.resPlanks != cachedMaterialQuantities[1] ||
-    //          GameDataManager.Instance.dataStore.resMetal != cachedMaterialQuantities[2])
-    //      {
-    //          cachedMaterialQuantities = new int[] {GameDataManager.Instance.dataStore.resBricks, GameDataManager.Instance.dataStore.resPlanks, GameDataManager.Instance.dataStore.resMetal};
-    //          int[] costs = TownBuilding.GetUpgradeCost_Forge();
-    //          RefreshResourceCounters(costs);
-    //          if (GameDataManager.Instance.CheckMaterialAvailability(costs))
-    //          {
-    //              if (devStatusLabel.text != strings[16]) devStatusLabel.text = strings[16];
-    //          }
-    //          else if (devStatusLabel.text != strings[15]) devStatusLabel.text = strings[15];
-    //      }
-    //  }
-    //  else
-    //  {
-    //      if (materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(false);
-    //      if (devStatusLabel.text != strings[17]) devStatusLabel.text = strings[17];
-    //  }
-    //}
+    private void UpdateProcessing_Library ()
+    {
+        bool libraryUnavailable = GameDataManager.Instance.dataStore.unlockedWarriorPromotes == WarriorPromotes.None && GameDataManager.Instance.dataStore.unlockedMysticPromotes == MysticPromotes.None && GameDataManager.Instance.dataStore.nextPromoteUnlockBattles != 0;
+        if (libraryUnavailable != panelShroud.activeInHierarchy) panelShroud.SetActive(libraryUnavailable);
+        if (!libraryUnavailable)
+        {
+            if (GameDataManager.Instance.dataStore.nextWarriorPromote == WarriorPromotes.None && GameDataManager.Instance.dataStore.nextMysticPromote == MysticPromotes.None)
+            {
+                if (materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(false);
+                if (devStatusLabel.text != strings[40]) devStatusLabel.text = strings[40];
+            }
+            else
+            {
+                if (GameDataManager.Instance.dataStore.nextPromoteUnlockBattles == 0)
+                {
+                    if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
+                    if (cachedMaterialQuantities != GameDataManager.Instance.dataStore.nextPromoteUnlockCosts)
+                    {
+                        cachedMaterialQuantities = GameDataManager.Instance.dataStore.nextPromoteUnlockCosts;
+                        RefreshResourceCounters(cachedMaterialQuantities);
+                    }
+                    if (devStatusLabel.text != strings[36]) devStatusLabel.text = strings[36];
+                }
+                else
+                {
+                    if (materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(false);
+                    if (devStatusLabel.text != strings[35]) devStatusLabel.text = strings[35];
+                }
+            }
+        }
+
+    }
+
+    private void UpdateProcessing_Forge ()
+    {
+        int vLv = 0;
+        if (GameDataManager.Instance.dataStore.buyable0 != null && GameDataManager.Instance.dataStore.buyable0.wpnType != WpnType.None) vLv = vLv | 1;
+        if (GameDataManager.Instance.dataStore.buyable1 != null && GameDataManager.Instance.dataStore.buyable1.wpnType != WpnType.None) vLv = vLv | 2;
+        if (buildingLevelCached != vLv)
+        {
+            buildingLevelCached = vLv;
+            if (vLv == 3)
+            {
+                if (devStatusLabel.text != strings[37]) devStatusLabel.text = strings[37];
+                if (GameDataManager.Instance.dataStore.buyable1.wpnLevel > GameDataManager.Instance.dataStore.buyable0.wpnLevel) _in_UpdateProcessing_Forge_UpdateMats(GameDataManager.Instance.dataStore.buyable1);
+                else _in_UpdateProcessing_Forge_UpdateMats(GameDataManager.Instance.dataStore.buyable0);
+            }
+            else if (vLv == 2)
+            {
+                if (devStatusLabel.text != strings[38]) devStatusLabel.text = strings[38];
+                _in_UpdateProcessing_Forge_UpdateMats(GameDataManager.Instance.dataStore.buyable1);
+            }
+            else if (vLv == 1)
+            {
+                if (devStatusLabel.text != strings[38]) devStatusLabel.text = strings[38];
+                _in_UpdateProcessing_Forge_UpdateMats(GameDataManager.Instance.dataStore.buyable0);
+            }
+            else
+            {
+                if (devStatusLabel.text != strings[39]) devStatusLabel.text = strings[39];
+                if (materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(false);
+            }
+        }
+    }
+
+    private void _in_UpdateProcessing_Forge_UpdateMats (SovereignWpn w)
+    {
+        if (!materialsNeededSection.activeInHierarchy) materialsNeededSection.SetActive(true);
+        if (w.wpnLevel > 1)
+        {
+            materialsNeededBrick.SetActive(false);
+            materialsNeededMetal.SetActive(false);
+            materialsNeededPlanks.SetActive(false);
+            materialsNeededMana.SetActive(true);
+            manaResCounter.text = ForgePopup.lv2cost.ToString();
+        }
+        else
+        {
+            materialsNeededBrick.SetActive(true);
+            materialsNeededMetal.SetActive(true);
+            materialsNeededPlanks.SetActive(true);
+            materialsNeededMana.SetActive(false);
+            string s;
+            if (w.wpnLevel > 0) s = ForgePopup.lv1cost.ToString();
+            else s = ForgePopup.lv0cost.ToString();
+            bricksResCounter.text = metalResCounter.text = planksResCounter.text = s;
+        }
+    }
 
     private void UpdateProcessing_Barracks ()
     {

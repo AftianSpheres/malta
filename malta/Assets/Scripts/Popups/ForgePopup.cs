@@ -39,9 +39,9 @@ public class ForgePopup : MonoBehaviour
     private float explainAreaExpiryTimer = -1;
     private const float explainAreaExpiryTime = 0.5f;
     private ForgeStatus status;
-    const int lv0cost = 15;
-    const int lv1cost = 30;
-    const int lv2cost = 20;
+    public const int lv0cost = 15;
+    public const int lv1cost = 30;
+    public const int lv2cost = 20;
 
     // Use this for initialization
     void Start ()

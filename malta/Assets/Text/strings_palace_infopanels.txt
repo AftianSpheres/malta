@@ -35,3 +35,7 @@ Barracks
 Library
 Status: No new tomes in stock
 Status: There's a new tome to translate
+Two weapons in stock!
+One weapon in stock!
+No weapons in stock!
+Status: The shelves are full to bursting
