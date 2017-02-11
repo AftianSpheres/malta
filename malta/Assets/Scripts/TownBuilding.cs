@@ -1,13 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-enum BuildingStates_House
-{
-    Base,
-    WithOutbuilding,
-    Foundation
-}
-
 /// <summary>
 /// Handles basic data management for town buildings.
 /// To do: serialization/saving/loading
@@ -20,7 +13,6 @@ public class TownBuilding : MonoBehaviour
     public int buildingStateIndex;
     public int nonUniqueBuildingsIndex;
     public PopupMenu[] associatedPopups;
-    public HousePopup housePopup;
     public BuildingType buildingType;
     new public BoxCollider2D collider;
     public SpriteRenderer spriteRenderer;
@@ -28,7 +20,6 @@ public class TownBuilding : MonoBehaviour
     public TextMesh buildingMessage;
     public bool hasOutbuilding;
     public bool isUndeveloped;
-    public bool forgeOutbuildingIsKobold;
     private AdventurerClass _cachedAdvClass;
     private bool buildingAlteredSinceLastUpdate = true;
 
@@ -44,6 +35,10 @@ public class TownBuilding : MonoBehaviour
             }
             switch (buildingType)
             {
+                case BuildingType.Peddler:
+                    spriteRenderer.enabled = GameDataManager.Instance.dataStore.peddlerIsPresent;
+                    if (spriteRenderer.enabled) RefreshBuildingAssociations();
+                    break;
                 case BuildingType.Tower:
                     if (GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock) != spriteRenderer.enabled) spriteRenderer.enabled = GameDataManager.Instance.HasFlag(ProgressionFlags.TowerUnlock);
                     if (spriteRenderer.enabled) RefreshBuildingAssociations();

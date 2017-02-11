@@ -72,6 +72,7 @@ public class GameDataManager_DataStore
     public MysticPromotes nextMysticPromote;
     public int[] nextPromoteUnlockCosts;
     public int nextPromoteUnlockBattles;
+    public bool peddlerIsPresent;
 
     public GameDataManager_DataStore ()
     {
@@ -129,6 +130,7 @@ public class GameDataManager_DataStore
         buyable1 = null;
         unlockedMysticPromotes = MysticPromotes.None;
         unlockedWarriorPromotes = WarriorPromotes.None;
+        peddlerIsPresent = false;
     }
 
     public void SaveToFile(string path)
@@ -323,6 +325,9 @@ public class GameDataManager : Manager<GameDataManager>
 
     public void BattleEndDataRefresh ()
     {
+        const int peddlerRarity = 8;
+        if (dataStore.peddlerIsPresent) dataStore.peddlerIsPresent = false;
+        else if (Random.Range(0, peddlerRarity) == 0) dataStore.peddlerIsPresent = true;
         RerollBuyableWpns();
         if (dataStore.nextPromoteUnlockBattles > 0) dataStore.nextPromoteUnlockBattles--;
     }

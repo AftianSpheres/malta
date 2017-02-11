@@ -14,5 +14,6 @@ public enum BuildingType
     Tower,
     Portal,
     Forest,
-    Library
+    Library,
+    Peddler
 }
