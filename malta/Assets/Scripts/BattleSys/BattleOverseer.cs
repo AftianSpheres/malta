@@ -35,7 +35,7 @@ public class BattleOverseer : MonoBehaviour
     private List<Battler> validEnemyTargets;
     private List<Battler> validPlayerTargets;
     const string _owned = "_BattleOverseerCoroutine";
-    private int baseEndlessAdventurePayout;
+    private int endlessAdvManaPrize;
     private bool _forceAllBattlersRegen = false;
     public bool tutorial { get; private set; }
 
@@ -47,7 +47,7 @@ public class BattleOverseer : MonoBehaviour
         validPlayerTargets = new List<Battler>(playerParty.Length);
         retreatButton.SetActive(false);
         Timing.RunCoroutine(Bootstrap(), _owned);
-        baseEndlessAdventurePayout = GameDataManager.Instance.dataStore.nextRandomAdventureAnte;
+        endlessAdvManaPrize = GameDataManager.Instance.GetManaFromResourceCosts( new int[] { GameDataManager.Instance.dataStore.nextRandomAdventureAnte, GameDataManager.Instance.dataStore.nextRandomAdventureAnte, GameDataManager.Instance.dataStore.nextRandomAdventureAnte });
 	}
 
     IEnumerator<float> RunTurn ()
@@ -185,7 +185,7 @@ public class BattleOverseer : MonoBehaviour
             if (GameDataManager.Instance.dataStore.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel)
             {
                 GameDataManager.Instance.dataStore.nextRandomAdventureAnte += Random.Range(1, 4);
-                GameDataManager.Instance.dataStore.resMana += baseEndlessAdventurePayout;
+                GameDataManager.Instance.AwardMana(endlessAdvManaPrize);
             }
             GameDataManager.Instance.dataStore.adventureLevel++;
         }
@@ -200,9 +200,9 @@ public class BattleOverseer : MonoBehaviour
         while (theater.processing) yield return 0f;
         if (GameDataManager.Instance.dataStore.adventureLevel >= AdventureSubstageLoader.randomAdventureBaseLevel && !playerParty[0].dead)
         {
-            GameDataManager.Instance.dataStore.resBricks += baseEndlessAdventurePayout / 2;
-            GameDataManager.Instance.dataStore.resPlanks += baseEndlessAdventurePayout / 2;
-            GameDataManager.Instance.dataStore.resMetal += baseEndlessAdventurePayout / 2;
+            GameDataManager.Instance.dataStore.resBricks += GameDataManager.Instance.dataStore.nextRandomAdventureAnte / 2;
+            GameDataManager.Instance.dataStore.resPlanks += GameDataManager.Instance.dataStore.nextRandomAdventureAnte / 2;
+            GameDataManager.Instance.dataStore.resMetal += GameDataManager.Instance.dataStore.nextRandomAdventureAnte / 2;
         }
         yield return Timing.WaitForSeconds(battleStepLength * 3);
         GameDataManager.Instance.BattleEndDataRefresh();

@@ -1,0 +1,8 @@
+"Heh heh heh... Material wealth certainly suits a sovereign. ...But as the world dies, those riches will invariably crumble to dust. ...And once they've rotted, kings are ultimately the same stuff as paupers. If you seek power, what you need is... something beyond base matter. That's what I can offer you. ...If you're willing to recoup my costs. Plus a tidy profit, of course."
+"Ho ho ho... What, you expected me to give you something in return? ...You've been paid, of course. I am a man of my word. ...When you want to punch a hole, you pierce from both sides of the cloth at once. That the power I've given you is beyond sight doesn't make it unreal; on the contrary, it makes it more real than anything else on this side of the firmament."
+"Fufufu... ...You again? Our deal is done, I believe. Perhaps we'll meet again, but for now I don't believe we have any business left to do."
+Exchange 
+ bricks, 
+ planks, and 
+ metal for 
+mana

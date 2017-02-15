@@ -73,6 +73,7 @@ public class GameDataManager_DataStore
     public int[] nextPromoteUnlockCosts;
     public int nextPromoteUnlockBattles;
     public bool peddlerIsPresent;
+    public int peddlerPrice;
 
     public GameDataManager_DataStore ()
     {
@@ -131,6 +132,7 @@ public class GameDataManager_DataStore
         unlockedMysticPromotes = MysticPromotes.None;
         unlockedWarriorPromotes = WarriorPromotes.None;
         peddlerIsPresent = false;
+        peddlerPrice = 25;
     }
 
     public void SaveToFile(string path)
@@ -640,6 +642,38 @@ public class GameDataManager : Manager<GameDataManager>
             result = true;
         }
         return result;
+    }
+
+    public int GetManaFromResourceCosts (int b, int p, int m)
+    {
+        float bricksMulti;
+        if (dataStore.resBricks_Lv > 0) bricksMulti = 0.5f;
+        else bricksMulti = 1 / 3f;
+        float planksMulti;
+        if (dataStore.resPlanks_Lv > 0) planksMulti = 0.5f;
+        else planksMulti = 1 / 3f;
+        float metalMulti;
+        if (dataStore.resMetal_Lv > 0) metalMulti = 0.5f;
+        else metalMulti = 1 / 3f;
+        return Mathf.CeilToInt(b * bricksMulti) + Mathf.CeilToInt(p * planksMulti) + Mathf.CeilToInt(m * metalMulti);
+    }
+
+    public int GetManaFromResourceCosts (int[] costs)
+    {
+        return GetManaFromResourceCosts(costs[0], costs[1], costs[2]);
+    }
+
+    public void AwardMana (int m)
+    {
+        if (m < 1) throw new System.Exception("awarded " + m.ToString() + " mana, what the fuck are you even doing you utter shithead");
+        dataStore.resMana += m;
+        if (dataStore.resMana > dataStore.resMana_max) dataStore.resMana = dataStore.resMana_max;
+    }
+
+    public void BurnResourcesIntoMana (int[] costs)
+    {
+        if (SpendResourcesIfPossible(costs) == false) throw new System.Exception("How are you calling BurnResourcesIntoMana without the costs???");
+        AwardMana(GetManaFromResourceCosts(costs));
     }
 
     public void UpgradeResourceCap (ResourceType resource)

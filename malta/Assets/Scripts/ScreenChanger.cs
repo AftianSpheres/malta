@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public enum SceneChanegAnimType
@@ -26,6 +27,10 @@ public class ScreenChanger : MonoBehaviour
 
     public void Activate ()
     {
+        if (SceneManager.GetActiveScene().buildIndex == (int)SceneIDType.TownScene && GameDataManager.Instance.dataStore.peddlerIsPresent)
+        {
+            GameDataManager.Instance.dataStore.peddlerIsPresent = false; // peddler leaves when you leave the town scene!
+        }
         if (bgmSource != null)
         {
             bgmSource.Stop();

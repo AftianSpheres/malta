@@ -69,6 +69,7 @@ public class PopupMenu : MonoBehaviour
         activeScrollbars = new Scrollbar[scrollbars.Length];
         for (int i = 0; i < scrollbars.Length; i++)
         {
+            if (scrollbars[i] == null) continue;
             if (scrollbars[i].interactable)
             {
                 activeScrollbars[i] = scrollbars[i];
