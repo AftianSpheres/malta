@@ -374,6 +374,11 @@ public class GameDataManager : Manager<GameDataManager>
             }
         }
         if (dataStore == null) RegenerateDataStore();
+        else
+        {
+            dataStore.sovereignAdventurer.SanityCheck();
+            for (int i = 0; i < dataStore.housingLevel; i++) dataStore.houseAdventurers[i].SanityCheck();
+        }
         return r;
     }
 

@@ -269,8 +269,28 @@ public class Adventurer
     public void Reclass (AdventurerClass _advClass)
     {
         advClass = _advClass;
+        baseClass = AdventurerClass.None;
+        for (int i = 0; i < warriorTypeClasses.Length; i++)
+        {
+            if (warriorTypeClasses[i] == _advClass)
+            {
+                baseClass = AdventurerClass.Warrior;
+                break;
+            }
+            else if (mysticTypeClasses[i] == advClass)
+            {
+                baseClass = AdventurerClass.Mystic;
+                break;
+            }
+        }
+        if (baseClass == AdventurerClass.None) baseClass = _advClass;
         RerollFullTitle();
         RecalcStatsAndReloadMoves();
+    }
+
+    public void SanityCheck ()
+    {
+        isPromoted = (advClass != AdventurerClass.Sovereign && advClass != AdventurerClass.Warrior && advClass != AdventurerClass.Mystic && advClass != AdventurerClass.Avatar && advClass != AdventurerClass.None);
     }
 
     public void Reroll (AdventurerClass _advClass, AdventurerSpecies _species, bool _isElite, int[] individualStats)
@@ -302,6 +322,7 @@ public class Adventurer
         GenerateBioText();
         initialized = true;
         awakened = false;
+        isPromoted = false;
     }
 
     public void RecalcStatsAndReloadMoves ()

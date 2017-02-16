@@ -39,6 +39,12 @@ public class PopupMenu : MonoBehaviour
         }
 	}
 
+    public void SelfishOpen ()
+    {
+        GameStateManager.Instance.StealFocus();
+        Open();
+    }
+
     public void Open ()
     {
         contents.SetActive(true);

@@ -1,12 +1,12 @@
 NULL,0,0,None,None,None,0,0
 Mace Swing,0,0,None,Hit,TargetWeakestEnemy,6,0,NeedsTarget,Melee
 Siphon,0,0,None,Cast,TargetWeakestEnemy,5,0,IsMagic,Drain,NeedsTarget
-Haste,1,2,None,Cast,TargetOwnSide,0,0,IsMagic,SpeBoost
+Haste,2,2,None,Cast,TargetOwnSide,0,0,IsMagic,SpeBoost
 Silencing Shot,0,1,None,Hit,RandomTarget_ButOnlyCasters,2,0,Silence,NeedsTarget,ForbidAfterTurn1
 Rain of Arrows,0,0,None,Hit,HitAll,3,0,NeedsTarget
 Bowshot,0,0,None,Hit,TargetWeakestEnemy,6,0,NeedsTarget
 Shield Wall,0,1,BattleStart,PhysBuff,TargetOwnSide,0,0,ShieldWall
-Shield Block,0,1,None,PhysBuff,TargetSelf,0,0,ShieldBlock
+Shield Block,2,1,None,PhysBuff,TargetSelf,0,0,ShieldBlock
 Spear Thrust,0,0,None,Hit,TargetWeakestEnemy,4,0,NeedsTarget,Melee
 Barrier,0,2,BattleStart,Cast,TargetOwnSide,0,0,IsMagic,Barrier
 Vampiric Winds,0,0,None,Cast,TargetWeakestEnemy,8,1,IsMagic,Drain,NeedsTarget
@@ -22,7 +22,7 @@ Rend,0,0,None,Cast,TargetWeakestEnemy,99,0,IsMagic,NeedsTarget
 Bludgeon,0,0,None,Hit,TargetWeakestEnemy,5,0,NeedsTarget,Melee
 Continent Smash,0,0,None,Hit,TargetWeakestEnemy,10,0,NeedsTarget,Melee
 Fortify,2,2,None,PhysBuff,TargetSelf,0,0,MarBoost
-Blood of Steel,2,3,None,PhysBuff,TargetSelf,0,0,MarBoost
+Blood of Steel,3,3,None,PhysBuff,TargetSelf,0,0,MarBoost
 Wide Swing,0,0,None,Hit,HitAll,3,0,NeedsTarget,Melee
 Cataclysmic Impact,0,0,None,Hit,HitAll,6,0,NeedsTarget,Melee
 Concuss,0,1,BattleStart,PhysBuff,TargetSelf,0,0,StunBuff
@@ -31,9 +31,9 @@ Quick Stab,0,0,None,Hit,TargetWeakestEnemy,5,0,NeedsTarget,Melee
 Stiletto,0,0,None,Hit,TargetWeakestEnemy,7,0,NeedsTarget,Melee
 Throat Slit,0,0,None,Hit,TargetWeakestEnemy,10,0,NeedsTarget,Melee
 Blood Rites,0,2,None,Cast,TargetSelf,0,0,Sacrifice,IsMagic
-Blade of Crimson,0,3,None,Cast,TargetSelf,0,0,Sacrifice,IsMagic
-Fleet Feet,0,2,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
-Flash Step,0,3,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
+Blade of Crimson,3,3,None,Cast,TargetSelf,0,0,Sacrifice,IsMagic
+Fleet Feet,2,2,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
+Flash Step,3,3,BattleStart,Cast,TargetSelf,0,0,FStep,IsMagic
 Second Sight,3,1,None,Cast,TargetSelf,0,0,DodgeBuff,IsMagic
 With the Wind,3,2,None,Cast,TargetSelf,0,0,DodgeBuff,IsMagic
 Healing Wind,0,0,None,Cast,TargetEndangeredAlly,4,0,NeedsTarget,IsMagic,Healing

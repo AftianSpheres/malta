@@ -60,6 +60,11 @@ public class GameStateManager : Manager<GameStateManager>
         cutsceneHasFocus = false;
     }
 
+    public void StealFocus ()
+    {
+        controllingPopupsStack.Peek().SurrenderFocus();
+    }
+
     public void GiveFocusToPopup (PopupMenu popup)
     {
         popupHasFocus = true;
