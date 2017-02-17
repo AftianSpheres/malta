@@ -10,10 +10,12 @@ public class PromotePopup : MonoBehaviour
     public Dropdown dd;
     private Adventurer adv;
     public Text promoteText;
+    public Text reqsText;
+    public Button confirmBtn;
     private List<AdventurerClass> advClasses;
     public AdventurerClass setClass;
     private string[] strings;
-    const int manaCost = 10;
+    private int cachedMana = -1;
 
 	// Use this for initialization
 	void Awake ()
@@ -21,6 +23,17 @@ public class PromotePopup : MonoBehaviour
         strings = Util.GetLinesFrom(stringsResource);
         advClasses = new List<AdventurerClass>();
 	}
+
+    void Update ()
+    {
+        if (cachedMana != GameDataManager.Instance.dataStore.resMana)
+        {
+            int manaCost = Adventurer.GetPromoteCostForClass(setClass);
+            cachedMana = GameDataManager.Instance.dataStore.resMana;
+            reqsText.text = strings[3] + manaCost + strings[4];
+            confirmBtn.interactable = (cachedMana >= manaCost);
+        }
+    }
 
     public void OpenOn (Adventurer _adv)
     {
@@ -101,6 +114,7 @@ public class PromotePopup : MonoBehaviour
 
     public void PromoteUnit ()
     {
+        int manaCost = Adventurer.GetPromoteCostForClass(setClass);
         if (GameDataManager.Instance.SpendManaIfPossible(manaCost))
         {
             adv.PromoteToTier2(setClass);

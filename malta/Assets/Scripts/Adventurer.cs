@@ -66,6 +66,7 @@ public class Adventurer
     public bool isElite { get; private set; }
     public bool isPromoted { get; private set; }
     public bool initialized { get; private set; }
+    public bool isDeceased { get; private set; }
     private static string[] attackNames;
     private static string[] classNames;
     private static string[] specialNames;
@@ -561,9 +562,20 @@ public class Adventurer
         throw new System.Exception(mp.ToString() + "ain't a thing, etc. etc.");
     }
 
+    public static int GetPromoteCostForClass(AdventurerClass promotedClass)
+    {
+        return 10; // this system doesn't actually exist yet, lol
+    }
+
+    public void ReplaceDead ()
+    {
+        if (!isDeceased) throw new System.Exception("I AIN'T DEAD YET WHAT ARE YOU TRYING TO PULL");
+        Reroll(baseClass, species, isElite, GetRandomStatPoint());
+    }
+
     public void Permadeath ()
     {
-        initialized = false;
+        isDeceased = true;
     }
 
     public Sprite GetEnemyGraphic ()

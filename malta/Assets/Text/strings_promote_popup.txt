@@ -1,3 +1,5 @@
 Promote 
  to a 
  to an 
+ Promotion cost: 
+  mana

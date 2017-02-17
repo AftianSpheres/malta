@@ -159,23 +159,28 @@ public class GameDataManager : Manager<GameDataManager>
     private int resourceGainTimer = 0;
     private const int resourceGainThreshold = 59;
     private const int resourceMaximumsBaseValue= 600; // ten hours
-    private const int pendingUpgradeBaseTime = 300; // five minutes;
+    private const int pendingUpgradeBaseTime = 150; // 2.5 min;
     private const string saveName = "/save.bin";
-    public SovereignWpn[] testWpns; // We don't do anything with these and it's actually kinda pricey to generate all of them. It's just to get a good sample of the weapon gen output we can inspect. Kill this later!
 
     void Start ()
     {
         lastSecondTimestamp = Time.time;
         saveExisted = LoadFromSave();
-        testWpns = new SovereignWpn[20];
-        for (int i = 0; i < testWpns.Length; i++)
-        {
-            testWpns[i] = new SovereignWpn(Random.Range(0, 3), (WpnType)Random.Range(1, 4));
-        }
     }
 
     void DebugBlob ()
     {
+        Debug.logger.logEnabled = true;
+        if (Input.GetKeyDown(KeyCode.PageUp))
+        {
+            string s = "";
+            for (int i = 1; i > 1 << 31; )
+            {
+                if (HasFlag((ProgressionFlags)i)) s = s + ((ProgressionFlags)i).ToString() +" ";
+                i = i << 1;
+            }
+            Debug.Log(s);
+        }
         if (Input.GetKeyDown(KeyCode.Home))
         {
             BattleEndDataRefresh();
@@ -207,7 +212,11 @@ public class GameDataManager : Manager<GameDataManager>
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Sawmill, ref dataStore.buildingLv_Sawmill, ref dataStore.pendingUpgrade_Sawmill, ref dataStore.resPlanks_maxUpgrades);
             HandlePendingUpgrade(ref dataStore.pendingUpgradeTimer_Smith, ref dataStore.buildingLv_Smith, ref dataStore.pendingUpgrade_Smith, ref dataStore.resMetal_maxUpgrades);
         }
-        for (int i = 0; i < dataStore.housingLevel; i++) if (!dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
+        for (int i = 0; i < dataStore.housingLevel; i++)
+        {
+            if (!dataStore.houseAdventurers[i].initialized) dataStore.houseAdventurers[i].Reroll(AdventurerClass.Warrior, AdventurerSpecies.Human, dataStore.housingUnitUpgrades[i], Adventurer.GetRandomStatPoint());
+            else if (dataStore.houseAdventurers[i].isDeceased) dataStore.houseAdventurers[i].ReplaceDead();
+        }
         if (dataStore.adventureLevel > 1 && (!HasFlag(ProgressionFlags.FaeUnlock) || !HasFlag(ProgressionFlags.OrcUnlock)))
         {
             SetFlag(ProgressionFlags.FaeUnlock);
