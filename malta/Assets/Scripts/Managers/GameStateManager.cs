@@ -62,7 +62,7 @@ public class GameStateManager : Manager<GameStateManager>
 
     public void StealFocus ()
     {
-        controllingPopupsStack.Peek().SurrenderFocus();
+        if (controllingPopupsStack.Count > 0) controllingPopupsStack.Peek().SurrenderFocus();
     }
 
     public void GiveFocusToPopup (PopupMenu popup)
