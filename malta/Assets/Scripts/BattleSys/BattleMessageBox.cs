@@ -47,9 +47,7 @@ public enum BattleMessageType
 public class BattleMessageBox : MonoBehaviour
 {
     public BattleOverseer overseer;
-    public Text uiText;
-    public string line0;
-    public string line1;
+    public Text bigMessageBoxText;
     public TextAsset mainStringsResource;
     public TextAsset actionNameStringsResource;
     public Queue<BattleMessageType> messageQueue;
@@ -63,9 +61,12 @@ public class BattleMessageBox : MonoBehaviour
     private bool _processing;
     private const float messageDelay = .33f;
     private bool _clear = true;
+    private static string dividerString = System.Environment.NewLine + "------------------------------------------------------" + System.Environment.NewLine;
+    private const int lineCount = 27;
+    private List<string> messageStrings;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
         mainStrings = mainStringsResource.text.Split('\n');
         actionNameStrings = actionNameStringsResource.text.Split('\n');
@@ -73,7 +74,8 @@ public class BattleMessageBox : MonoBehaviour
         actorQueue = new Queue<Battler>();
         actionQueue = new Queue<BattlerAction>();
         messageQueue = new Queue<BattleMessageType>();
-        uiText.text = "";
+        messageStrings = new List<string>();
+        bigMessageBoxText.text = "";
 	}
 	
 	// Update is called once per frame
@@ -100,163 +102,143 @@ public class BattleMessageBox : MonoBehaviour
         actionQueue.Enqueue(action);
     }
 
-    public void FlushWhenReady ()
-    {
-        Timing.RunCoroutine(_FlushWhenReady());
-    }
-
-    IEnumerator<float> _FlushWhenReady ()
-    {
-        _processing = true;
-        while (messageQueue.Count > 0 || timer < messageDelay) yield return 0f;
-        Flush();
-        timer = 0;
-        _processing = false;
-        _clear = false;
-    }
-
-    private void Flush ()
-    {
-        uiText.text = "";
-        line0 = "";
-        line1 = "";
-    }
-
     private void NextMessage ()
     {
         timer = 0;
         BattleMessageType message = messageQueue.Dequeue();
         Battler actor = actorQueue.Dequeue();
         BattlerAction action = actionQueue.Dequeue();
-        bool drawToLine1 = true;
-        if (line0 == "") drawToLine1 = false;
-        else if (line1 != "") line0 = line1;
         string baseLine;
-        string nextLine = "";
+        string nextMsg = "";
         switch (message)
         {
             case BattleMessageType.StandardTurnMessage:
                 if (actor == null) throw new System.Exception("Can't do standard turn message with null battler!");
                 if (overseer.standardActionPriorityBracket) baseLine = mainStrings[0];
                 else baseLine = mainStrings[1];
-                if (overseer.currentActingBattler.isEnemy) nextLine = actor.adventurer.title + baseLine + actionNameStrings[(int)action];
-                else nextLine = actor.adventurer.fullName + baseLine + actionNameStrings[(int)action];
+                if (overseer.currentActingBattler.isEnemy) nextMsg = actor.adventurer.title + baseLine + actionNameStrings[(int)action];
+                else nextMsg = actor.adventurer.fullName + baseLine + actionNameStrings[(int)action];
                 break;
             case BattleMessageType.Silence:
-                nextLine = mainStrings[3];
+                nextMsg = mainStrings[3];
                 break;
             case BattleMessageType.ShieldWall:
-                nextLine = mainStrings[4];
+                nextMsg = mainStrings[4];
                 break;
             case BattleMessageType.ShieldBlock:
-                nextLine = mainStrings[5];
+                nextMsg = mainStrings[5];
                 break;
             case BattleMessageType.Heal:
-                nextLine = mainStrings[6];
+                nextMsg = mainStrings[6];
                 break;
             case BattleMessageType.Haste:
-                nextLine = mainStrings[7];
+                nextMsg = mainStrings[7];
                 break;
             case BattleMessageType.Barrier:
-                nextLine = mainStrings[8];
+                nextMsg = mainStrings[8];
                 break;
             case BattleMessageType.MultiHeal:
-                nextLine = mainStrings[9];
+                nextMsg = mainStrings[9];
                 break;
             case BattleMessageType.Encore:
-                nextLine = mainStrings[10];
+                nextMsg = mainStrings[10];
                 break;
             case BattleMessageType.Feedback:
-                nextLine = mainStrings[11];
+                nextMsg = mainStrings[11];
                 break;
             case BattleMessageType.Revenge:
-                nextLine = mainStrings[12];
+                nextMsg = mainStrings[12];
                 break;
             case BattleMessageType.Critical:
-                nextLine = mainStrings[13];
+                nextMsg = mainStrings[13];
                 break;
             case BattleMessageType.SavedAlly:
-                nextLine = mainStrings[14];
+                nextMsg = mainStrings[14];
                 break;
             case BattleMessageType.Flanking:
-                nextLine = mainStrings[15];
+                nextMsg = mainStrings[15];
                 break;
             case BattleMessageType.SomebodyDead:
                 Battler bat = corpseQueue.Dequeue();
-                if (bat.isEnemy) nextLine = bat.adventurer.title + mainStrings[2];
-                else nextLine = bat.adventurer.fullName + mainStrings[2];
+                if (bat.isEnemy) nextMsg = bat.adventurer.title + mainStrings[2];
+                else nextMsg = bat.adventurer.fullName + mainStrings[2];
                 break;
             case BattleMessageType.Win:
-                nextLine = mainStrings[16];
+                nextMsg = mainStrings[16];
                 break;
             case BattleMessageType.Loss:
-                nextLine = mainStrings[17];
+                nextMsg = mainStrings[17];
                 break;
             case BattleMessageType.Retreat:
-                nextLine = mainStrings[18];
+                nextMsg = mainStrings[18];
                 break;
             case BattleMessageType.FailedCast:
-                if (overseer.currentActingBattler.isEnemy) nextLine = actor.adventurer.title + mainStrings[19];
-                else nextLine = actor.adventurer.fullName + mainStrings[19];
+                if (overseer.currentActingBattler.isEnemy) nextMsg = actor.adventurer.title + mainStrings[19];
+                else nextMsg = actor.adventurer.fullName + mainStrings[19];
                 break;
             case BattleMessageType.PulledOutOfBattle:
-                nextLine = actor.adventurer.fullName + mainStrings[20];
+                nextMsg = actor.adventurer.fullName + mainStrings[20];
                 break;
             case BattleMessageType.ReenteredBattle:
-                nextLine = actor.adventurer.fullName + mainStrings[21];
+                nextMsg = actor.adventurer.fullName + mainStrings[21];
                 break;
             case BattleMessageType.StunBuff:
-                nextLine = mainStrings[22];
+                nextMsg = mainStrings[22];
                 break;
             case BattleMessageType.StunBuffFaded:
-                nextLine = mainStrings[23];
+                nextMsg = mainStrings[23];
                 break;
             case BattleMessageType.Stun:
-                nextLine = mainStrings[24];
+                nextMsg = mainStrings[24];
                 break;
             case BattleMessageType.PumpedUp:
-                nextLine = mainStrings[25];
+                nextMsg = mainStrings[25];
                 break;
             case BattleMessageType.MovesBetweenLines:
-                nextLine = mainStrings[26];
+                nextMsg = mainStrings[26];
                 break;
             case BattleMessageType.SwiftlyMovesBetweenLines:
-                nextLine = mainStrings[27];
+                nextMsg = mainStrings[27];
                 break;
             case BattleMessageType.AttunedBuff:
-                nextLine = mainStrings[28];
+                nextMsg = mainStrings[28];
                 break;
             case BattleMessageType.AttunedBuffFaded:
-                nextLine = mainStrings[29];
+                nextMsg = mainStrings[29];
                 break;
             case BattleMessageType.Dodged:
-                nextLine = mainStrings[30];
+                nextMsg = mainStrings[30];
                 break;
             case BattleMessageType.DrainKill:
-                nextLine = mainStrings[31];
+                nextMsg = mainStrings[31];
                 break;
             case BattleMessageType.FailedToDrain:
-                nextLine = mainStrings[32];
+                nextMsg = mainStrings[32];
                 break;
             case BattleMessageType.MagBoost:
-                nextLine = mainStrings[33];
+                nextMsg = mainStrings[33];
                 break;
             case BattleMessageType.StatBoostsLost:
-                nextLine = mainStrings[34];
+                nextMsg = mainStrings[34];
                 break;
             case BattleMessageType.SacrificeLost:
-                nextLine = mainStrings[35];
+                nextMsg = mainStrings[35];
                 break;
             case BattleMessageType.Sacrifice:
-                nextLine = mainStrings[36];
+                nextMsg = mainStrings[36];
                 break;
             case BattleMessageType.StunnedNoMove:
-                if (overseer.currentActingBattler.isEnemy) nextLine = actor.adventurer.title + mainStrings[37];
-                else nextLine = actor.adventurer.fullName + mainStrings[37];
+                if (overseer.currentActingBattler.isEnemy) nextMsg = actor.adventurer.title + mainStrings[37];
+                else nextMsg = actor.adventurer.fullName + mainStrings[37];
                 break;
         }
-        if (drawToLine1) line1 = nextLine;
-        else line0 = nextLine;
-        uiText.text = line0 + System.Environment.NewLine + line1;
+        string[] nextLineSplit = Util.GetLinesFrom(nextMsg);
+        messageStrings.Insert(0, dividerString);
+        for (int i = nextLineSplit.Length - 1; i > -1; i--) messageStrings.Insert(0, nextLineSplit[i]);
+        for (int i = messageStrings.Count - 1; i >= lineCount; i--) messageStrings.RemoveAt(i);
+        //messageStrings.Insert(0, nextMsg);
+        // i need indexable lifo...
+        // actually split these by lines!!!
+        bigMessageBoxText.text = string.Concat(messageStrings.ToArray());
     }
 }

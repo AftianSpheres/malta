@@ -40,7 +40,7 @@ public class BattleTheater : MonoBehaviour
     public void StartOfTurn ()
     {
         RefreshTurnInfoPanel();
-        messageBox.FlushWhenReady();
+        //messageBox.FlushWhenReady();
     }
 
     public void ProcessAction ()

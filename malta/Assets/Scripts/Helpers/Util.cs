@@ -14,6 +14,11 @@ public static class Util
         return a.text.Split(new string[] { "\r\n", "\n" }, System.StringSplitOptions.None);
     }
 
+    public static string[] GetLinesFrom (string s)
+    {
+        return s.Split(new string[] { "\r\n", "\n" }, System.StringSplitOptions.None);
+    }
+
     public static bool isVowel (char c)
     {
         bool r = false;
