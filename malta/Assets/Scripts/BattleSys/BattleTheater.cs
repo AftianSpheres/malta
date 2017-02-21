@@ -40,7 +40,6 @@ public class BattleTheater : MonoBehaviour
     public void StartOfTurn ()
     {
         RefreshTurnInfoPanel();
-        //messageBox.FlushWhenReady();
     }
 
     public void ProcessAction ()
@@ -54,6 +53,7 @@ public class BattleTheater : MonoBehaviour
         else battleBG.sprite = battleBG_bgs[AdventureSubstageLoader.randomAdventureBaseLevel];
         source.clip = overseer.adventure[overseer.battleNo].battleBGM;
         source.Play();
+        messageBox.Flush();
     }
 
     IEnumerator<float> _PlayAnim (BattlerActionAnim anim)

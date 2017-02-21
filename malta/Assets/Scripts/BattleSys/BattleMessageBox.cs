@@ -63,7 +63,10 @@ public class BattleMessageBox : MonoBehaviour
     private bool _clear = true;
     private static string dividerString = System.Environment.NewLine + "------------------------------------------------------" + System.Environment.NewLine;
     private const int lineCount = 27;
+    private const int lineLen = 28;
     private List<string> messageStrings;
+    private List<string> messageSubstrings;
+
 
     // Use this for initialization
     void Start ()
@@ -75,6 +78,7 @@ public class BattleMessageBox : MonoBehaviour
         actionQueue = new Queue<BattlerAction>();
         messageQueue = new Queue<BattleMessageType>();
         messageStrings = new List<string>();
+        messageSubstrings = new List<string>();
         bigMessageBoxText.text = "";
 	}
 	
@@ -100,6 +104,18 @@ public class BattleMessageBox : MonoBehaviour
         messageQueue.Enqueue(message);
         actorQueue.Enqueue(actor);
         actionQueue.Enqueue(action);
+    }
+
+    public void Flush ()
+    {
+        messageStrings.Clear();
+        messageQueue.Clear();
+        messageSubstrings.Clear();
+        messageQueue.Clear();
+        corpseQueue.Clear();
+        actionQueue.Clear();
+        actorQueue.Clear();
+        bigMessageBoxText.text = string.Empty;
     }
 
     private void NextMessage ()
@@ -233,8 +249,14 @@ public class BattleMessageBox : MonoBehaviour
                 break;
         }
         string[] nextLineSplit = Util.GetLinesFrom(nextMsg);
+        messageSubstrings.Clear();
+        for (int i = 0; i < nextLineSplit.Length; i++)
+        {
+            if (nextLineSplit[i].Length > lineLen) messageSubstrings.AddRange(Util.SplitIntoSubstringsOfLength(nextLineSplit[i], lineLen));
+            else messageSubstrings.Add(nextLineSplit[i]);
+        }
         messageStrings.Insert(0, dividerString);
-        for (int i = nextLineSplit.Length - 1; i > -1; i--) messageStrings.Insert(0, nextLineSplit[i]);
+        for (int i = messageSubstrings.Count- 1; i > -1; i--) messageStrings.Insert(0, messageSubstrings[i]);
         for (int i = messageStrings.Count - 1; i >= lineCount; i--) messageStrings.RemoveAt(i);
         //messageStrings.Insert(0, nextMsg);
         // i need indexable lifo...
